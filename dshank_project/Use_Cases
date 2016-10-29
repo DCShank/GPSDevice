@@ -1,0 +1,46 @@
+Panning to a different section of the map.
+	1. User clicks and drags the map display.
+	2. The display moves, following the movement of the drag.
+	3. User releases the click.
+	
+Zooming into a smaller section of the map.
+	1. The user moves the cursor to where they want to zoom in and scrolls the mousewheel up.
+	2. The display zooms in towards the cursor, maintaining the latitutude and longitude of
+		the cursor relative to it's position on the display.
+
+Zooming out to a larger section of the map.
+	1. The user moves the cursor to where they want to zoom away from on the map and scrolls the mousewheel back.
+	2. The display zooms out, away from the cursor, but maintaining the latitude and longitude
+		at the position of the cursor relative to its position on the display.
+		
+Selecting a starting location
+	1. The user clicks the button for choose a starting location.
+	2. The user then clicks on the map where they would like their starting location to be.
+	3. The map display hightlights their selected location.
+	
+	Variation 1: There are no locations to start from near where the user clicked.
+	1. The map display doesn't update anything.
+	2. The user may click again until they click near a location.
+	3. The user may click the cancel button to stop choosing a starting location.
+
+Selecting an ending location.
+	1. The user clicks the button for choose an ending location.
+	Otherwise the same as Selecting a starting location.
+	
+Getting directions from start to finish
+	1. The user selects a starting location as previously indicated.
+	2. The user selects an ending location as previously indicated.
+	3. The user presses the directions button.
+	3. The map display highlights a route from the start location to the end location.
+	
+Activationg GPS directions mode
+	1. The user selects an ending location as previously described.
+	2. The user presses the GPS directions button.
+	3. The map display highlights a route from the current GPS coordinates to the destination.
+	
+User goes off course while in GPS directions mode.
+	1. The program tells the user they have gone off course.
+	2. If the user continues to go off course, recalculate the directions.
+	
+Deactivating GPS directions mode
+	1. The user clicks the deactivate GPS button.
