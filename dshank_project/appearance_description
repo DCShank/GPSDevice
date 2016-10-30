@@ -1,0 +1,15 @@
+The application will have three main panels. A panel on the left, with buttons for
+selecting options, a panel in the middle that displays the map, and a pael on the
+right that has a textual description of any directions given.
+
+The left panel should include buttons for:
+	1. Choosing a starting location
+	2. Choosing a destination
+	3. Activating GPS directions, from "here" to the destination
+	4. Getting directions from start to destination
+	
+The center panel should display the map, including all roads and geographical
+structures. It should highlight the currently selected route if there is one.
+
+THe right panel displays rows of text corresponding to directions on the current
+route. It also displays the distance for a particular section of the route.

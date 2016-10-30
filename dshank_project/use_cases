@@ -37,6 +37,8 @@ Activationg GPS directions mode
 	1. The user selects an ending location as previously described.
 	2. The user presses the GPS directions button.
 	3. The map display highlights a route from the current GPS coordinates to the destination.
+	4. A panel to the right will display the directions in textual form, with distances for
+		each segment.
 	
 User goes off course while in GPS directions mode.
 	1. The program tells the user they have gone off course.
