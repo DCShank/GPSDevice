@@ -23,5 +23,15 @@ public class Relation {
 	public Relation(String idString, List<Object> elements) {
 		
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		return (Boolean) null;
+	}
+	
+	@Override
+	public int hashCode() {
+		return (Integer) null;
+	}
 
 }

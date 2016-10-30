@@ -2,6 +2,8 @@ package dshank_project;
 
 import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.JPanel;
 
@@ -21,6 +23,8 @@ public class MapPanel extends JPanel {
 	private MouseAdapter mouse;
 	/** Strategy for converting to pixels from lat/lon and to lat/lon from pixels. */
 	private ScaleStrategy scale;
+	
+	private HashSet<Way> highlightedWays;
 	
 	/**
 	 * Constructor for this object that takes a map to be displayed as the parameter
@@ -48,6 +52,10 @@ public class MapPanel extends JPanel {
 		
 	}
 	
+	public void setHighlightedWays(Set<Way> highlightedWays) {
+		
+	}
+	
 	/**
 	 * Draws the map.
 	 */
@@ -61,6 +69,14 @@ public class MapPanel extends JPanel {
 	 * @param way The way to be drawn.
 	 */
 	public void drawWay(Way way) {
+		
+	}
+	
+	/**
+	 * Highlights a given way.
+	 * @param way The Way to be highlighted.
+	 */
+	public void highlightWay(Way way) {
 		
 	}
 	

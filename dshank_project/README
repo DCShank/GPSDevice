@@ -1,0 +1,15 @@
+Author: David Shank
+
+This submission contains the necessary parts of Hand-In 2, including:
+
+	1. A description of how the window should appear. File named appearance_description
+	2. A set of use cases. File named use_cases
+	3. A UML Class diagram containing the relationship between all the primary classes.
+	4. UML Sequence diagrams for display, location tracking, panning, zooming, and
+		parsing.
+	(All UML diagrams are in che uml_files folder)
+	
+	5. All the classes involved in parsing and displaying the map data.
+	
+	
+project_demo_classes contains the classes for the demo submitted in Hand-In 1.
