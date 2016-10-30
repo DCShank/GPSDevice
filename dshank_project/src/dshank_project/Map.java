@@ -48,5 +48,16 @@ public class Map {
 	public Iterator<Way> getWayIt() {
 		return null;
 	}
+	
+	/**
+	 * Returns whether or not the specified position is "near to" a way.
+	 * what near to means will be decided later I suppose.
+	 * @param lat The lat position to check against.
+	 * @param lon The lon position to check against.
+	 * @return True if the position is near to a way, false otherwise.
+	 */
+	public boolean nearWay(double lat, double lon) {
+		return (Boolean) null;
+	}
 
 }
