@@ -4,6 +4,8 @@ import java.io.File;
 
 import javax.swing.JFrame;
 
+import map_data.Map;
+
 public class Application extends JFrame {
 	
 	private Map map;

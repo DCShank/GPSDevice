@@ -7,6 +7,9 @@ import java.util.Set;
 
 import javax.swing.JPanel;
 
+import map_data.Map;
+import map_data.Way;
+
 /**
  * Class that displays map data to a swing panel.
  * @author david

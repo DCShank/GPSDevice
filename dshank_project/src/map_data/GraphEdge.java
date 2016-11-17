@@ -1,4 +1,4 @@
-package dshank_project;
+package map_data;
 
 /**
  * Represents an Edge on a graph with a length, Nodes, and adjacent edges to each Node.

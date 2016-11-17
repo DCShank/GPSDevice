@@ -1,4 +1,4 @@
-package dshank_project;
+package map_data;
 
 public class HaversineDistance implements DistanceStrategy {
 	// This value is in meters.

@@ -1,4 +1,4 @@
-package dshank_project;
+package map_data;
 
 /**
  * A strategy for finding distance between two points.

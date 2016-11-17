@@ -1,4 +1,4 @@
-package dshank_project;
+package map_data;
 
 import java.util.ArrayList;
 import java.util.List;
