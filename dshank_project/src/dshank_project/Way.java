@@ -30,7 +30,9 @@ public class Way {
 	 * @param wayName The Ways name if it has one
 	 */
 	public Way(String idString, List<Node> nodeList, String wayName) {
-		
+		name = wayName;
+		id = idString;
+		nodes = new ArrayList<Node>(nodeList);
 	}
 	
 	/**
@@ -39,7 +41,9 @@ public class Way {
 	 * @param nodeList The list of nodes for the Way
 	 */
 	public Way(String idString, List<Node> nodeList) {
-		
+		name = "";
+		id = idString;
+		nodes = new ArrayList<Node>(nodeList);
 	}
 	
 	/**
@@ -47,7 +51,7 @@ public class Way {
 	 * @return An Iterator<Node> of the Nodes in the Way.
 	 */
 	public Iterator<Node> getNodeIt() {
-		return null;
+		return nodes.iterator();
 	}
 	
 	/**
@@ -55,7 +59,7 @@ public class Way {
 	 * @return String id
 	 */
 	public String getID() {
-		return null;
+		return id;
 	}
 	
 	/**
@@ -65,17 +69,29 @@ public class Way {
 	 * @return The name for named ways, empty string otherwise
 	 */
 	public String getName() {
-		return null;
+		return name;
+	}
+	
+	/**
+	 * Returns whether or not the way is a road.
+	 * @return True if the way is a road, false otherwise.
+	 */
+	public boolean isRoad() {
+		return !roadType.isEmpty();
 	}
 	
 	@Override
 	public boolean equals(Object other) {
-		return (Boolean) null;
+		if(other == null) { return false; }
+		if(other == this) { return true;  }
+		if(other.getClass() != this.getClass()) { return false; }
+		Way o = (Way) other;
+		return o.getID().equals(this.getID());
 	}
 	
 	@Override
 	public int hashCode() {
-		return (Integer) null;
+		return id.hashCode();
 	}
 
 }

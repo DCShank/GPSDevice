@@ -20,6 +20,9 @@ public class Node {
 	 * @param idString The string representing the nodes id
 	 */
 	public Node(double latitude, double longitude, String idString) {
+		lat = latitude;
+		lon = longitude;
+		id = idString;
 	}
 	
 	/**
@@ -27,7 +30,7 @@ public class Node {
 	 * @return latitude
 	 */
 	public double getLat() {
-		return (Double) null;
+		return lat;
 	}
 	
 	/**
@@ -35,7 +38,7 @@ public class Node {
 	 * @return longitude
 	 */
 	public double getLon() {
-		return (Double) null;
+		return lon;
 	}
 	
 	/**
@@ -43,17 +46,21 @@ public class Node {
 	 * @return string id
 	 */
 	public String getID() {
-		return null;
+		return id;
 	}
 	
 	@Override
 	public boolean equals(Object other) {
-		return (Boolean) null;
+		if(other == null) { return false; }
+		if(other == this) { return true;  }
+		if(other.getClass() != this.getClass()) { return false; }
+		Node o = (Node) other;
+		return o.getID().equals(this.getID());
 	}
 	
 	@Override
 	public int hashCode() {
-		return (Integer) null;
+		return id.hashCode();
 	}
 
 }
