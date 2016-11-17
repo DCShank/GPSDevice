@@ -1,5 +1,8 @@
 package dshank_project;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Represents a node in an OSM map.
  * 
@@ -11,6 +14,7 @@ public class Node {
 	private double lat;
 	private double lon;
 	private String id;
+	private Set<GraphEdge> edges;
 	
 	/**
 	 * Constructs a node with the given position and id.
@@ -23,6 +27,7 @@ public class Node {
 		lat = latitude;
 		lon = longitude;
 		id = idString;
+		edges = new HashSet<GraphEdge>();
 	}
 	
 	/**
