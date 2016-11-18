@@ -117,14 +117,13 @@ public class OSMParser {
 		 */
 		public void startElement(String namespaceURI, String localName, String qName, Attributes atts) {
 			if(qName.equals("node")) {storeNode(atts);}
-			if(qName.equals("way")) {
+			else if(qName.equals("way")) {
 				storeWayID(atts);
 				tempNodes = new ArrayList<Node>();
 			}
-			if(qName.equals("nd")) {storeWayNode(atts); }
-			if(qName.equals("tag") && !id.isEmpty()) {
-				parseWayTag(atts);
-			}
+			else if(qName.equals("nd")) {storeWayNode(atts); }
+			else if(qName.equals("tag") && !id.isEmpty()) { parseWayTag(atts); }
+			else if(qName.equals("bounds")) { storeBounds(atts); }
 		}
 
 		/**
@@ -138,10 +137,14 @@ public class OSMParser {
 			if(qName.equals("way")) {
 				Way way = new Way(id, tempNodes, name);
 				ways.put(id, way);
-				if (way.) {
+				// Put the ways into specific maps depending on their properties.
+				if(way.isNamed()) {
 					namedWays.put(name, way);
 				}
-				
+				if(way.isRoad()) {
+					roadWays.put(id, way);
+				}
+				// Reset the values for future elements.
 				id = "";
 				name = "";
 				roadType = "";
@@ -149,8 +152,26 @@ public class OSMParser {
 		}
 		
 		/**
+		 * Gets the bounds of a map file and stores them to instance vars.
+		 * @param atts
+		 */
+		private void storeBounds(Attributes atts) {
+			for (int i = 0; i < atts.getLength(); i++) {
+				String qName = atts.getQName(i);
+				String value = atts.getValue(i);
+				if (qName.equals("minlat"))
+					minLat = Double.parseDouble(value);
+				if (qName.equals("minLon"))
+					minLon = Double.parseDouble(value);
+				if (qName.equals("maxLat"))
+					maxLat = Double.parseDouble(value);
+				if (qName.equals("maxLon"))
+					maxLon = Double.parseDouble(value);
+			}
+		}
+		
+		/**
 		 * Given that an element is a node, adds it to the nodes hashMap
-		 * 
 		 * @param atts
 		 */
 		private void storeNode(Attributes atts) {
@@ -172,7 +193,6 @@ public class OSMParser {
 		}
 		/**
 		 * Iterates over the atts and stores the id to an instance variable
-		 * 
 		 * @param atts
 		 */
 		private void storeWayID(Attributes atts) {
@@ -186,8 +206,7 @@ public class OSMParser {
 		}
 
 		/**
-		 * Adds the node to a list of nodes.
-		 * 
+		 * Adds the node to a temporary list of nodes for the current way.
 		 * @param atts
 		 */
 		private void storeWayNode(Attributes atts) {
