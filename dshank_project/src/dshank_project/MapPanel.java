@@ -25,7 +25,10 @@ public class MapPanel extends JPanel {
 	/** MouseAdapter that handles all mouse events */
 	private MouseAdapter mouse;
 	/** Strategy for converting to pixels from lat/lon and to lat/lon from pixels. */
-	private ScaleStrategy scale;
+	private final ScaleStrategy scale = new MapScale();
+	
+	public static final int DEFUALT_WIDTH = 800;
+	public static final int DEFAULT_HEIGHT = 600;
 	
 	private HashSet<Way> highlightedWays;
 	
@@ -34,6 +37,8 @@ public class MapPanel extends JPanel {
 	 * @param map The map to be displayed
 	 */
 	public MapPanel(Map map) {
+		this.map = map;
+		scale.initZoom(map.getLatMin(), map.getLatMax(), DEFAULT_HEIGHT);
 		
 	}
 	

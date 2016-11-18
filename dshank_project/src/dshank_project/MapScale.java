@@ -8,6 +8,9 @@ package dshank_project;
  */
 public class MapScale implements ScaleStrategy{
 	
+	private static final double DEFAULT_ZOOM = 4000;
+	private static final double DEFAULT_ZOOM_CHANGE = 0.15;
+	
 	/** The amount to multiply zoom by when zooming in or out */
 	private double zoomChangeFactor;
 	/** The multiplier for longitude and latitude */
@@ -21,6 +24,15 @@ public class MapScale implements ScaleStrategy{
 	public MapScale(double zoom, double zoomChangeFactor) {
 		this.zoom = zoom;
 		this.zoomChangeFactor = zoomChangeFactor;
+	}	
+	
+	/**
+	 * Alternative constructor with a default value for zoom.
+	 * @param zoomChangeFactor Multiplier applied to zoom when changing zoom.
+	 */
+	public MapScale() {
+		this.zoom = DEFAULT_ZOOM;
+		this.zoomChangeFactor = DEFAULT_ZOOM_CHANGE;
 	}
 	
 	/**
@@ -83,6 +95,17 @@ public class MapScale implements ScaleStrategy{
 	@Override
 	public void setZoom(double newZoom) {
 		zoom = newZoom;
+	}
+	
+	/**
+	 * initializes the zoom so that the entire vertical portion of the map is visible.
+	 * @param latMin The minimum latitude
+	 * @param latMax The maximum latitude
+	 * @param height The height of the window to be initialized for
+	 */
+	public void initZoom(double latMin, double latMax, int height) {
+		double dl = Math.abs(latMax-latMin);
+		zoom = ((double)height)/-1.0/dl;
 	}
 
 }

@@ -44,5 +44,13 @@ public interface ScaleStrategy {
 	  * @param newZoom The value of the new zoom.
 	  */
 	void setZoom(double newZoom);
+	
+	/**
+	 * initializes the zoom so that the entire vertical portion of the map is visible.
+	 * @param latMin The minimum latitude
+	 * @param latMax The maximum latitude
+	 * @param height The height of the window to be initialized for
+	 */
+	public void initZoom(double latMin, double latMax, int height);
 
 }
