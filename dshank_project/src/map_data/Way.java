@@ -29,10 +29,11 @@ public class Way {
 	 * @param nodeList The list of nodes for the Way
 	 * @param wayName The Ways name if it has one
 	 */
-	public Way(String idString, List<Node> nodeList, String wayName) {
+	public Way(String idString, String wayName, String wayType, List<Node> nodeList) {
 		name = wayName;
 		id = idString;
 		nodes = new ArrayList<Node>(nodeList);
+		roadType = wayType;
 	}
 	
 	/**

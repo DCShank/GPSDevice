@@ -9,7 +9,7 @@ package dshank_project;
 public class MapScale implements ScaleStrategy{
 	
 	private static final double DEFAULT_ZOOM = 4000;
-	private static final double DEFAULT_ZOOM_CHANGE = 0.15;
+	private static final double DEFAULT_ZOOM_CHANGE = 0.055;
 	
 	/** The amount to multiply zoom by when zooming in or out */
 	private double zoomChangeFactor;
@@ -44,11 +44,13 @@ public class MapScale implements ScaleStrategy{
 	public int latToPixels(double lat) {
 		// The negative one flips the sign so that it's top to bottom
 		// instead of bottom to top.
-		return (int) (lat * -1.0 * zoom);
+		return (int) (lat * zoom * -1);
 	}
 	
 	/**
 	 * Returns the number of pixels east of the prime meridian for some point.
+	 * Honestly at this point I don't know what should be multiplied by negative 1.
+	 * At first I was sure that Latitude should be reversed bu that was wrong.
 	 * @param lat The latitude of the point to be converted.
 	 * @param lon The longitude of the point to be converted.
 	 * @return The number of pixels east of the prime meridian.
@@ -65,7 +67,7 @@ public class MapScale implements ScaleStrategy{
 	 */
 	@Override
 	public double pixelsToLat(int pixels) {
-		return (double) (((double)pixels) / zoom * -1.0);
+		return (double) (((double)pixels) / zoom * -1);
 	}
 	
 	/**
@@ -75,7 +77,7 @@ public class MapScale implements ScaleStrategy{
 	 */
 	@Override
 	public double pixelsToLon(int lonPix, int latPix) {
-		return (double) (((double)latPix) / zoom / Math.cos(Math.toRadians(pixelsToLat(latPix))));
+		return (double) (((double)lonPix) / zoom / Math.cos(Math.toRadians(pixelsToLat(latPix))));
 	}
 	
 	/**
@@ -85,7 +87,10 @@ public class MapScale implements ScaleStrategy{
 	 */
 	@Override
 	public void zoom(int direction) {
-		zoom = zoom * zoomChangeFactor * direction;
+		System.out.println("attempting to zoom");
+		if((zoom < 750000 || direction < 0) && (zoom > 100 || direction > 0)) {
+			zoom = zoom + zoom * zoomChangeFactor * direction;
+		}
 	}
 	
 	/**
@@ -105,7 +110,7 @@ public class MapScale implements ScaleStrategy{
 	 */
 	public void initZoom(double latMin, double latMax, int height) {
 		double dl = Math.abs(latMax-latMin);
-		zoom = ((double)height)/-1.0/dl;
+		zoom = ((double)height)/dl;
 	}
 
 }

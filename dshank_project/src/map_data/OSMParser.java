@@ -105,11 +105,11 @@ public class OSMParser {
 		/** Stores the nodes for a way as it's being parsed. */
 		private ArrayList<Node> tempNodes;
 		/** Stores the ID of an element as it's being parsed. */
-		private String id;
+		private String id = "";
 		/** Stores the name of an element as it's being parsed. */
-		private String name;
+		private String name = "";
 		/** Stores the type of road of a way as it's being parsed. */
-		private String roadType;
+		private String roadType = "";
 
 		/**
 		 * Method called by SAX parser when start of document is encountered.
@@ -147,7 +147,7 @@ public class OSMParser {
 		 */
 		public void endElement(String namespaceURI, String localName, String qName) throws SAXParseException {
 			if(qName.equals("way")) {
-				Way way = new Way(id, tempNodes, name);
+				Way way = new Way(id, name, roadType, tempNodes);
 				ways.put(id, way);
 				// Put the ways into specific maps depending on their properties.
 				if(way.isNamed()) {
@@ -173,11 +173,11 @@ public class OSMParser {
 				String value = atts.getValue(i);
 				if (qName.equals("minlat"))
 					minLat = Double.parseDouble(value);
-				if (qName.equals("minLon"))
+				if (qName.equals("minlon"))
 					minLon = Double.parseDouble(value);
-				if (qName.equals("maxLat"))
+				if (qName.equals("maxlat"))
 					maxLat = Double.parseDouble(value);
-				if (qName.equals("maxLon"))
+				if (qName.equals("maxlon"))
 					maxLon = Double.parseDouble(value);
 			}
 		}
@@ -200,7 +200,7 @@ public class OSMParser {
 				if (qName.equals("lon"))
 					lon = Double.parseDouble(value);
 			}
-			Node node = new Node(lat, lon, id);
+			Node node = new Node(lon, lat, id);
 			nodes.put(node.getID(), node);
 		}
 		

@@ -2,9 +2,12 @@ package dshank_project;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -32,7 +35,7 @@ public class MapPanel extends JPanel {
 	/** Strategy for converting to pixels from lat/lon and to lat/lon from pixels. */
 	private final ScaleStrategy scale = new MapScale();
 	
-	public static final int DEFUALT_WIDTH = 800;
+	public static final int DEFAULT_WIDTH = 800;
 	public static final int DEFAULT_HEIGHT = 600;
 	
 	private HashSet<Way> highlightedWays;
@@ -46,7 +49,51 @@ public class MapPanel extends JPanel {
 		scale.initZoom(map.getLatMin(), map.getLatMax(), DEFAULT_HEIGHT);
 		cenLat = (map.getLatMax()+map.getLatMin())/2.0;
 		cenLon = (map.getLonMax()+map.getLonMin())/2.0;
-		
+		this.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+		initMouse();
+		this.addMouseListener(mouse);
+		this.addMouseWheelListener(mouse);
+		this.addMouseMotionListener(mouse);
+	}	
+	
+	/**
+	 * 
+	 */
+	private void initMouse() {
+		mouse = new MouseAdapter() {
+			/** used for panning. */
+			private int x;
+			private int y;
+			
+			/**
+			 * Sets initial points for the pan operation.
+			 */
+			@Override
+			public void mousePressed(MouseEvent e) {
+				x = e.getX();
+				y = e.getY();
+			}
+			
+			/**
+			 * Pans the map when it is dragged with a mouse.
+			 */
+			@Override
+			public void mouseDragged(MouseEvent e) {
+				pan(scale.pixelsToLon(x-e.getX(),
+						scale.latToPixels(cenLat)-getHeight()/2), scale.pixelsToLat(y-e.getY()));
+				y = e.getY();
+				x = e.getX();
+				repaint();
+			}
+			/**
+			 * Zooms in the map when the mouse wheel is applied.
+			 */
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				scale.zoom(-e.getWheelRotation());
+				repaint();
+			}
+		};
 	}
 	
 	/**
@@ -55,7 +102,8 @@ public class MapPanel extends JPanel {
 	 * @param lon Amount to move by in the lon direction
 	 */
 	public void pan(double lon, double lat) {
-		
+		cenLon += lon;
+		cenLat += lat;
 	}
 	
 	/**
@@ -114,22 +162,25 @@ public class MapPanel extends JPanel {
 	public void highlightWay(Way way, Graphics g) {
 		Color currentColor = g.getColor();
 		Graphics2D g2 = (Graphics2D) g;
-		g2.setStroke(new BasicStroke(2));
 		g.setColor(Color.BLUE);
 		drawWay(way, g);
-		g2.setStroke(new BasicStroke(1));
 		g.setColor(currentColor);
 	}
 	
+	/**
+	 * Highlights all ways for a given iterator.
+	 * I implemented this becauaes it seemed like a waste to constantly
+	 * get and reset the color and stroke for a larg set.
+	 * @param it
+	 * @param g
+	 */
 	public void highlightWays(Iterator<Way> it, Graphics g) {
 		Color currentColor = g.getColor();
 		Graphics2D g2 = (Graphics2D) g;
-		g2.setStroke(new BasicStroke(2));
 		g.setColor(Color.BLUE);
 		while(it.hasNext()) {
 			drawWay(it.next(), g);
 		}
-		g2.setStroke(new BasicStroke(1));
 		g.setColor(currentColor);
 	}
 	
