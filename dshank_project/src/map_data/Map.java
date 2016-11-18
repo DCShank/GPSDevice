@@ -90,14 +90,19 @@ public class Map {
 		return lonMax;
 	}
 	
-	/**
-	 * Returns whether or not the specified position is "near to" a way.
-	 * what near to means will be decided later I suppose.
-	 * @param lat The lat position to check against.
-	 * @param lon The lon position to check against.
-	 * @return True if the position is near to a way, false otherwise.
-	 */
-	public boolean nearWay(double lat, double lon) {
-		return (Boolean) null;
+	public Node getNearNode(double lon, double lat) {
+		DistanceStrategy strat = new HaversineDistance();
+		Iterator<Node> it = nodes.values().iterator();
+		Node rtrnNode = it.next();
+		double dist = strat.getDistance(lon, lat, rtrnNode.getLon(), rtrnNode.getLat());
+		while(it.hasNext()) {
+			Node n = it.next();
+			double testDist = strat.getDistance(lon, lat, n.getLon(), n.getLat());
+			if(testDist < dist) {
+				rtrnNode = n;
+				dist = testDist;
+			}
+		}
+		return rtrnNode;
 	}
 }

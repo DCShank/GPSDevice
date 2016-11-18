@@ -30,6 +30,11 @@ public class MapPanel extends JPanel {
 	private double cenLat;
 	/** the longitude displayed in the center of the display */
 	private double cenLon;
+	
+	/** The number of pixels to the center latitdue of the display, from the equator. */
+	private int cenLatPix;
+	/** The number of pixels to the center longitude of the display, from the prime meridian. */
+	private int cenLonPix;
 	/** MouseAdapter that handles all mouse events */
 	private MouseAdapter mouse;
 	/** Strategy for converting to pixels from lat/lon and to lat/lon from pixels. */
@@ -37,6 +42,8 @@ public class MapPanel extends JPanel {
 	
 	public static final int DEFAULT_WIDTH = 800;
 	public static final int DEFAULT_HEIGHT = 600;
+	
+	private Node selectedNode = null;
 	
 	private HashSet<Way> highlightedWays;
 	
@@ -48,7 +55,9 @@ public class MapPanel extends JPanel {
 		this.map = map;
 		scale.initZoom(map.getLatMin(), map.getLatMax(), DEFAULT_HEIGHT);
 		cenLat = (map.getLatMax()+map.getLatMin())/2.0;
+		cenLatPix = scale.latToPixels(cenLat);
 		cenLon = (map.getLonMax()+map.getLonMin())/2.0;
+		cenLonPix = scale.lonToPixels(cenLon, cenLat);
 		this.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 		initMouse();
 		this.addMouseListener(mouse);
@@ -79,8 +88,7 @@ public class MapPanel extends JPanel {
 			 */
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				pan(scale.pixelsToLon(x-e.getX(),
-						scale.latToPixels(cenLat)-getHeight()/2), scale.pixelsToLat(y-e.getY()));
+				pan(scale.pixelsToLon(x-e.getX(),screenToLat(y)), scale.pixelsToLat(y-e.getY()));
 				y = e.getY();
 				x = e.getX();
 				repaint();
@@ -91,6 +99,20 @@ public class MapPanel extends JPanel {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				scale.zoom(-e.getWheelRotation());
+				cenLatPix = scale.latToPixels(cenLat);
+				cenLonPix = scale.lonToPixels(cenLon, cenLat);
+				repaint();
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				double lat = screenToLat(e.getY());
+				double lon = screenToLon(e.getX(), e.getY());
+				System.out.println(lat);
+				System.out.println(lon);
+				Node n = map.getNearNode(lon, lat);
+				selectedNode = n;
+				System.out.println(selectedNode.getID());
 				repaint();
 			}
 		};
@@ -104,6 +126,8 @@ public class MapPanel extends JPanel {
 	public void pan(double lon, double lat) {
 		cenLon += lon;
 		cenLat += lat;
+		cenLatPix = scale.latToPixels(lat);
+		cenLonPix = scale.lonToPixels(cenLon, cenLat);
 	}
 	
 	/**
@@ -131,6 +155,13 @@ public class MapPanel extends JPanel {
 			drawWay(wayIt.next(), g);
 		}
 		highlightWays(roadWayIt, g);
+		if(selectedNode != null) {
+			Node n = selectedNode;
+			Color c = g.getColor();
+			g.setColor(Color.RED);
+			g.drawOval(lonToScreen(n.getLon(), n.getLat()), latToScreen(n.getLat()), 4, 4);
+			g.setColor(c);
+		}
 	}
 	
 	/**
@@ -201,6 +232,25 @@ public class MapPanel extends JPanel {
 	 */
 	public int lonToScreen(double lon, double lat) {
 		return scale.lonToPixels(lon-cenLon, lat) + getWidth() / 2;
+	}
+	
+	/**
+	 * Returns the approximate latitude value of a point on the screen..
+	 * @param y The number of pixels below the top of the screen.
+	 * @return The latitude of that y position on the screen.
+	 */
+	public double screenToLat(int y) {
+		return cenLat-scale.pixelsToLat((getHeight()/2)-y);
+	}
+	
+	/**
+	 * Returns the longitude of an x-y position on the screen.
+	 * @param x the position to the right of the screen
+	 * @param y the position below the top of the screen
+	 * @return the longitude at that position
+	 */
+	public double screenToLon(int x, int y) {
+		return cenLon+scale.pixelsToLon(x-getWidth()/2, screenToLat(y));
 	}
 
 }

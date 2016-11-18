@@ -77,7 +77,12 @@ public class MapScale implements ScaleStrategy{
 	 */
 	@Override
 	public double pixelsToLon(int lonPix, int latPix) {
-		return (double) (((double)lonPix) / zoom / Math.cos(Math.toRadians(pixelsToLat(latPix))));
+		return (double) (lonPix / zoom / Math.cos(Math.toRadians(pixelsToLat(latPix))));
+	}
+	
+	@Override 
+	public double pixelsToLon(int lonPix, double lat) {
+		return (double) ((double)lonPix) / zoom / Math.cos(Math.toRadians(lat));
 	}
 	
 	/**
@@ -87,7 +92,6 @@ public class MapScale implements ScaleStrategy{
 	 */
 	@Override
 	public void zoom(int direction) {
-		System.out.println("attempting to zoom");
 		if((zoom < 750000 || direction < 0) && (zoom > 100 || direction > 0)) {
 			zoom = zoom + zoom * zoomChangeFactor * direction;
 		}

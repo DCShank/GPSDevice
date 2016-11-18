@@ -31,6 +31,14 @@ public interface ScaleStrategy {
 	 * @return The longitude value
 	 */
 	double pixelsToLon(int lonPix, int latPix);
+	
+	/**
+	 * Alternative method for if you already have a latitude value calculated.
+	 * @param lonPix The number of pixels in the longitude direction
+	 * @param lat The latitude of that position
+	 * @return The longitude at the position.
+	 */
+	double pixelsToLon(int lonPix, double lat);
 
 	/**
 	 * Zooms in or out, depending on the value of direction.
