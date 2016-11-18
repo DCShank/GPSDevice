@@ -71,6 +71,14 @@ public class Way {
 	public String getName() {
 		return name;
 	}
+    
+    /**
+     * Returns whether or not the way is named.
+     * @return True if the way has a a name, false otherwise.
+     */
+    public boolean isNamed() {
+    	return !name.isEmpty();
+    }
 	
 	/**
 	 * Returns whether or not the way is a road.
