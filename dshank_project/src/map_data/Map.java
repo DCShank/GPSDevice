@@ -75,6 +75,22 @@ public class Map {
 	}
 	
 	/**
+	 * Returns the minimum longitude value.
+	 * @return The minimum longitude.
+	 */
+	public double getLonMin() {
+		return lonMin;
+	}
+	
+	/**
+	 * Returns the maximum longitude value.
+	 * @return The maximum longitude
+	 */
+	public double getLonMax() {
+		return lonMax;
+	}
+	
+	/**
 	 * Returns whether or not the specified position is "near to" a way.
 	 * what near to means will be decided later I suppose.
 	 * @param lat The lat position to check against.
