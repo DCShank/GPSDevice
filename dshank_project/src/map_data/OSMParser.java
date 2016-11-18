@@ -80,6 +80,7 @@ public class OSMParser {
 	public HashMap<String,Node> getNodes() {
 		return nodes;
 	}
+	
 	/**
 	 * Returns the Hashmap containing all the ways.
 	 * @return The ways HashMap
@@ -191,6 +192,7 @@ public class OSMParser {
 			Node node = new Node(lat, lon, id);
 			nodes.put(node.getID(), node);
 		}
+		
 		/**
 		 * Iterates over the atts and stores the id to an instance variable
 		 * @param atts
@@ -216,7 +218,6 @@ public class OSMParser {
 					ndID = atts.getValue(i);
 			}
 			tempNodes.add(nodes.get(ndID));
-
 		}
 		
 		/**
@@ -233,8 +234,6 @@ public class OSMParser {
 				roadType = value;
 			}
 		}
-
 		
 	}
-
 }
