@@ -11,11 +11,11 @@ public interface ScaleStrategy {
 
 	/**
 	 * Converts a latitude and longitude to a number of pixels in the longitudinal direction.
-	 * @param lat The position in lat
 	 * @param lon The value to convert
+	 * @param lat The position in lat
 	 * @return The number of pixels
 	 */
-	int lonToPixels(double lat, double lon);
+	int lonToPixels(double lon, double lat);
 
 	/**
 	 * Converts some number of pixels into a latitude
@@ -26,11 +26,11 @@ public interface ScaleStrategy {
 
 	/**
 	 * Converts some pixel position to a longitude
-	 * @param latPix The number of pixels in the latitude axis
 	 * @param lonPix The number of pixels in the longitude axis
+	 * @param latPix The number of pixels in the latitude axis
 	 * @return The longitude value
 	 */
-	double pixelsToLon(int latPix, int lonPix);
+	double pixelsToLon(int lonPix, int latPix);
 
 	/**
 	 * Zooms in or out, depending on the value of direction.

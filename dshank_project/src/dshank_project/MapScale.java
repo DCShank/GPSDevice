@@ -42,7 +42,7 @@ public class MapScale implements ScaleStrategy{
 	 * @return The number of pixels east of the prime meridian.
 	 */
 	@Override
-	public int lonToPixels(double lat, double lon) {
+	public int lonToPixels(double lon, double lat) {
 		return (int) (lon * zoom * Math.cos(Math.toRadians(lat)));
 	}
 	
@@ -62,7 +62,7 @@ public class MapScale implements ScaleStrategy{
 	 * @param lonPix The number of pixels east of the equator at the point.
 	 */
 	@Override
-	public double pixelsToLon(int latPix, int lonPix) {
+	public double pixelsToLon(int lonPix, int latPix) {
 		return (double) (((double)latPix) / zoom / Math.cos(Math.toRadians(pixelsToLat(latPix))));
 	}
 	

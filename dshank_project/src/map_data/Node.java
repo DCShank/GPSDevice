@@ -11,8 +11,8 @@ import java.util.Set;
  *
  */
 public class Node {
-	private double lat;
 	private double lon;
+	private double lat;
 	private String id;
 	private Set<GraphEdge> edges;
 	
@@ -23,7 +23,7 @@ public class Node {
 	 * @param longitude The longitude of the node
 	 * @param idString The string representing the nodes id
 	 */
-	public Node(double latitude, double longitude, String idString) {
+	public Node(double longitude, double latitude, String idString) {
 		lat = latitude;
 		lon = longitude;
 		id = idString;

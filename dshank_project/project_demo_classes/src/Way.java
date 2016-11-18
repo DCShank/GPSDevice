@@ -30,6 +30,14 @@ public class Way {
     }
     
     /**
+     * Returns whether or not the way is named.
+     * @return True if the way has a a name, false otherwise.
+     */
+    public boolean isNamed() {
+    	return !name.isEmpty();
+    }
+    
+    /**
      * Gives an iterator for the nodes of this way.
      * @return Iterator<Node>
      */

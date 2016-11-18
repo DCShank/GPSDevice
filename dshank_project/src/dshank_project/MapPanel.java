@@ -42,7 +42,7 @@ public class MapPanel extends JPanel {
 	 * @param lat Amount to move by in the lat direction
 	 * @param lon Amount to move by in the lon direction
 	 */
-	public void pan(double lat, double lon) {
+	public void pan(double lon, double lat) {
 		
 	}
 	
@@ -51,7 +51,7 @@ public class MapPanel extends JPanel {
 	 * @param lat The latitude to set center at.
 	 * @param lon The longitude to set center at.
 	 */
-	public void setCenter(double lat, double lon) {
+	public void setCenter(double lon, double lat) {
 		
 	}
 	

@@ -74,10 +74,16 @@ public class Way {
 	
 	/**
 	 * Returns whether or not the way is a road.
+	 * There are a number of types of 'highway's that we don't want to count,
+	 * such as paths and foot paths. I have isolated the roads types that should
+	 * be included.
 	 * @return True if the way is a road, false otherwise.
 	 */
 	public boolean isRoad() {
-		return !roadType.isEmpty();
+		if(roadType.isEmpty()) { return false; }
+		return roadType.equals("residential") || roadType.equals("primary")
+				|| roadType.equals("turning_circle") || roadType.equals("tertiary")
+				|| roadType.equals("trunk");
 	}
 	
 	@Override
