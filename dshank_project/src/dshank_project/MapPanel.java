@@ -58,6 +58,10 @@ public class MapPanel extends JPanel {
 		cenLatPix = scale.latToPixels(cenLat);
 		cenLon = (map.getLonMax()+map.getLonMin())/2.0;
 		cenLonPix = scale.lonToPixels(cenLon, cenLat);
+
+		System.out.println(cenLonPix);
+		System.out.println(cenLatPix + "\n");
+		
 		this.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 		initMouse();
 		this.addMouseListener(mouse);
@@ -98,9 +102,8 @@ public class MapPanel extends JPanel {
 			 */
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
-				scale.zoom(-e.getWheelRotation());
-				cenLatPix = scale.latToPixels(cenLat);
-				cenLonPix = scale.lonToPixels(cenLon, cenLat);
+				zoomPan(e.getX(), e.getY(), -e.getWheelRotation());
+				setCenter(cenLon, cenLat);
 				repaint();
 			}
 			
@@ -108,11 +111,8 @@ public class MapPanel extends JPanel {
 			public void mouseClicked(MouseEvent e) {
 				double lat = screenToLat(e.getY());
 				double lon = screenToLon(e.getX(), e.getY());
-//				System.out.println(lat);
-//				System.out.println(lon);
 				Node n = map.getNearNode(lon, lat, map.getRoadIt());
 				selectedNode = n;
-//				System.out.println(selectedNode.getID());
 				repaint();
 			}
 		};
@@ -124,10 +124,24 @@ public class MapPanel extends JPanel {
 	 * @param lon Amount to move by in the lon direction
 	 */
 	public void pan(double lon, double lat) {
-		cenLon += lon;
-		cenLat += lat;
-		cenLatPix = scale.latToPixels(lat);
-		cenLonPix = scale.lonToPixels(cenLon, cenLat);
+		setCenter(cenLon + lon, cenLat + lat);
+	}
+	
+	/**
+	 * Zooms the screen and pans so that the mouse is positioned on the same point,
+	 * @param lonPix The pixel position on screen of the longitude
+	 * @param latPix The pixel position on screen of the latitude
+	 */
+	public void zoomPan(int lonPix, int latPix, int direction) {
+		double oldLat = screenToLat(latPix);
+		double oldLon = screenToLon(lonPix, latPix);
+		scale.zoom(direction);
+		double newLat = screenToLat(latPix);
+		double newLon = screenToLon(lonPix, latPix);
+		double latChange = newLat-oldLat;
+		double lonChange = newLon-oldLon;
+		setCenter(cenLon - lonChange, cenLat - latChange);
+		
 	}
 	
 	/**
@@ -136,7 +150,17 @@ public class MapPanel extends JPanel {
 	 * @param lon The longitude to set center at.
 	 */
 	public void setCenter(double lon, double lat) {
-		
+		cenLon = lon;
+		cenLat = lat;
+		cenLonPix = scale.lonToPixels(lon, lat);
+		cenLatPix = scale.latToPixels(lat);
+	}
+	
+	public void setCenterPixels(int lonPix, int latPix) {
+		cenLonPix = lonPix;
+		cenLatPix = latPix;
+		cenLat = scale.pixelsToLat(cenLatPix);
+		cenLon = scale.pixelsToLon(cenLonPix, cenLatPix);
 	}
 	
 	public void setHighlightedWays(Set<Way> highlightedWays) {
