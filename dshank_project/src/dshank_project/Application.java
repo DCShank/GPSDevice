@@ -34,6 +34,13 @@ public class Application extends JFrame {
 		setVisible(true);
 	}
 	
+	/**
+	 * Loads a given map file and displays it on the application frame.
+	 * @param file The file to be loaded.
+	 * @throws Exception Throws an exception if the file can't be loaded. This
+	 * 			causes the file to stop being loaded and leaves the previous map
+	 * 			being displayed.
+	 */
 	public void loadMap(File file) throws Exception {
 		prsr = new OSMParser(file);
 		prsr.parse();
@@ -44,11 +51,16 @@ public class Application extends JFrame {
 		pack();
 	}
 	
+	/**
+	 * Creates a menu bar for the application. Currently the only function of the
+	 * menu bar is to load new OSM files.
+	 */
 	public void createMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
 		final JFileChooser fc = new JFileChooser();
 		JMenuItem loadMap = new JMenuItem("Load Map");
+		// The action listener displays a file chooser dialog and lets display a new file.
 		loadMap.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				int chooseVal = fc.showOpenDialog(Application.this);
@@ -69,11 +81,11 @@ public class Application extends JFrame {
 	
 	/**
 	 * Main method for initialzing the program. Takes an OSM file as the argument.
-	 * @param args OSM file to be used
+	 * @param args OSM file to be displayed first.
 	 * @throws Exception Throws an exception if something goes wrong with the file.
 	 */
 	public static void main(String[] args) throws Exception {
-		Application test = new Application(new File(args[0]));
+		new Application(new File(args[0]));
 	}
 
 }

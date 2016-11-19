@@ -108,11 +108,11 @@ public class MapPanel extends JPanel {
 			public void mouseClicked(MouseEvent e) {
 				double lat = screenToLat(e.getY());
 				double lon = screenToLon(e.getX(), e.getY());
-				System.out.println(lat);
-				System.out.println(lon);
+//				System.out.println(lat);
+//				System.out.println(lon);
 				Node n = map.getNearNode(lon, lat, map.getRoadIt());
 				selectedNode = n;
-				System.out.println(selectedNode.getID());
+//				System.out.println(selectedNode.getID());
 				repaint();
 			}
 		};
@@ -145,6 +145,7 @@ public class MapPanel extends JPanel {
 	
 	/**
 	 * Draws the map.
+	 * This includes drawing all ways, and highlighting ways of importance.
 	 */
 	@Override
 	public void paintComponent(Graphics g) {
@@ -154,12 +155,12 @@ public class MapPanel extends JPanel {
 		while(wayIt.hasNext()) {
 			drawWay(wayIt.next(), g);
 		}
-		highlightWays(roadWayIt, g);
+		highlightWays(roadWayIt,Color.MAGENTA, g);
 		if(selectedNode != null) {
 			Node n = selectedNode;
 			Color c = g.getColor();
 			g.setColor(Color.RED);
-			g.drawOval(lonToScreen(n.getLon(), n.getLat()), latToScreen(n.getLat()), 16,16);
+			g.fillOval(lonToScreen(n.getLon(), n.getLat())-3, latToScreen(n.getLat())-3, 7, 7);
 			g.setColor(c);
 		}
 	}
@@ -205,10 +206,10 @@ public class MapPanel extends JPanel {
 	 * @param it
 	 * @param g
 	 */
-	public void highlightWays(Iterator<Way> it, Graphics g) {
+	public void highlightWays(Iterator<Way> it, Color c, Graphics g) {
 		Color currentColor = g.getColor();
 		Graphics2D g2 = (Graphics2D) g;
-		g.setColor(Color.RED);
+		g.setColor(c);
 		while(it.hasNext()) {
 			drawWay(it.next(), g);
 		}
