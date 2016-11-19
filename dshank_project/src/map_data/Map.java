@@ -92,6 +92,15 @@ public class Map {
 		return lonMax;
 	}
 	
+	/**
+	 * Returns the nearest node on a given set of ways.
+	 * In this case the set of ways is parameterized as an iterator because map only
+	 * really gives out iterators.
+	 * @param lon The longitude of the point to find a node near.
+	 * @param lat The latitude of the point to find a node near.
+	 * @param wayIt The iterator for the set of ways that you want to search through.
+	 * @return The node nearest to the point that is available in the way set.
+	 */
 	public Node getNearNode(double lon, double lat, Iterator<Way> wayIt) {
 		Node rtrnNode = wayIt.next().getNearestNode(lon, lat, strat);
 		double dist = strat.getDistance(lon, lat, rtrnNode.getLon(), rtrnNode.getLat());

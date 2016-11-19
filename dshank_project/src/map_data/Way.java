@@ -98,8 +98,8 @@ public class Way {
 	
 	/**
 	 * Returns the node nearest to the specified coordinates on this way.
-	 * @param lon
-	 * @param lat
+	 * @param lon The longitude of the point to search for a node near to
+	 * @param lat The latitude of the point to search for a node near to
 	 * @return
 	 */
 	public Node getNearestNode(double lon, double lat, DistanceStrategy strat) {
