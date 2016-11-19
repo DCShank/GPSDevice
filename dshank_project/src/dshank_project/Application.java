@@ -12,6 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.WindowConstants;
 
 import map_data.Map;
 import map_data.OSMParser;
@@ -27,6 +28,8 @@ public class Application extends JFrame {
 	 * @param file An OSM file
 	 */
 	public Application(File file) throws Exception {
+		this.setTitle("Map Application");
+		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); // Irritating
 		Container content = getContentPane();
 		content.setLayout(new BorderLayout());
 		loadMap(file);
