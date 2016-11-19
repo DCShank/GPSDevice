@@ -110,7 +110,7 @@ public class MapPanel extends JPanel {
 				double lon = screenToLon(e.getX(), e.getY());
 				System.out.println(lat);
 				System.out.println(lon);
-				Node n = map.getNearNode(lon, lat);
+				Node n = map.getNearNode(lon, lat, map.getRoadIt());
 				selectedNode = n;
 				System.out.println(selectedNode.getID());
 				repaint();
@@ -150,7 +150,7 @@ public class MapPanel extends JPanel {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Iterator<Way> wayIt = map.getWayIt();
-		Iterator<Way> roadWayIt = map.getRoadWayIt();
+		Iterator<Way> roadWayIt = map.getRoadIt();
 		while(wayIt.hasNext()) {
 			drawWay(wayIt.next(), g);
 		}
@@ -159,7 +159,7 @@ public class MapPanel extends JPanel {
 			Node n = selectedNode;
 			Color c = g.getColor();
 			g.setColor(Color.RED);
-			g.drawOval(lonToScreen(n.getLon(), n.getLat()), latToScreen(n.getLat()), 4, 4);
+			g.drawOval(lonToScreen(n.getLon(), n.getLat()), latToScreen(n.getLat()), 16,16);
 			g.setColor(c);
 		}
 	}
@@ -208,7 +208,7 @@ public class MapPanel extends JPanel {
 	public void highlightWays(Iterator<Way> it, Graphics g) {
 		Color currentColor = g.getColor();
 		Graphics2D g2 = (Graphics2D) g;
-		g.setColor(Color.BLUE);
+		g.setColor(Color.RED);
 		while(it.hasNext()) {
 			drawWay(it.next(), g);
 		}

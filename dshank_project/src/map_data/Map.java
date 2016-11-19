@@ -22,6 +22,8 @@ public class Map {
 	
 	private double lonMin, latMin, lonMax, latMax;
 	
+	private final DistanceStrategy strat = new HaversineDistance();
+	
 	/**
 	 * Constructor for the Map
 	 * @param minLon The minimum bound for longitude
@@ -54,7 +56,7 @@ public class Map {
 		return ways.values().iterator();
 	}
 	
-	public Iterator<Way> getRoadWayIt() {
+	public Iterator<Way> getRoadIt() {
 		return roadWays.values().iterator();
 	}
 	
@@ -90,13 +92,12 @@ public class Map {
 		return lonMax;
 	}
 	
-	public Node getNearNode(double lon, double lat) {
-		DistanceStrategy strat = new HaversineDistance();
-		Iterator<Node> it = nodes.values().iterator();
-		Node rtrnNode = it.next();
+	public Node getNearNode(double lon, double lat, Iterator<Way> wayIt) {
+		Node rtrnNode = wayIt.next().getNearestNode(lon, lat, strat);
 		double dist = strat.getDistance(lon, lat, rtrnNode.getLon(), rtrnNode.getLat());
-		while(it.hasNext()) {
-			Node n = it.next();
+		while(wayIt.hasNext()) {
+			Way way = wayIt.next();
+			Node n = way.getNearestNode(lon, lat, strat);
 			double testDist = strat.getDistance(lon, lat, n.getLon(), n.getLat());
 			if(testDist < dist) {
 				rtrnNode = n;

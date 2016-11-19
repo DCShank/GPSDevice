@@ -90,9 +90,31 @@ public class Way {
 	 */
 	public boolean isRoad() {
 		if(roadType.isEmpty()) { return false; }
-		return roadType.equals("residential") || roadType.equals("primary")
-				|| roadType.equals("turning_circle") || roadType.equals("tertiary")
-				|| roadType.equals("trunk");
+//		return roadType.equals("residential") || roadType.equals("primary")
+//				|| roadType.equals("turning_circle") || roadType.equals("tertiary")
+//				|| roadType.equals("trunk") || roadType.equals("service");
+		return !(roadType.equals("footway") || roadType.equals("path"));
+	}
+	
+	/**
+	 * Returns the node nearest to the specified coordinates on this way.
+	 * @param lon
+	 * @param lat
+	 * @return
+	 */
+	public Node getNearestNode(double lon, double lat, DistanceStrategy strat) {
+		Iterator<Node> it = nodes.iterator();
+		Node rtrnNode = it.next();
+		double dist = strat.getDistance(lon, lat, rtrnNode.getLon(), rtrnNode.getLat());
+		while(it.hasNext()) {
+			Node n = it.next();
+			double testDist = strat.getDistance(lon, lat, n.getLon(), n.getLat());
+			if(testDist < dist) {
+				rtrnNode = n;
+				dist = testDist;
+			}
+		}
+		return rtrnNode;
 	}
 	
 	@Override
