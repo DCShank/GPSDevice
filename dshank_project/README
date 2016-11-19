@@ -1,16 +1,21 @@
 Author: David Shank
 
-This hand in includes a mostly functional gui interface.
+This hand in includes a mostly functional gui interface, including the map, buttons for selecting
+start and end nodes, the ability to load different maps, and the ability to select nodes with the
+mouse.
+
 Currently set so you can only select nodes on roads with the mouse. Selecting anywhere will select
 the nearest road node.
 
-Changes from the initial design:
-There are now GraphNodes and GraphEdges. Director now depends on these instead of the map itself.
+Implemented the Haversine Formula for finding distances over the map. This is used for finding
+shortest distances from one point to a node by iterating over all the nodes. (Rather inefficient)
+This will also be used for finding the lengths of GraphEdges.
+
+There is a skeletal implementation of many of the features for finding a route, including a number
+of Graph interfaces. The Director class will make use of the features in these interfaces to
+generate a list of directions from one point to another.
 
 
-
-TODO: Figure out how "segments" should work, where a segment goes from one "intersection" to
+TODO: Figure out how "segments" should work.A segment would go from one "intersection" to
 to another, and an intersection is where two ways intersect. I believe this would make shortest
 path calculation faster than going through all the graph edges.
-	
-project_demo_classes contains the classes for the demo submitted in Hand-In 1.
