@@ -1,6 +1,8 @@
 package map_data;
 
 import java.io.File;
+
+import directions.Graph;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -10,7 +12,7 @@ import java.util.Iterator;
  * @author david
  *
  */
-public class Map {
+public class Map implements Graph{
 	/** Maps id's to nodes */
 	private HashMap<String,Node> nodes;
 	/** maps id's to ways */

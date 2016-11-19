@@ -14,6 +14,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import map_data.Map;
 import map_data.OSMParser;
@@ -34,6 +35,7 @@ public class Application extends JFrame {
 		Container content = getContentPane();
 		content.setLayout(new BorderLayout());
 		loadMap(file);
+		createMenuBar();
 		pack();
 		setVisible(true);
 	}
@@ -49,8 +51,9 @@ public class Application extends JFrame {
 		prsr = new OSMParser(file);
 		prsr.parse();
 		map = prsr.getMap();
+		// Remove the old map panel if one exists.
+		if(mapPanel != null) {remove(mapPanel);}
 		mapPanel = new MapPanel(map);
-		createMenuBar();
 		getContentPane().add(mapPanel, BorderLayout.CENTER);
 		pack();
 	}
@@ -64,6 +67,8 @@ public class Application extends JFrame {
 		JMenu fileMenu = new JMenu("File");
 		final JFileChooser fc = new JFileChooser();
 		JMenuItem loadMap = new JMenuItem("Load Map");
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("OSM Map files", "osm");
+		fc.setFileFilter(filter);
 		// The action listener displays a file chooser dialog and lets display a new file.
 		loadMap.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
