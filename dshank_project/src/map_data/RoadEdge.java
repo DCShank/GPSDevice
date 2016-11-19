@@ -1,11 +1,15 @@
 package map_data;
 
+import directions.GraphEdge;
+
 /**
  * Represents an Edge on a graph with a length, Nodes, and adjacent edges to each Node.
+ * RoadEdges can be assumed to be directional; For a two way street each node would have
+ * a different road edge.
  * @author david
  *
  */
-public class GraphEdge {
+public class RoadEdge implements GraphEdge {
 	private final Node startNode;
 	private final Node endNode;
 	private final double length;
@@ -15,7 +19,7 @@ public class GraphEdge {
 	 * @param sn the startNode
 	 * @param en the endNode
 	 */
-	GraphEdge(Node sn, Node en, DistanceStrategy strat) {
+	RoadEdge(Node sn, Node en, DistanceStrategy strat) {
 		startNode = sn;
 		endNode = en;
 		length = strat.getDistance(sn.getLon(), sn.getLat(), en.getLon(), en.getLat());
@@ -26,6 +30,7 @@ public class GraphEdge {
 	 * @param n The specified node
 	 * @return Whether this edge connects to the specified node.
 	 */
+	@Override
 	public boolean hasNode(Node n) {
 		return startNode.equals(n) || endNode.equals(n);
 	}
@@ -34,6 +39,7 @@ public class GraphEdge {
 	 * returns the length of this edge
 	 * @return the double value of the length between the two nodes.
 	 */
+	@Override
 	public double getLength() {
 		return length;
 	}
@@ -42,6 +48,7 @@ public class GraphEdge {
 	 * returns the start node
 	 * @return The start node
 	 */
+	@Override
 	public Node getStartNode() {
 		return startNode;
 	}
@@ -50,6 +57,7 @@ public class GraphEdge {
 	 * returns the end node
 	 * @return the end node
 	 */
+	@Override
 	public Node getEndNode() {
 		return endNode;
 	}
@@ -65,7 +73,7 @@ public class GraphEdge {
 	}
 	
 	/**
-	 * Checks if this GraphEdge equals another graph edge. Two GraphEdges are equals if
+	 * Checks if this RoadEdge equals another graph edge. Two GraphEdges are equals if
 	 * they have the same pair of nodes, regardless of direction.
 	 */
 	@Override

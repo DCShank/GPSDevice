@@ -110,6 +110,8 @@ public class OSMParser {
 		private String name = "";
 		/** Stores the type of road of a way as it's being parsed. */
 		private String roadType = "";
+		/** Stores whether or not a way is one way. */
+		private boolean oneway = false;
 
 		/**
 		 * Method called by SAX parser when start of document is encountered.
@@ -147,7 +149,7 @@ public class OSMParser {
 		 */
 		public void endElement(String namespaceURI, String localName, String qName) throws SAXParseException {
 			if(qName.equals("way")) {
-				Way way = new Way(id, name, roadType, tempNodes);
+				Way way = new Way(id, name, roadType, tempNodes, oneway);
 				ways.put(id, way);
 				// Put the ways into specific maps depending on their properties.
 				if(way.isNamed()) {
@@ -160,6 +162,7 @@ public class OSMParser {
 				id = "";
 				name = "";
 				roadType = "";
+				oneway = false;
 			}
 		}
 		
@@ -243,6 +246,8 @@ public class OSMParser {
 				name = value;
 			} else if(key.equals("highway")) {
 				roadType = value;
+			} else if(key.equals("oneway")) {
+				oneway = value.equals("yes");
 			}
 		}
 		

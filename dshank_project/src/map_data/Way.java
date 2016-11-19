@@ -22,6 +22,8 @@ public class Way {
 	private String name;
 	/** The empty string if the Way has no road type */
 	private String roadType;
+	/** Boolean that declares if the road is one way. */
+	private boolean oneWay;
 	
 	/**
 	 * Initializes the Way with the parameters given.
@@ -29,11 +31,12 @@ public class Way {
 	 * @param nodeList The list of nodes for the Way
 	 * @param wayName The Ways name if it has one
 	 */
-	public Way(String idString, String wayName, String wayType, List<Node> nodeList) {
+	public Way(String idString, String wayName, String wayType, List<Node> nodeList, boolean oneway) {
 		name = wayName;
 		id = idString;
 		nodes = new ArrayList<Node>(nodeList);
 		roadType = wayType;
+		oneWay = oneway;
 	}
 	
 	/**

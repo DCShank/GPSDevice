@@ -1,7 +1,11 @@
 package map_data;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
+
+import directions.GraphEdge;
+import directions.GraphNode;
 
 /**
  * Represents a node in an OSM map.
@@ -10,7 +14,7 @@ import java.util.Set;
  * @author david
  *
  */
-public class Node {
+public class Node implements GraphNode {
 	private double lon;
 	private double lat;
 	private String id;
@@ -52,6 +56,10 @@ public class Node {
 	 */
 	public String getID() {
 		return id;
+	}
+	
+	public Iterator<GraphEdge> getEdgeIt() {
+		return edges.iterator();
 	}
 	
 	@Override
