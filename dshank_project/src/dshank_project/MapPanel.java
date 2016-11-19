@@ -40,8 +40,8 @@ public class MapPanel extends JPanel {
 	/** Strategy for converting to pixels from lat/lon and to lat/lon from pixels. */
 	private final ScaleStrategy scale = new MapScale();
 	
-	public static final int DEFAULT_WIDTH = 800;
-	public static final int DEFAULT_HEIGHT = 600;
+	public static final int DEFAULT_WIDTH = 1200;
+	public static final int DEFAULT_HEIGHT = 800;
 	
 	private Node selectedNode = null;
 	

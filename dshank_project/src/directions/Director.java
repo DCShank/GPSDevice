@@ -2,12 +2,25 @@ package directions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import map_data.Node;
 
+/**
+ * SKELETON CLASS
+ * 
+ * A class that will produce directions from a start point to an end point.
+ * Much easier to make mutable than otherwise because 
+ * @author david
+ *
+ */
 public class Director {
 	/** A list of edges to follow to reach a destination */
 	private List<GraphEdge> directions;
+	/** A list of the nodes traversed by this graph. */
+	private List<GraphNode> dirNodes;
+	/** A set of nodes. Useful for checking if a node is in the directions. */
+	private Set<GraphNode> nodeSet;
 	/** A list of the directions to follow in a human readable form. */
 	private String dirString;
 	
@@ -15,7 +28,7 @@ public class Director {
 	
 	private GraphNode endNode;
 	
-	public Director(GraphNode startNode) {
+	public Director() {
 	}
 	
 	/**
@@ -32,6 +45,10 @@ public class Director {
 	 */
 	public void setEndNode(GraphNode n) {
 		endNode = n;
+	}
+	
+	public boolean hasNode(GraphNode n) {
+		return false;
 	}
 	
 	/**
