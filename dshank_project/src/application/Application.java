@@ -1,8 +1,9 @@
-package dshank_project;
+package application;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -35,21 +36,30 @@ public class Application extends JFrame {
 	private Director dir;
 	
 	/**
-	 * Initializes the application with an OSM file to use for data.
-	 * @param file An OSM file
+	 * Constructor for the application which takes no argument.
 	 */
-	public Application(File file) throws Exception {
-		this.setTitle("Map Application");
-		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); // Irritating
+	public Application() throws Exception {
+		setTitle("Map Application");
+		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); // Irritating
+		setPreferredSize(new Dimension(MapPanel.DEFAULT_WIDTH, MapPanel.DEFAULT_HEIGHT));
 		Container content = getContentPane();
 		content.setLayout(new BorderLayout());
-		loadMap(file);
 		createMenuBar();
 		ButtonPanel buttons = new ButtonPanel();
 		content.add(buttons, BorderLayout.WEST);
 		pack();
 		setVisible(true);
 	}
+	
+	/**
+	 * Initializes the application with an OSM file to use for data.
+	 * @param file An OSM file
+	 */
+	public Application(File file) throws Exception {
+		this();
+		loadMap(file);;
+	}
+
 	
 	/**
 	 * Loads a given map file and displays it on the application frame.
@@ -99,16 +109,14 @@ public class Application extends JFrame {
 		menuBar.add(fileMenu);
 		setJMenuBar(menuBar);
 	}
-	
 	/**
-	 * Main method for initialzing the program. Takes an OSM file as the argument.
-	 * @param args OSM file to be displayed first.
-	 * @throws Exception Throws an exception if something goes wrong with the file.
+	 * A panel that holds all the buttons used by the application.
+	 * Currently holds select start and end nodes
+	 * 
+	 * In the future will have buttons for getting directions and activating the gps.
+	 * @author david
+	 *
 	 */
-	public static void main(String[] args) throws Exception {
-		new Application(new File(args[0]));
-	}
-	
 	class ButtonPanel extends JPanel {
 		JButton selStart;
 		JButton selEnd;
@@ -149,6 +157,19 @@ public class Application extends JFrame {
 			this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 			this.add(selStart);
 			this.add(selEnd);
+		}
+	}
+	
+	/**
+	 * Main method for initialzing the program. Takes an OSM file as the argument.
+	 * @param args OSM file to be displayed first.
+	 * @throws Exception Throws an exception if something goes wrong with the file.
+	 */
+	public static void main(String[] args) throws Exception {
+		if(args.length > 0) {
+			new Application(new File(args[0]));
+		} else {
+			new Application();
 		}
 	}
 

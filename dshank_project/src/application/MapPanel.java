@@ -1,4 +1,4 @@
-package dshank_project;
+package application;
 
 import java.awt.BasicStroke;
 import java.awt.Color;

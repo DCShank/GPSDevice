@@ -1,4 +1,4 @@
-package dshank_project;
+package application;
 
 /**
  * Strategy for converting latitude and longitude values into pixels and vice versa

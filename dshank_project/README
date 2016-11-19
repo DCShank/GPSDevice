@@ -4,6 +4,9 @@ This hand in includes a mostly functional gui interface.
 Currently set so you can only select nodes on roads with the mouse. Selecting anywhere will select
 the nearest road node.
 
+Changes from the initial design:
+There are now GraphNodes and GraphEdges. Director now depends on these instead of the map itself.
+
 
 
 TODO: Figure out how "segments" should work, where a segment goes from one "intersection" to

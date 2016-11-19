@@ -1,4 +1,4 @@
-package dshank_project;
+package application;
 
 public interface ScaleStrategy {
 
