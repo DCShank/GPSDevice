@@ -1,8 +1,8 @@
 Author: David Shank
 
 This hand in includes a mostly functional gui interface.
-Currently set so you can only select roads with the mouse. Selecting anywhere will select
-the nearest road.
+Currently set so you can only select nodes on roads with the mouse. Selecting anywhere will select
+the nearest road node.
 
 
 

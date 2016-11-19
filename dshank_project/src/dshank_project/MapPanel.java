@@ -45,6 +45,7 @@ public class MapPanel extends JPanel {
 	
 	private Node selectedNode = null;
 	
+	private HashSet<Node> highlightedNodes;
 	private HashSet<Way> highlightedWays;
 	
 	/**
@@ -58,15 +59,14 @@ public class MapPanel extends JPanel {
 		cenLatPix = scale.latToPixels(cenLat);
 		cenLon = (map.getLonMax()+map.getLonMin())/2.0;
 		cenLonPix = scale.lonToPixels(cenLon, cenLat);
-
-		System.out.println(cenLonPix);
-		System.out.println(cenLatPix + "\n");
 		
 		this.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 		initMouse();
 		this.addMouseListener(mouse);
 		this.addMouseWheelListener(mouse);
 		this.addMouseMotionListener(mouse);
+		
+		highlightedNodes = new HashSet();
 	}	
 	
 	/**
@@ -181,9 +181,15 @@ public class MapPanel extends JPanel {
 		}
 		highlightWays(roadWayIt,Color.MAGENTA, g);
 		if(selectedNode != null) {
-			Node n = selectedNode;
 			Color c = g.getColor();
+			Node n = selectedNode;
 			g.setColor(Color.RED);
+			g.fillOval(lonToScreen(n.getLon(), n.getLat())-3, latToScreen(n.getLat())-3, 7, 7);
+			g.setColor(c);
+		}
+		for(Node n : highlightedNodes) {
+			Color c = g.getColor();
+			g.setColor(Color.BLUE);
 			g.fillOval(lonToScreen(n.getLon(), n.getLat())-3, latToScreen(n.getLat())-3, 7, 7);
 			g.setColor(c);
 		}
@@ -276,6 +282,32 @@ public class MapPanel extends JPanel {
 	 */
 	public double screenToLon(int x, int y) {
 		return cenLon+scale.pixelsToLon(x-getWidth()/2, screenToLat(y));
+	}
+	
+	/**
+	 * Pops the currently selected node and sets selectedNode to null.
+	 * @return selectedNode.
+	 */
+	public Node popSelectedNode() {
+		Node rtrnNode = selectedNode;
+		selectedNode = null;
+		return rtrnNode;
+	}
+	
+	/**
+	 * Adds a node to the set of highlighted nodes.
+	 * @param n THe node to be highlighted.
+	 */
+	public void addHilightedNode(Node n) {
+		highlightedNodes.add(n);
+	}
+	
+	/**
+	 * Removes a node from the set of highlighted nodes.
+	 * @param n The node to be unhighlighted.
+	 */
+	public void removeHighlightedNode(Node n) {
+		highlightedNodes.remove(n);
 	}
 
 }

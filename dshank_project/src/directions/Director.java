@@ -47,6 +47,23 @@ public class Director {
 		endNode = n;
 	}
 	
+	/**
+	 * Returns the start node.
+	 * @return the start node.
+	 */
+	public GraphNode getStartNode() {
+		return startNode;
+	}
+	
+	/**
+	 * Returns the end node.
+	 * @return the end node.
+	 */
+	public GraphNode getEndNode() {
+		return endNode;
+	}
+	
+	
 	public boolean hasNode(GraphNode n) {
 		return false;
 	}
@@ -74,6 +91,21 @@ public class Director {
 	 */
 	private List<GraphEdge> calcDir() {
 		return null;
+	}
+	
+	/**
+	 * Produces a test string with the start and end nodes.
+	 */
+	@Override
+	public String toString() {
+		String rtrnString = "";
+		if(startNode != null) {
+			rtrnString += "[Start: " + startNode.getID() + "] ";
+		}
+		if(endNode != null) {
+			rtrnString += "[End: " + endNode.getID() + "] ";
+		}
+		return rtrnString;
 	}
 
 }
