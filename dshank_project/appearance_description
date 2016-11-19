@@ -1,5 +1,5 @@
 The application will have three main panels. A panel on the left, with buttons for
-selecting options, a panel in the middle that displays the map, and a pael on the
+selecting options, a panel in the middle that displays the map, and a panel on the
 right that has a textual description of any directions given.
 
 The left panel should include buttons for:

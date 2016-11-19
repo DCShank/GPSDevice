@@ -102,7 +102,7 @@ public class MapPanel extends JPanel {
 			 */
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
-				zoomPan(e.getX(), e.getY(), -e.getWheelRotation());
+				zoomToPosition(e.getX(), e.getY(), -e.getWheelRotation());
 				setCenter(cenLon, cenLat);
 				repaint();
 			}
@@ -132,7 +132,7 @@ public class MapPanel extends JPanel {
 	 * @param lonPix The pixel position on screen of the longitude
 	 * @param latPix The pixel position on screen of the latitude
 	 */
-	public void zoomPan(int lonPix, int latPix, int direction) {
+	public void zoomToPosition(int lonPix, int latPix, int direction) {
 		double oldLat = screenToLat(latPix);
 		double oldLon = screenToLon(lonPix, latPix);
 		scale.zoom(direction);

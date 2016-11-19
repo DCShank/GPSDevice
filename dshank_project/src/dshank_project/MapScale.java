@@ -9,7 +9,7 @@ package dshank_project;
 public class MapScale implements ScaleStrategy{
 	
 	private static final double DEFAULT_ZOOM = 4000;
-	private static final double DEFAULT_ZOOM_CHANGE = 0.055;
+	private static final double DEFAULT_ZOOM_CHANGE = 0.045;
 	
 	/** The amount to multiply zoom by when zooming in or out */
 	private double zoomChangeFactor;

@@ -12,6 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
 import map_data.Map;
@@ -89,6 +90,10 @@ public class Application extends JFrame {
 	 */
 	public static void main(String[] args) throws Exception {
 		new Application(new File(args[0]));
+	}
+	
+	class ButtonPanel extends JPanel {
+		
 	}
 
 }
