@@ -15,8 +15,7 @@ public class Director {
 	
 	private GraphNode endNode;
 	
-	public Director(Graph g) {
-		this.g = g;
+	public Director(GraphNode startNode) {
 	}
 	
 	/**

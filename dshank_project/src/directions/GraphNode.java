@@ -5,6 +5,12 @@ import java.util.Iterator;
 public interface GraphNode {
 	
 	/**
+	 * Returns the unique id of this node
+	 * @return The string id of this node.
+	 */
+	public String getID();
+	
+	/**
 	 * Returns an iterator over te edges of the graph.
 	 * @return THe iterator for the graphs edges.
 	 */

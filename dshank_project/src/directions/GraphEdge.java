@@ -9,7 +9,7 @@ public interface GraphEdge {
 	 * @param n The specified node
 	 * @return Whether this edge connects to the specified node.
 	 */
-	boolean hasNode(Node n);
+	boolean hasNode(GraphNode n);
 
 	/**
 	 * returns the length of this edge

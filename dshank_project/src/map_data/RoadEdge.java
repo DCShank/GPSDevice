@@ -1,6 +1,7 @@
 package map_data;
 
 import directions.GraphEdge;
+import directions.GraphNode;
 
 /**
  * Represents an Edge on a graph with a length, Nodes, and adjacent edges to each Node.
@@ -31,7 +32,7 @@ public class RoadEdge implements GraphEdge {
 	 * @return Whether this edge connects to the specified node.
 	 */
 	@Override
-	public boolean hasNode(Node n) {
+	public boolean hasNode(GraphNode n) {
 		return startNode.equals(n) || endNode.equals(n);
 	}
 	

@@ -246,6 +246,10 @@ public class OSMParser {
 				name = value;
 			} else if(key.equals("highway")) {
 				roadType = value;
+				if(value.equals("roundabout") || value.equals("motorway")) {
+					// These are apparently implicily one way.
+					oneway = true;
+				}
 			} else if(key.equals("oneway")) {
 				oneway = value.equals("yes");
 			}
