@@ -2,10 +2,11 @@ Author: David Shank
 
 This hand in includes a mostly functional gui interface, including the map, buttons for selecting
 start and end nodes, the ability to load different maps, and the ability to select nodes with the
-mouse.
+mouse. UML diagrams are included in PRJ3_uml_files.
 
-Currently set so you can only select nodes on roads with the mouse. Selecting anywhere will select
-the nearest road node.
+To select a node, click somewhere on the map and then click on one of the Select node buttons.
+Currently set so you can only select nodes on roads. Selecting anywhere will select the nearest 
+road node.
 
 Implemented the Haversine Formula for finding distances over the map. This is used for finding
 shortest distances from one point to a node by iterating over all the nodes. (Rather inefficient)
@@ -15,12 +16,9 @@ There is a skeletal implementation of many of the features for finding a route, 
 of Graph interfaces. The Director class will make use of the features in these interfaces to
 generate a list of directions from one point to another.
 
-Director is not the GPSInterface for convenience. This may be split off later depending on how
+Director is now the GPSInterface for convenience. This may be split off later depending on how
 large the class becomes.
 
-GraphEdges are currently not in use, and should be considered skeleton class.
+GraphEdges and RoadEdges are currently are currently not in use, and should be considered essentially
+skeleton classes despite having all their methods implemented.
 
-
-TODO: Figure out how "segments" should work.A segment would go from one "intersection" to
-to another, and an intersection is where two ways intersect. I believe this would make shortest
-path calculation faster than going through all the graph edges.
