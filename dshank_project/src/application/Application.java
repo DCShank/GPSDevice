@@ -23,13 +23,15 @@ import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import directions.Director;
+import directions.GPSEvent;
+import directions.GPSListener;
 import directions.Graph;
 import directions.GraphNode;
 import map_data.Map;
 import map_data.Node;
 import map_data.OSMParser;
 
-public class Application extends JFrame {
+public class Application extends JFrame implements GPSListener {
 
 	private Map map;
 	private MapPanel mapPanel;
@@ -117,6 +119,15 @@ public class Application extends JFrame {
 		fileMenu.add(loadMap);
 		menuBar.add(fileMenu);
 		setJMenuBar(menuBar);
+	}
+	
+	/**
+	 * Processes a GPSEvent and updates everything important, including the
+	 * Director and MapPanel.
+	 * @param e The GPSEvent with information.
+	 */
+	public void processEvent(GPSEvent e) {
+		
 	}
 
 	/**

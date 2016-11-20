@@ -16,9 +16,12 @@ There is a skeletal implementation of many of the features for finding a route, 
 of Graph interfaces. The Director class will make use of the features in these interfaces to
 generate a list of directions from one point to another.
 
-Director is now the GPSInterface for convenience. This may be split off later depending on how
-large the class becomes.
+Application is now the GPSEvent listener. This seems like probably the wrong way to do it but it
+simplifies the system for getting events, updating directions, and updating the map panel.
 
 GraphEdges and RoadEdges are currently are currently not in use, and should be considered essentially
 skeleton classes despite having all their methods implemented.
 
+(I think I may be over complicating getting directions. It might be much simpler if Director simply had
+access to the MapPanel. Then it could easily get and set start and end nodes, set the route, and Director
+could be the only GPSListener. I will test this during Thanksgiving.)

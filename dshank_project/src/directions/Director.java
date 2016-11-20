@@ -18,7 +18,7 @@ import map_data.Node;
  * @author david
  *
  */
-public class Director implements GPSListener {
+public class Director {
 	private final Graph graph;
 	/** A list of edges to follow to reach a destination */
 	private List<GraphEdge> directions;
@@ -95,14 +95,6 @@ public class Director implements GPSListener {
 	}
 	
 	/**
-	 * Processes a GPS event.
-	 * @param e The event being processed.
-	 */
-	public void processEvent(GPSEvent e) {
-		
-	}
-	
-	/**
 	 * Calculates a set of directions based on the Directors start and end nodes.
 	 * Also writes the directions to the instance variable.
 	 * @return The list of directions for immediate use.
@@ -113,9 +105,9 @@ public class Director implements GPSListener {
 	
 	/**
 	 * Determines whether someone is off course based on their lon, lat, and heading.
-	 * @param lon The longitude of the GPS
-	 * @param lat The latitdue of the GPS
-	 * @param heading The heaing of the GPS
+	 * @param lon The longitude of the position.
+	 * @param lat The latitdue of the position
+	 * @param heading The heading.
 	 * @return
 	 */
 	private boolean onCourse(double lon, double lat, double heading) {
@@ -125,9 +117,9 @@ public class Director implements GPSListener {
 	/**
 	 * Finds and returns the first node ahead of some position with heading.
 	 * Returns null if there is no such node.
-	 * @param lon The longitude position of the GPS
-	 * @param lat The latitude position of the GPS
-	 * @param heading The heading of the GPS
+	 * @param lon The longitude position.
+	 * @param lat The latitude position.
+	 * @param heading The heading.
 	 * @return The next node if such a node exists, null otherwise.
 	 */
 	private GraphNode nearNodeOnCourse(double lon, double lat, double heading) {
@@ -151,16 +143,17 @@ public class Director implements GPSListener {
 	}
 	
 	/**
-	 * Updates the directions based on some GPSEvent.
+	 * Updates and returns the directions based on some current position and heading.
 	 * If the GPS indicates it is off course we recalculate new directions based
 	 * on the nearest node.
 	 * Otherwise we move forward along the route.
-	 * @param lat The latitude of the GPS
-	 * @param lon the longitude of the GPS
-	 * @param heading The Heading of the GPS
+	 * @param lat The latitude of the position.
+	 * @param lon the longitude of the position.
+	 * @param heading The heading.
+	 * @return The new directions.
 	 */
-	private void updateDirections(double lat, double lon, double heading) {
-		
+	public List<GraphEdge> updateDirections(double lat, double lon, double heading) {
+		return null;
 	}
 
 }
