@@ -100,6 +100,10 @@ public class Map implements Graph{
 	 * 
 	 * I don't know if this works. Will need to be tested.
 	 * 
+	 * Also I don't know what direction and from what starting point the heading
+	 * is going to be given so this is all essentially a sample of what the code
+	 * should be like.
+	 * 
 	 * @param lon The initial longitude of the circular segment.
 	 * @param lat The initial latitude of the circular segment.
 	 * @param theta	 The angle Theta of the circular segment.

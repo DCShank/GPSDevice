@@ -15,9 +15,9 @@ import directions.GraphNode;
  *
  */
 public class Node implements GraphNode {
-	private double lon;
-	private double lat;
-	private String id;
+	private final double lon;
+	private final double lat;
+	private final String id;
 	/** 
 	 * These edges are the edges with this node as the start node. Edges are
 	 * directed.
@@ -60,6 +60,10 @@ public class Node implements GraphNode {
 	 */
 	public String getID() {
 		return id;
+	}
+	
+	public void addGraphEdge(GraphEdge edge) {
+		edges.add(edge);
 	}
 	
 	public Iterator<GraphEdge> getEdgeIt() {

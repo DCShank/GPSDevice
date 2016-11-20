@@ -6,11 +6,17 @@ import directions.GraphNode;
 /**
  * Represents an Edge on a graph with a length, Nodes, and adjacent edges to each Node.
  * RoadEdges can be assumed to be directional; For a two way street each node would have
- * a different road edge.
+ * a different RoadEdge, although both RoadEdges would have both of the nodes, with start
+ * and end reversed.
  * @author david
  *
  */
 public class RoadEdge implements GraphEdge {
+	/** 
+	 * The String ID for this edge.
+	 * The ID is made up of the id of the start node + the id of the end node.
+	 */
+	private final String id;
 	private final Node startNode;
 	private final Node endNode;
 	private final double length;
@@ -23,6 +29,7 @@ public class RoadEdge implements GraphEdge {
 	RoadEdge(Node sn, Node en, DistanceStrategy strat) {
 		startNode = sn;
 		endNode = en;
+		id = startNode.getID() + endNode.getID();
 		length = strat.getDistance(sn.getLon(), sn.getLat(), en.getLon(), en.getLat());
 	}
 	
@@ -64,6 +71,14 @@ public class RoadEdge implements GraphEdge {
 	}
 	
 	/**
+	 * Returns the unique ID for this edge.
+	 * The IDs for RoadEdges is made up of the id of the start node + the id of the end node.
+	 */
+	public String getID() {
+		return id;
+	}
+	
+	/**
 	 * I don't know if this works. I believe that because every node has a unique id that
 	 * each for every possible pair of nodes, concatID should be unique.
 	 */
@@ -74,16 +89,16 @@ public class RoadEdge implements GraphEdge {
 	}
 	
 	/**
-	 * Checks if this RoadEdge equals another graph edge. Two GraphEdges are equals if
-	 * they have the same pair of nodes, regardless of direction.
+	 * Checks if both two edges are equals.
+	 * @return True if the objects share the same ID, false otherwise.
 	 */
 	@Override
 	public boolean equals(Object other) {
 		if(other == null) { return false; }
 		if(other == this) { return true; }
 		if(other.getClass() != this.getClass()) { return false; }
-		GraphEdge o = (GraphEdge) other;
-		return o.hasNode(startNode) && o.hasNode(endNode);
+		RoadEdge o = (RoadEdge) other;
+		return id.equals(o.id);
 	}
 
 }

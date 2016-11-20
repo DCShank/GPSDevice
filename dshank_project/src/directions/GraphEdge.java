@@ -28,5 +28,11 @@ public interface GraphEdge {
 	 * @return the end node
 	 */
 	GraphNode getEndNode();
+	
+	/**
+	 * Returns the unique ID for this edge.
+	 * @return
+	 */
+	String getID();
 
 }
