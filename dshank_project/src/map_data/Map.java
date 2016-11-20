@@ -95,6 +95,31 @@ public class Map implements Graph{
 	}
 	
 	/**
+	 * Determines if a node is within a circular segment with some start position,
+	 * heading, angle, and radius.
+	 * 
+	 * I don't know if this works. Will need to be tested.
+	 * 
+	 * @param lon The initial longitude of the circular segment.
+	 * @param lat The initial latitude of the circular segment.
+	 * @param theta	 The angle Theta of the circular segment.
+	 * @param phi The angle from north the the center of theta.
+	 * @param radius The radius of the circular segment.
+	 * @param n The node that's being checked.
+	 * @return True if the node is in the circular segment, false otherwise.
+	 */
+	public boolean inCircularSegment(double lon, double lat, double theta, double phi,
+										double radius, Node n) {
+		// Return false if the node is outside the possible range of the circular segment.
+		if(strat.getDistance(lon, lat, n.getLon(), n.getLat()) > radius) { return false; }
+		double angleMin = phi - theta/2;
+		double angleMax = phi + theta/2;
+		// Should find the angle from North to the node...
+		double angleNode = Math.toDegrees(Math.atan2(n.getLat()-lat, n.getLon()-lon));
+		return ((angleNode < angleMax) || (angleNode > angleMin));
+	}
+	
+	/**
 	 * Returns the nearest node on a given set of ways.
 	 * In this case the set of ways is parameterized as an iterator because map only
 	 * really gives out iterators.

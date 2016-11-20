@@ -29,12 +29,12 @@ import map_data.Node;
 import map_data.OSMParser;
 
 public class Application extends JFrame {
-	
+
 	private Map map;
 	private MapPanel mapPanel;
 	private OSMParser prsr;
 	private Director dir;
-	
+
 	/**
 	 * Constructor for the application which takes no argument.
 	 */
@@ -50,39 +50,46 @@ public class Application extends JFrame {
 		pack();
 		setVisible(true);
 	}
-	
+
 	/**
 	 * Initializes the application with an OSM file to use for data.
-	 * @param file An OSM file
+	 * 
+	 * @param file
+	 *            An OSM file
 	 */
 	public Application(File file) throws Exception {
 		this();
-		loadMap(file);;
+		loadMap(file);
+		;
 	}
 
-	
 	/**
 	 * Loads a given map file and displays it on the application frame.
-	 * @param file The file to be loaded.
-	 * @throws Exception Throws an exception if the file can't be loaded. This
-	 * 			causes the file to stop being loaded and leaves the previous map
-	 * 			being displayed.
+	 * 
+	 * @param file
+	 *            The file to be loaded.
+	 * @throws Exception
+	 *             Throws an exception if the file can't be loaded. This causes
+	 *             the file to stop being loaded and leaves the previous map
+	 *             being displayed.
 	 */
 	public void loadMap(File file) throws Exception {
 		prsr = new OSMParser(file);
 		prsr.parse();
 		map = prsr.getMap();
 		// Remove the old map panel if one exists.
-		if(mapPanel != null) {remove(mapPanel);}
+		if (mapPanel != null) {
+			remove(mapPanel);
+		}
 		mapPanel = new MapPanel(map);
 		dir = new Director();
 		getContentPane().add(mapPanel, BorderLayout.CENTER);
 		pack();
 	}
-	
+
 	/**
-	 * Creates a menu bar for the application. Currently the only function of the
-	 * menu bar is to load new OSM files.
+	 * Creates a menu bar for the application. Currently the only function of
+	 * the menu bar is to load new OSM files.
 	 */
 	public void createMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
@@ -91,15 +98,16 @@ public class Application extends JFrame {
 		JMenuItem loadMap = new JMenuItem("Load Map");
 		FileNameExtensionFilter filter = new FileNameExtensionFilter("OSM Map files", "osm");
 		fc.setFileFilter(filter);
-		// The action listener displays a file chooser dialog and lets display a new file.
+		// The action listener displays a file chooser dialog and lets display a
+		// new file.
 		loadMap.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				int chooseVal = fc.showOpenDialog(Application.this);
-				if(chooseVal == fc.APPROVE_OPTION) {
+				if (chooseVal == fc.APPROVE_OPTION) {
 					File file = fc.getSelectedFile();
 					try {
 						loadMap(file);
-					} catch(Exception x) {
+					} catch (Exception x) {
 						System.out.println("Failed to load the map");
 					}
 				}
@@ -109,44 +117,47 @@ public class Application extends JFrame {
 		menuBar.add(fileMenu);
 		setJMenuBar(menuBar);
 	}
+
 	/**
-	 * A panel that holds all the buttons used by the application.
-	 * Currently holds select start and end nodes
+	 * A panel that holds all the buttons used by the application. Currently
+	 * holds select start and end nodes
 	 * 
-	 * In the future will have buttons for getting directions and activating the gps.
+	 * In the future will have buttons for getting directions and activating the
+	 * gps.
+	 * 
 	 * @author david
 	 *
 	 */
 	class ButtonPanel extends JPanel {
 		JButton selStart;
 		JButton selEnd;
-		
+
 		public ButtonPanel() {
 			ActionListener selListener = new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					GraphNode n = mapPanel.popSelectedNode();
-					if(n != null && e.getActionCommand().equals("start")) {
+					if (n != null && e.getActionCommand().equals("start")) {
 						GraphNode oldStart = dir.getStartNode();
-						if(oldStart != null) {
+						if (oldStart != null) {
 							mapPanel.removeHighlightedNode((Node) oldStart);
 						}
 						dir.setStartNode(n);
-						mapPanel.addHilightedNode((Node)n);
+						mapPanel.addHilightedNode((Node) n);
 						JOptionPane.showMessageDialog(null, "Start node selected");
 					}
-					if(n != null && e.getActionCommand().equals("end")) {
+					if (n != null && e.getActionCommand().equals("end")) {
 						GraphNode oldEnd = dir.getEndNode();
-						if(oldEnd != null) {
+						if (oldEnd != null) {
 							mapPanel.removeHighlightedNode((Node) oldEnd);
 						}
 						dir.setEndNode(n);
-						mapPanel.addHilightedNode((Node)n);
+						mapPanel.addHilightedNode((Node) n);
 						JOptionPane.showMessageDialog(null, "End node selected");
 					}
 				}
 			};
-			
+
 			selStart = new JButton("Select start");
 			selStart.setActionCommand("start");
 			selStart.addActionListener(selListener);
@@ -159,14 +170,18 @@ public class Application extends JFrame {
 			this.add(selEnd);
 		}
 	}
-	
+
 	/**
-	 * Main method for initialzing the program. Takes an OSM file as the argument.
-	 * @param args OSM file to be displayed first.
-	 * @throws Exception Throws an exception if something goes wrong with the file.
+	 * Main method for initialzing the program. Takes an OSM file as the
+	 * argument.
+	 * 
+	 * @param args
+	 *            OSM file to be displayed first.
+	 * @throws Exception
+	 *             Throws an exception if something goes wrong with the file.
 	 */
 	public static void main(String[] args) throws Exception {
-		if(args.length > 0) {
+		if (args.length > 0) {
 			new Application(new File(args[0]));
 		} else {
 			new Application();

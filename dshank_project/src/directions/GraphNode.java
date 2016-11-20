@@ -11,7 +11,7 @@ public interface GraphNode {
 	public String getID();
 	
 	/**
-	 * Returns an iterator over te edges of the graph.
+	 * Returns an iterator over te edges moving away from the graph.
 	 * @return THe iterator for the graphs edges.
 	 */
 	public Iterator<GraphEdge> getEdgeIt();

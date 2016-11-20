@@ -94,6 +94,21 @@ public class Director {
 	}
 	
 	/**
+	 * Removes the first element of the list. essentially representing following the directions.
+	 */
+	public void moveForward() {
+		
+	}
+	
+	/**
+	 * Removes elements from the directions until you reach the selected node.
+	 * @param n The node to progress to.
+	 */
+	public void moveForwardTo(GraphNode n) {
+		
+	}
+	
+	/**
 	 * Produces a test string with the start and end nodes.
 	 */
 	@Override

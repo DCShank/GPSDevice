@@ -18,6 +18,10 @@ public class Node implements GraphNode {
 	private double lon;
 	private double lat;
 	private String id;
+	/** 
+	 * These edges are the edges with this node as the start node. Edges are
+	 * directed.
+	 */
 	private Set<GraphEdge> edges;
 	
 	/**
