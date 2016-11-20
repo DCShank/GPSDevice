@@ -11,10 +11,15 @@ import map_data.Node;
  * 
  * A class that will produce directions from a start point to an end point.
  * Much easier to make mutable than otherwise because 
+ * 
+ * This class is starting to seem really bloated. This is one place I might
+ * look to split off a smaller class. Originally I had planned to have a separate
+ * GPSListener but this seemed convenient as I was working.
  * @author david
  *
  */
-public class Director {
+public class Director implements GPSListener {
+	private final Graph graph;
 	/** A list of edges to follow to reach a destination */
 	private List<GraphEdge> directions;
 	/** A list of the nodes traversed by this graph. */
@@ -28,7 +33,8 @@ public class Director {
 	
 	private GraphNode endNode;
 	
-	public Director() {
+	public Director(Graph g) {
+		graph = g;
 	}
 	
 	/**
@@ -63,7 +69,11 @@ public class Director {
 		return endNode;
 	}
 	
-	
+	/**
+	 * Returns whether or not a certain node is in the route.
+	 * @param n
+	 * @return
+	 */
 	public boolean hasNode(GraphNode n) {
 		return false;
 	}
@@ -85,6 +95,14 @@ public class Director {
 	}
 	
 	/**
+	 * Processes a GPS event.
+	 * @param e The event being processed.
+	 */
+	public void processEvent(GPSEvent e) {
+		
+	}
+	
+	/**
 	 * Calculates a set of directions based on the Directors start and end nodes.
 	 * Also writes the directions to the instance variable.
 	 * @return The list of directions for immediate use.
@@ -94,9 +112,33 @@ public class Director {
 	}
 	
 	/**
-	 * Removes the first element of the list. essentially representing following the directions.
+	 * Determines whether someone is off course based on their lon, lat, and heading.
+	 * @param lon The longitude of the GPS
+	 * @param lat The latitdue of the GPS
+	 * @param heading The heaing of the GPS
+	 * @return
 	 */
-	public void moveForward() {
+	private boolean onCourse(double lon, double lat, double heading) {
+		return false;
+	}
+	
+	/**
+	 * Finds and returns the first node ahead of some position with heading.
+	 * Returns null if there is no such node.
+	 * @param lon The longitude position of the GPS
+	 * @param lat The latitude position of the GPS
+	 * @param heading The heading of the GPS
+	 * @return The next node if such a node exists, null otherwise.
+	 */
+	private GraphNode nearNodeOnCourse(double lon, double lat, double heading) {
+		return null;
+	}
+	
+	/**
+	 * Removes the first element of the list. essentially representing following
+	 * the directions forward one edge.
+	 */
+	private void moveForward() {
 		
 	}
 	
@@ -104,23 +146,21 @@ public class Director {
 	 * Removes elements from the directions until you reach the selected node.
 	 * @param n The node to progress to.
 	 */
-	public void moveForwardTo(GraphNode n) {
+	private void moveForwardTo(GraphNode n) {
 		
 	}
 	
 	/**
-	 * Produces a test string with the start and end nodes.
+	 * Updates the directions based on some GPSEvent.
+	 * If the GPS indicates it is off course we recalculate new directions based
+	 * on the nearest node.
+	 * Otherwise we move forward along the route.
+	 * @param lat The latitude of the GPS
+	 * @param lon the longitude of the GPS
+	 * @param heading The Heading of the GPS
 	 */
-	@Override
-	public String toString() {
-		String rtrnString = "";
-		if(startNode != null) {
-			rtrnString += "[Start: " + startNode.getID() + "] ";
-		}
-		if(endNode != null) {
-			rtrnString += "[End: " + endNode.getID() + "] ";
-		}
-		return rtrnString;
+	private void updateDirections(double lat, double lon, double heading) {
+		
 	}
 
 }

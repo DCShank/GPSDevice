@@ -23,6 +23,7 @@ import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import directions.Director;
+import directions.Graph;
 import directions.GraphNode;
 import map_data.Map;
 import map_data.Node;
@@ -82,7 +83,7 @@ public class Application extends JFrame {
 			remove(mapPanel);
 		}
 		mapPanel = new MapPanel(map);
-		dir = new Director();
+		dir = new Director((Graph)map);
 		getContentPane().add(mapPanel, BorderLayout.CENTER);
 		pack();
 	}

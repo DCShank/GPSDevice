@@ -3,6 +3,8 @@ package map_data;
 import java.io.File;
 
 import directions.Graph;
+import directions.GraphNode;
+
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -113,7 +115,8 @@ public class Map implements Graph{
 	 * @return True if the node is in the circular segment, false otherwise.
 	 */
 	public boolean inCircularSegment(double lon, double lat, double theta, double phi,
-										double radius, Node n) {
+										double radius, GraphNode node) {
+		Node n = (Node) node;
 		// Return false if the node is outside the possible range of the circular segment.
 		if(strat.getDistance(lon, lat, n.getLon(), n.getLat()) > radius) { return false; }
 		double angleMin = phi - theta/2;

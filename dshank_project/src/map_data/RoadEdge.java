@@ -4,6 +4,8 @@ import directions.GraphEdge;
 import directions.GraphNode;
 
 /**
+ * SKELETON CLASS
+ * 
  * Represents an Edge on a graph with a length, Nodes, and adjacent edges to each Node.
  * RoadEdges can be assumed to be directional; For a two way street each node would have
  * a different RoadEdge, although both RoadEdges would have both of the nodes, with start

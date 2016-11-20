@@ -15,6 +15,11 @@ There is a skeletal implementation of many of the features for finding a route, 
 of Graph interfaces. The Director class will make use of the features in these interfaces to
 generate a list of directions from one point to another.
 
+Director is not the GPSInterface for convenience. This may be split off later depending on how
+large the class becomes.
+
+GraphEdges are currently not in use, and should be considered skeleton class.
+
 
 TODO: Figure out how "segments" should work.A segment would go from one "intersection" to
 to another, and an intersection is where two ways intersect. I believe this would make shortest
