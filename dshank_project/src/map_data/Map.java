@@ -24,6 +24,8 @@ public class Map implements Graph{
 	/** maps id's to relations */
 	private HashMap<String,Way> roadWays;
 	
+	private HashMap<String,Way> nonRoadWays;
+	
 	private double lonMin, latMin, lonMax, latMax;
 	
 	private final DistanceStrategy strat = new HaversineDistance();
@@ -38,10 +40,11 @@ public class Map implements Graph{
 	 * @param ways The map from ids to Ways
 	 * @param namedWays The map from names to Ways
 	 * @param roadWays A map of the ways that are roads.
+	 * @param nonRoadWays 
 	 */
 	public Map(double minLon, double minLat, double maxLon, double maxLat,
 				HashMap<String,Node> nodes, HashMap<String,Way> ways, HashMap<String,Way> namedWays,
-				HashMap<String,Way> roadWays) {
+				HashMap<String,Way> roadWays, HashMap<String,Way> nonRoadWays) {
 		lonMin = minLon;
 		latMin = minLat;
 		lonMax = maxLon;
@@ -50,6 +53,7 @@ public class Map implements Graph{
 		this.ways = ways;
 		this.namedWays = namedWays;
 		this.roadWays = roadWays;
+		this.nonRoadWays = nonRoadWays;
 	}
 	
 	/**
@@ -62,6 +66,10 @@ public class Map implements Graph{
 	
 	public Iterator<Way> getRoadIt() {
 		return roadWays.values().iterator();
+	}
+	
+	public Iterator<Way> getNonRoadIt() {
+		return nonRoadWays.values().iterator();
 	}
 	
 	/**

@@ -174,7 +174,8 @@ public class MapPanel extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		Iterator<Way> wayIt = map.getWayIt();
+//		Iterator<Way> wayIt = map.getWayIt();
+		Iterator<Way> wayIt = map.getNonRoadIt();
 		Iterator<Way> roadWayIt = map.getRoadIt();
 		while(wayIt.hasNext()) {
 			drawWay(wayIt.next(), g);

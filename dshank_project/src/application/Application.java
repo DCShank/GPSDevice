@@ -111,7 +111,7 @@ public class Application extends JFrame implements GPSListener {
 					try {
 						loadMap(file);
 					} catch (Exception x) {
-						System.out.println("Failed to load the map");
+						JOptionPane.showMessageDialog(null, "Failed to load map.");
 					}
 				}
 			}

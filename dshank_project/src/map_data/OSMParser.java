@@ -32,6 +32,7 @@ public class OSMParser {
 	private HashMap<String,Way> ways;
 	private HashMap<String,Way> namedWays;
 	private HashMap<String,Way> roadWays;
+	private HashMap<String,Way> nonRoadWays;
 	private HashMap<String,Relation> relations;
 	
 	/** Bounds for the map being parsed. */
@@ -47,6 +48,7 @@ public class OSMParser {
 		ways = new HashMap<String,Way>();
 		namedWays = new HashMap<String,Way>();
 		roadWays = new HashMap<String,Way>();
+		nonRoadWays = new HashMap<String,Way>();
 	}
 	
 	/**
@@ -80,7 +82,7 @@ public class OSMParser {
 	 * @return A Map containing all the parsed data.
 	 */
 	public Map getMap() {
-		Map map = new Map(minLon, minLat, maxLon, maxLat, nodes, ways, namedWays, roadWays);
+		Map map = new Map(minLon, minLat, maxLon, maxLat, nodes, ways, namedWays, roadWays, nonRoadWays);
 		return map;
 	}
 	
@@ -137,7 +139,7 @@ public class OSMParser {
 			}
 			else if(qName.equals("nd")) {storeWayNode(atts); }
 			else if(qName.equals("tag") && !id.isEmpty()) { parseWayTag(atts); }
-			else if(qName.equals("bounds")) { storeBounds(atts); }
+			else if(qName.equals("bounds") || qName.equals("bound")) { storeBounds(atts); }
 		}
 
 		/**
@@ -157,6 +159,9 @@ public class OSMParser {
 				}
 				if(way.isRoad()) {
 					roadWays.put(id, way);
+				} 
+				else {
+					nonRoadWays.put(id, way);
 				}
 				// Reset the values for future elements.
 				id = "";
@@ -182,6 +187,13 @@ public class OSMParser {
 					maxLat = Double.parseDouble(value);
 				if (qName.equals("maxlon"))
 					maxLon = Double.parseDouble(value);
+				if (qName.equals("box")) {
+					String[] values = value.split(",");
+					minLat = Double.parseDouble(values[0]);
+					minLon = Double.parseDouble(values[1]);
+					maxLat = Double.parseDouble(values[2]);
+					maxLon = Double.parseDouble(values[3]);
+				}
 			}
 		}
 		
@@ -231,7 +243,9 @@ public class OSMParser {
 				if (atts.getQName(i).equals("ref"))
 					ndID = atts.getValue(i);
 			}
-			tempNodes.add(nodes.get(ndID));
+			Node node = nodes.get(ndID);
+			if(node != null)
+				tempNodes.add(nodes.get(ndID));
 		}
 		
 		/**
