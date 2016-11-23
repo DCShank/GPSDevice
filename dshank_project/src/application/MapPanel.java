@@ -174,20 +174,25 @@ public class MapPanel extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-//		Iterator<Way> wayIt = map.getWayIt();
-		Iterator<Way> wayIt = map.getNonRoadIt();
-		Iterator<Way> roadWayIt = map.getRoadIt();
+		Iterator<Way> wayIt = map.getWayIt();
+//		Iterator<Way> wayIt = map.getNonRoadIt();
+//		Iterator<Way> roadWayIt = map.getRoadIt();
 		while(wayIt.hasNext()) {
-			drawWay(wayIt.next(), g);
+			Way w = wayIt.next();
+			if(!w.isRoad()) {
+				drawWay(w, g);
+			} else {
+				highlightWay(w, g);
+			}
 		}
-		highlightWays(roadWayIt,Color.MAGENTA, g);
-		if(selectedNode != null) {
-			Color c = g.getColor();
-			Node n = selectedNode;
-			g.setColor(Color.RED);
-			g.fillOval(lonToScreen(n.getLon(), n.getLat())-3, latToScreen(n.getLat())-3, 7, 7);
-			g.setColor(c);
-		}
+//		highlightWays(roadWayIt,Color.MAGENTA, g);
+//		if(selectedNode != null) {
+//			Color c = g.getColor();
+//			Node n = selectedNode;
+//			g.setColor(Color.RED);
+//			g.fillOval(lonToScreen(n.getLon(), n.getLat())-3, latToScreen(n.getLat())-3, 7, 7);
+//			g.setColor(c);
+//		}
 		for(Node n : highlightedNodes) {
 			Color c = g.getColor();
 			g.setColor(Color.BLUE);

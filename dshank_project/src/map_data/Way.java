@@ -23,7 +23,9 @@ public class Way {
 	/** The empty string if the Way has no road type */
 	private String roadType;
 	/** Boolean that declares if the road is one way. */
-	private boolean oneWay;
+	private boolean oneway;
+	
+	private boolean isRoad;
 	
 	/**
 	 * Initializes the Way with the parameters given.
@@ -36,7 +38,8 @@ public class Way {
 		id = idString;
 		nodes = new ArrayList<Node>(nodeList);
 		roadType = wayType;
-		oneWay = oneway;
+		this.oneway = oneway;
+		setRoad();	// I'm not sure how much I actually get out of this. It seems like it saves me a few 
 	}
 	
 	/**
@@ -92,11 +95,26 @@ public class Way {
 	 * @return True if the way is a road, false otherwise.
 	 */
 	public boolean isRoad() {
-		if(roadType.isEmpty()) { return false; }
+		return isRoad;
+	}
+	
+	/**
+	 * Returns whether or not the way is oneway.
+	 * @return True if the way is oneway, false otherwise.
+	 */
+	public boolean isOneway() {
+		return oneway;
+	}
+	
+	/**
+	 * Sets the road field for this way.
+	 */
+	private void setRoad() {
 //		return roadType.equals("residential") || roadType.equals("primary")
 //				|| roadType.equals("turning_circle") || roadType.equals("tertiary")
 //				|| roadType.equals("trunk") || roadType.equals("service");
-		return !(roadType.equals("footway") || roadType.equals("path"));
+		isRoad = !(roadType.isEmpty() || roadType.equals("footway") || roadType.equals("path"));
+		
 	}
 	
 	/**

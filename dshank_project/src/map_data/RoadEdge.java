@@ -4,8 +4,6 @@ import directions.GraphEdge;
 import directions.GraphNode;
 
 /**
- * SKELETON CLASS
- * 
  * Represents an Edge on a graph with a length, Nodes, and adjacent edges to each Node.
  * RoadEdges can be assumed to be directional; For a two way street each node would have
  * a different RoadEdge, although both RoadEdges would have both of the nodes, with start
@@ -22,17 +20,25 @@ public class RoadEdge implements GraphEdge {
 	private final Node startNode;
 	private final Node endNode;
 	private final double length;
+	private final DistanceStrategy strat;
 	
 	/**
 	 * Constructor for a graph edge.
 	 * @param sn the startNode
 	 * @param en the endNode
+	 * @param strat The strategy for finding the distance.
 	 */
-	RoadEdge(Node sn, Node en, DistanceStrategy strat) {
+	public RoadEdge(Node sn, Node en, DistanceStrategy strat) {
 		startNode = sn;
 		endNode = en;
 		id = startNode.getID() + endNode.getID();
 		length = strat.getDistance(sn.getLon(), sn.getLat(), en.getLon(), en.getLat());
+		this.strat = strat;
+	}
+	
+	public RoadEdge getReverse() {
+		RoadEdge reverse = new RoadEdge(endNode, startNode, strat);
+		return reverse;
 	}
 	
 	/**

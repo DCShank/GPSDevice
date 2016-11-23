@@ -3,6 +3,7 @@ package map_data;
 import java.io.File;
 
 import directions.Graph;
+import directions.GraphEdge;
 import directions.GraphNode;
 
 import java.util.HashMap;
@@ -54,6 +55,7 @@ public class Map implements Graph{
 		this.namedWays = namedWays;
 		this.roadWays = roadWays;
 		this.nonRoadWays = nonRoadWays;
+		edgeInit();
 	}
 	
 	/**
@@ -132,6 +134,28 @@ public class Map implements Graph{
 		// Should find the angle from North to the node...
 		double angleNode = Math.toDegrees(Math.atan2(n.getLat()-lat, n.getLon()-lon));
 		return ((angleNode < angleMax) || (angleNode > angleMin));
+	}
+	
+	/**
+	 * Method to help initialize all the RoadEdges and assign them to their nodes.
+	 */
+	private void edgeInit() {
+		Iterator<Way> it = getRoadIt();
+		while(it.hasNext()) {
+			Way w = it.next();
+			Iterator<Node> nIt = w.getNodeIt();
+			Node currNode = nIt.next();
+			Node prevNode = null;
+			while(nIt.hasNext()) {
+				prevNode = currNode;
+				currNode = nIt.next();
+				RoadEdge e = new RoadEdge(prevNode, currNode, strat);
+				prevNode.addGraphEdge((GraphEdge)e);
+				if(!w.isOneway()) {
+					currNode.addGraphEdge((GraphEdge)e.getReverse());
+				}
+			}
+		}
 	}
 	
 	/**
