@@ -155,7 +155,7 @@ public class Application extends JFrame implements GPSListener {
 							mapPanel.removeHighlightedNode((Node) oldStart);
 						}
 						dir.setStartNode(n);
-						mapPanel.addHilightedNode((Node) n);
+						mapPanel.addHighlightedNode((Node) n);
 						JOptionPane.showMessageDialog(null, "Start node selected");
 					}
 					if (n != null && e.getActionCommand().equals("end")) {
@@ -164,7 +164,7 @@ public class Application extends JFrame implements GPSListener {
 							mapPanel.removeHighlightedNode((Node) oldEnd);
 						}
 						dir.setEndNode(n);
-						mapPanel.addHilightedNode((Node) n);
+						mapPanel.addHighlightedNode((Node) n);
 						JOptionPane.showMessageDialog(null, "End node selected");
 					}
 				}

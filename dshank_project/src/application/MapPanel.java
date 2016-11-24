@@ -14,6 +14,8 @@ import java.util.Set;
 
 import javax.swing.JPanel;
 
+import directions.GraphEdge;
+import directions.GraphNode;
 import map_data.Map;
 import map_data.Node;
 import map_data.Way;
@@ -112,7 +114,13 @@ public class MapPanel extends JPanel {
 				double lat = screenToLat(e.getY());
 				double lon = screenToLon(e.getX(), e.getY());
 				Node n = map.getNearNode(lon, lat, map.getRoadIt());
+				
 				selectedNode = n;
+//				Iterator<GraphEdge> it = n.getEdgeIt();
+//				while(it.hasNext()) {
+//					addHighlightedNode((Node)it.next().getEndNode());
+//				}
+//				addHighlightedNode(n);
 				repaint();
 			}
 		};
@@ -175,8 +183,6 @@ public class MapPanel extends JPanel {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Iterator<Way> wayIt = map.getWayIt();
-//		Iterator<Way> wayIt = map.getNonRoadIt();
-//		Iterator<Way> roadWayIt = map.getRoadIt();
 		while(wayIt.hasNext()) {
 			Way w = wayIt.next();
 			if(!w.isRoad()) {
@@ -185,19 +191,19 @@ public class MapPanel extends JPanel {
 				highlightWay(w, g);
 			}
 		}
-//		highlightWays(roadWayIt,Color.MAGENTA, g);
-//		if(selectedNode != null) {
-//			Color c = g.getColor();
-//			Node n = selectedNode;
-//			g.setColor(Color.RED);
-//			g.fillOval(lonToScreen(n.getLon(), n.getLat())-3, latToScreen(n.getLat())-3, 7, 7);
-//			g.setColor(c);
-//		}
 		for(Node n : highlightedNodes) {
 			Color c = g.getColor();
 			g.setColor(Color.BLUE);
 			g.fillOval(lonToScreen(n.getLon(), n.getLat())-3, latToScreen(n.getLat())-3, 7, 7);
 			g.setColor(c);
+		}
+		if(selectedNode != null) {
+			Color c = g.getColor();
+			g.setColor(Color.RED);
+			Node n = selectedNode;
+			g.fillOval(lonToScreen(n.getLon(), n.getLat())-3, latToScreen(n.getLat())-3, 7, 7);
+			g.setColor(c);
+			
 		}
 	}
 	
@@ -304,7 +310,7 @@ public class MapPanel extends JPanel {
 	 * Adds a node to the set of highlighted nodes.
 	 * @param n THe node to be highlighted.
 	 */
-	public void addHilightedNode(Node n) {
+	public void addHighlightedNode(Node n) {
 		highlightedNodes.add(n);
 	}
 	
