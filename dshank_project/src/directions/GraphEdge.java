@@ -5,8 +5,6 @@ import map_data.Node;
 public interface GraphEdge {
 
 	/**
-	 * SKELETON INTERFACE
-	 * 
 	 * returns whether or not a specified node is one of the nodes connected to this edge.
 	 * @param n The specified node
 	 * @return Whether this edge connects to the specified node.
@@ -33,7 +31,7 @@ public interface GraphEdge {
 	
 	/**
 	 * Returns the unique ID for this edge.
-	 * @return
+	 * @return The edge's unique id.
 	 */
 	String getID();
 

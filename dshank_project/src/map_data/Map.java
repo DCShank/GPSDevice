@@ -7,6 +7,7 @@ import directions.GraphEdge;
 import directions.GraphNode;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 
 /**
@@ -56,6 +57,7 @@ public class Map implements Graph{
 		this.roadWays = roadWays;
 		this.nonRoadWays = nonRoadWays;
 		edgeInit();
+		segmentInit();
 	}
 	
 	/**
@@ -154,6 +156,40 @@ public class Map implements Graph{
 				if(!w.isOneway()) {
 					currNode.addGraphEdge((GraphEdge)e.getReverse());
 				}
+			}
+		}
+	}
+	
+	/**
+	 * Initializes the segments for this map.
+	 */
+	private void segmentInit() {
+		Iterator<Way> wayIt = getRoadIt();
+		while(wayIt.hasNext()) {
+			Way w = wayIt.next();
+			Iterator<Node> nIt = w.getNodeIt();
+			Node sn = nIt.next();
+			Node pn = sn;
+			Node nn = null;
+			double len = 0;
+			HashSet<Node>nodes = new HashSet();
+			nodes.add(sn);
+			while(nIt.hasNext()) {
+				nn = nIt.next();
+				len += pn.getEdgeTo((GraphNode)nn).getLength();
+				nodes.add(nn);
+				if(nn.getDegree() != 1) {
+					RoadSegment seg = new RoadSegment(sn, nn, len, nodes);
+					sn.addGraphEdge(seg);
+					if(!w.isOneway()) {
+						nn.addGraphEdge(seg.getReverse());
+					}
+					sn = nn;
+					nodes = new HashSet();
+					nodes.add(sn);
+					len = 0;
+				}
+				pn = nn;
 			}
 		}
 	}

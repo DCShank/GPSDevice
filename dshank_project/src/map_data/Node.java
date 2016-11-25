@@ -1,5 +1,6 @@
 package map_data;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -18,11 +19,18 @@ public class Node implements GraphNode {
 	private final double lon;
 	private final double lat;
 	private final String id;
+	private int degree = 0;
 	/** 
 	 * These edges are the edges with this node as the start node. Edges are
 	 * directed.
 	 */
 	private Set<GraphEdge> edges;
+	/**
+	 * A set of segments.
+	 */
+	private Set<GraphEdge> segments;
+	
+	private HashMap<GraphNode, GraphEdge> nodeEdgeMap;
 	
 	/**
 	 * Constructs a node with the given position and id.
@@ -36,6 +44,8 @@ public class Node implements GraphNode {
 		lon = longitude;
 		id = idString;
 		edges = new HashSet<GraphEdge>();
+		nodeEdgeMap = new HashMap<GraphNode, GraphEdge>();
+		segments = new HashSet<GraphEdge>();
 	}
 	
 	/**
@@ -63,11 +73,26 @@ public class Node implements GraphNode {
 	}
 	
 	public void addGraphEdge(GraphEdge edge) {
-		edges.add(edge);
+		if(edge instanceof RoadEdge) {
+			edges.add(edge);
+			nodeEdgeMap.put(edge.getEndNode(), edge);
+			degree += 1;
+		}
+		if(edge instanceof RoadSegment) {
+			segments.add(edge);
+		}
 	}
 	
 	public Iterator<GraphEdge> getEdgeIt() {
 		return edges.iterator();
+	}
+	
+	public Iterator<GraphEdge> getSegmentIt() {
+		return segments.iterator();
+	}
+	
+	public GraphEdge getEdgeTo(GraphNode n) {
+		return nodeEdgeMap.get(n);
 	}
 	
 	@Override
@@ -82,6 +107,11 @@ public class Node implements GraphNode {
 	@Override
 	public int hashCode() {
 		return id.hashCode();
+	}
+
+	@Override
+	public int getDegree() {
+		return degree;
 	}
 
 }
