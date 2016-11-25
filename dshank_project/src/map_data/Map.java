@@ -178,7 +178,7 @@ public class Map implements Graph{
 				nn = nIt.next();
 				len += pn.getEdgeTo((GraphNode)nn).getLength();
 				nodes.add(nn);
-				if(nn.getDegree() != 1) {
+				if((nn.getDegree() != 1 && w.isOneway()) || (nn.getDegree() != 2 && w.isOneway())) {
 					RoadSegment seg = new RoadSegment(sn, nn, len, nodes);
 					sn.addGraphEdge(seg);
 					if(!w.isOneway()) {

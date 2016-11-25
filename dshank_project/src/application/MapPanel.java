@@ -116,11 +116,10 @@ public class MapPanel extends JPanel {
 				Node n = map.getNearNode(lon, lat, map.getRoadIt());
 				
 				selectedNode = n;
-//				Iterator<GraphEdge> it = n.getEdgeIt();
-//				while(it.hasNext()) {
-//					addHighlightedNode((Node)it.next().getEndNode());
-//				}
-//				addHighlightedNode(n);
+				Iterator<GraphEdge> it = n.getSegmentIt();
+				while(it.hasNext()) {
+					addHighlightedNode((Node)it.next().getEndNode());
+				}
 				repaint();
 			}
 		};
