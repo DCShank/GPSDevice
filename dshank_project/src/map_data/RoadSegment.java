@@ -1,6 +1,8 @@
 package map_data;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import directions.GraphEdge;
@@ -15,17 +17,19 @@ import directions.GraphNode;
  */
 public class RoadSegment implements GraphEdge {
 	
+	private final ArrayList<Node> nodeList;
 	private final HashSet<Node> nodes;
 	private final String id;
 	private final Node startNode;
 	private final Node endNode;
 	private final double length;
 
-	public RoadSegment(Node sn, Node en, double len, Set<Node> nodes) {
+	public RoadSegment(Node sn, Node en, double len, List<Node> nList) {
 		startNode = sn;
 		endNode = en;
 		length = len;
-		this.nodes = (HashSet<Node>) nodes;
+		nodeList = new ArrayList<Node>(nList);
+		nodes = new HashSet<Node>(nList);
 		id = sn.getID() + en.getID();
 	}
 	
@@ -55,7 +59,7 @@ public class RoadSegment implements GraphEdge {
 	}
 	
 	public RoadSegment getReverse() {
-		return new RoadSegment(endNode, startNode, length, nodes);
+		return new RoadSegment(endNode, startNode, length, nodeList);
 	}
 
 	@Override

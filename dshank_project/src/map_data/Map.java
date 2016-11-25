@@ -6,6 +6,7 @@ import directions.Graph;
 import directions.GraphEdge;
 import directions.GraphNode;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -172,20 +173,20 @@ public class Map implements Graph{
 			Node pn = sn;
 			Node nn = null;
 			double len = 0;
-			HashSet<Node>nodes = new HashSet();
+			ArrayList<Node>nodes = new ArrayList<Node>();
 			nodes.add(sn);
 			while(nIt.hasNext()) {
 				nn = nIt.next();
 				len += pn.getEdgeTo((GraphNode)nn).getLength();
 				nodes.add(nn);
-				if((nn.getDegree() != 1 && w.isOneway()) || (nn.getDegree() != 2 && w.isOneway())) {
+				if((nn.getDegree() != 1 && w.isOneway()) || (nn.getDegree() != 2 && !w.isOneway())) {
 					RoadSegment seg = new RoadSegment(sn, nn, len, nodes);
 					sn.addGraphEdge(seg);
 					if(!w.isOneway()) {
 						nn.addGraphEdge(seg.getReverse());
 					}
 					sn = nn;
-					nodes = new HashSet();
+					nodes = new ArrayList<Node>();
 					nodes.add(sn);
 					len = 0;
 				}
