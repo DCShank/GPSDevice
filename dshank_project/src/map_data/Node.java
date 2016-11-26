@@ -116,13 +116,26 @@ public class Node implements GraphNode {
 	public Iterator<GraphSegment> getIncomingSegmentIt() {
 		return incomingSegments.iterator();
 	}
-	
+
+	@Override
+	public int getDegree() {
+		return degree;
+	}
 	
 	/**
 	 * Returns the edge that leads to the specified node.
 	 */
 	public GraphEdge getEdgeTo(GraphNode n) {
 		return toNodeEdges.get(n);
+	}
+	
+	public void removeSegment(GraphSegment seg) {
+		if(segments.contains(seg)) {
+			segments.remove(seg);
+		}
+		if(incomingSegments.contains(seg)) {
+			incomingSegments.remove(seg);
+		}
 	}
 	
 	@Override
@@ -137,11 +150,6 @@ public class Node implements GraphNode {
 	@Override
 	public int hashCode() {
 		return id.hashCode();
-	}
-
-	@Override
-	public int getDegree() {
-		return degree;
 	}
 
 }

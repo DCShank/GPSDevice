@@ -40,5 +40,7 @@ public interface GraphNode {
 	public Iterator<GraphSegment> getSegmentIt();
 	
 	public Iterator<GraphSegment> getIncomingSegmentIt();
+	
+	public void removeSegment(GraphSegment seg);
 
 }

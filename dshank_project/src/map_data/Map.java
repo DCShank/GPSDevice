@@ -5,11 +5,13 @@ import java.io.File;
 import directions.Graph;
 import directions.GraphEdge;
 import directions.GraphNode;
+import directions.GraphSegment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 /**
  * A representation of the data in an OSM map.
@@ -28,6 +30,8 @@ public class Map implements Graph{
 	private HashMap<String,Way> roadWays;
 	
 	private HashMap<String,Way> nonRoadWays;
+	
+	private Set<RoadSegment> segments;
 	
 	private double lonMin, latMin, lonMax, latMax;
 	
@@ -58,6 +62,7 @@ public class Map implements Graph{
 		this.roadWays = roadWays;
 		this.nonRoadWays = nonRoadWays;
 		edgeInit();
+		segments = new HashSet();
 		segmentInit();
 	}
 	
@@ -183,9 +188,11 @@ public class Map implements Graph{
 					RoadSegment seg = new RoadSegment(sn, nn, len, nodes);
 					sn.addGraphEdge(seg);
 					nn.addGraphEdge(seg);
+					segments.add(seg);
 					if(!w.isOneway()) {
 						nn.addGraphEdge(seg.getReverse());
 						sn.addGraphEdge(seg.getReverse());
+						segments.add(seg.getReverse());
 					}
 					sn = nn;
 					nodes = new ArrayList<Node>();
@@ -194,6 +201,28 @@ public class Map implements Graph{
 				}
 				pn = nn;
 			}
+		}
+	}
+	
+	/**
+	 * Adds a segment to the graph and the corresponding start and end nodes.
+	 * @param seg The segment to be added.
+	 */
+	public void addSegment(GraphSegment seg) {
+		GraphNode sn = seg.getStartNode();
+		GraphNode en = seg.getEndNode();
+		sn.addGraphEdge(seg);
+		en.addGraphEdge(seg);
+	}
+	
+	/**
+	 * Removes a segment from the graph and from the corresponding nodes.
+	 */
+	public void removeSegment(GraphSegment seg) {
+		if(segments.contains(seg)) {
+			segments.remove(seg);
+			seg.getStartNode().removeSegment(seg);
+			seg.getEndNode().removeSegment(seg);
 		}
 	}
 	

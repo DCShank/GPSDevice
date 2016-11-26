@@ -17,6 +17,10 @@ public interface Graph {
 	public boolean inCircularSegment(double x, double y, double theta, double phi,
 										double radius, GraphNode n);
 	
+	public void addSegment(GraphSegment seg);
+	
+	public void removeSegment(GraphSegment seg);
+	
 //	/**
 //	 * Returns a set of GraphNodes.
 //	 * @return The set of GraphNodes
