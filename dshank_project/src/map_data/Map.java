@@ -182,8 +182,10 @@ public class Map implements Graph{
 				if((nn.getDegree() != 1 && w.isOneway()) || (nn.getDegree() != 2 && !w.isOneway())) {
 					RoadSegment seg = new RoadSegment(sn, nn, len, nodes);
 					sn.addGraphEdge(seg);
+					nn.addGraphEdge(seg);
 					if(!w.isOneway()) {
 						nn.addGraphEdge(seg.getReverse());
+						sn.addGraphEdge(seg.getReverse());
 					}
 					sn = nn;
 					nodes = new ArrayList<Node>();

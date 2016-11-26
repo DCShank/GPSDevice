@@ -17,6 +17,12 @@ public interface GraphNode {
 	public Iterator<GraphEdge> getEdgeIt();
 	
 	/**
+	 * Returns an iterator over the incoming edges for a node.
+	 * @return An iterator over the incoming edges.
+	 */
+	public Iterator<GraphEdge> getIncomingEdgeIt();
+	
+	/**
 	 * Returns the edge going from this node to paramter end node.
 	 * @param endNode The node to find the edge to
 	 * @return The node if there is a direct edge to it, walse otherwise.
@@ -28,5 +34,11 @@ public interface GraphNode {
 	 * @return The degree of the node. 0 if the node has no outgoing edges.
 	 */
 	public int getDegree();
+	
+	public void addGraphEdge(GraphEdge e);
+	
+	public Iterator<GraphSegment> getSegmentIt();
+	
+	public Iterator<GraphSegment> getIncomingSegmentIt();
 
 }

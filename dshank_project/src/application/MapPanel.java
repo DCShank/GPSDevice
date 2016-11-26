@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 
 import directions.GraphEdge;
 import directions.GraphNode;
+import directions.GraphSegment;
 import map_data.Map;
 import map_data.Node;
 import map_data.Way;
@@ -116,7 +117,7 @@ public class MapPanel extends JPanel {
 				Node n = map.getNearNode(lon, lat, map.getRoadIt());
 				
 				selectedNode = n;
-				Iterator<GraphEdge> it = n.getSegmentIt();
+				Iterator<GraphSegment> it = n.getSegmentIt();
 				while(it.hasNext()) {
 					addHighlightedNode((Node)it.next().getEndNode());
 				}

@@ -7,6 +7,7 @@ import java.util.Set;
 
 import directions.GraphEdge;
 import directions.GraphNode;
+import directions.GraphSegment;
 
 /**
  * Represents a node in an OSM map.
@@ -25,12 +26,16 @@ public class Node implements GraphNode {
 	 * directed.
 	 */
 	private Set<GraphEdge> edges;
+	
+	private Set<GraphEdge> incomingEdges;
 	/**
 	 * A set of segments.
 	 */
-	private Set<GraphEdge> segments;
+	private Set<GraphSegment> segments;
 	
-	private HashMap<GraphNode, GraphEdge> nodeEdgeMap;
+	private Set<GraphSegment> incomingSegments;
+	
+	private HashMap<GraphNode, GraphEdge> toNodeEdges;
 	
 	/**
 	 * Constructs a node with the given position and id.
@@ -44,8 +49,10 @@ public class Node implements GraphNode {
 		lon = longitude;
 		id = idString;
 		edges = new HashSet<GraphEdge>();
-		nodeEdgeMap = new HashMap<GraphNode, GraphEdge>();
-		segments = new HashSet<GraphEdge>();
+		incomingEdges = new HashSet<GraphEdge>();
+		toNodeEdges = new HashMap<GraphNode, GraphEdge>();
+		segments = new HashSet<GraphSegment>();
+		incomingSegments = new HashSet<GraphSegment>();
 	}
 	
 	/**
@@ -72,14 +79,25 @@ public class Node implements GraphNode {
 		return id;
 	}
 	
+	/**
+	 * Adds a graph edge to the node.
+	 * Determines the nature of the edge adds it appropriately to the node.
+	 * @param edge The edge to be added.
+	 */
 	public void addGraphEdge(GraphEdge edge) {
-		if(edge instanceof RoadEdge) {
+		if(edge instanceof RoadEdge && edge.getStartNode().equals(this)) {
 			edges.add(edge);
-			nodeEdgeMap.put(edge.getEndNode(), edge);
+			toNodeEdges.put(edge.getEndNode(), edge);
 			degree += 1;
 		}
-		if(edge instanceof RoadSegment) {
-			segments.add(edge);
+		if(edge instanceof RoadSegment && edge.getStartNode().equals(this)) {
+			segments.add((RoadSegment) edge);
+		}
+		if(edge instanceof RoadEdge && edge.getEndNode().equals(this)) {
+			incomingEdges.add(edge);
+		}
+		if(edge instanceof RoadSegment && edge.getEndNode().equals(this)) {
+			incomingSegments.add((RoadSegment)edge);
 		}
 	}
 	
@@ -87,12 +105,24 @@ public class Node implements GraphNode {
 		return edges.iterator();
 	}
 	
-	public Iterator<GraphEdge> getSegmentIt() {
+	public Iterator<GraphEdge> getIncomingEdgeIt() {
+		return incomingEdges.iterator();
+	}
+	
+	public Iterator<GraphSegment> getSegmentIt() {
 		return segments.iterator();
 	}
 	
+	public Iterator<GraphSegment> getIncomingSegmentIt() {
+		return incomingSegments.iterator();
+	}
+	
+	
+	/**
+	 * Returns the edge that leads to the specified node.
+	 */
 	public GraphEdge getEdgeTo(GraphNode n) {
-		return nodeEdgeMap.get(n);
+		return toNodeEdges.get(n);
 	}
 	
 	@Override
