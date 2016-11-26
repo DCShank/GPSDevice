@@ -31,7 +31,7 @@ public class Map implements Graph{
 	
 	private HashMap<String,Way> nonRoadWays;
 	
-	private Set<RoadSegment> segments;
+	private Set<GraphSegment> segments;
 	
 	private double lonMin, latMin, lonMax, latMax;
 	
@@ -248,5 +248,9 @@ public class Map implements Graph{
 			}
 		}
 		return rtrnNode;
+	}
+	
+	public Iterator<GraphSegment> getSegmentIterator() {
+		return segments.iterator();
 	}
 }

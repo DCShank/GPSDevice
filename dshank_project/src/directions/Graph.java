@@ -1,5 +1,6 @@
 package directions;
 
+import java.util.Iterator;
 import java.util.Set;
 
 public interface Graph {
@@ -20,6 +21,8 @@ public interface Graph {
 	public void addSegment(GraphSegment seg);
 	
 	public void removeSegment(GraphSegment seg);
+	
+	public Iterator<GraphSegment> getSegmentIterator();
 	
 //	/**
 //	 * Returns a set of GraphNodes.

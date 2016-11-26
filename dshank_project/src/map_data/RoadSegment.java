@@ -25,7 +25,7 @@ public class RoadSegment implements GraphSegment {
 	private final String id;
 	private final Node startNode;
 	private final Node endNode;
-	private final double length;
+	private double length;
 
 	public RoadSegment(Node sn, Node en, double len, List<Node> nodes) {
 		startNode = sn;
@@ -42,6 +42,20 @@ public class RoadSegment implements GraphSegment {
 			prevNode = currNode;
 		}
 		id = sn.getID() + en.getID();
+	}
+	
+	public RoadSegment(Node sn, Node en, List<GraphEdge> edges) {
+		startNode = sn;
+		endNode = en;
+		length = 0;
+		nodes = new HashSet<Node>();
+		this.edges = new LinkedList(edges);
+		for(GraphEdge e : edges) {
+			length += e.getLength();
+			nodes.add((Node) e.getStartNode());
+			nodes.add((Node) e.getEndNode());
+		}
+		id = startNode.getID() + endNode.getID();
 	}
 	
 	@Override
@@ -103,5 +117,34 @@ public class RoadSegment implements GraphSegment {
 	@Override
 	public Iterator<GraphEdge> getEdgeIt() {
 		return edges.iterator();
+	}
+	
+	/**
+	 * Returns a sub segment that extends from the beginning of this 
+	 * @param end
+	 * @return
+	 */
+	public GraphSegment getPreSubsegment(GraphNode en) {
+		Iterator<GraphEdge> edgeIt = edges.iterator();
+		GraphEdge currEdge = null;
+		LinkedList<GraphEdge> newList = new LinkedList<GraphEdge>();
+		while(currEdge.getEndNode() != en) {
+			currEdge = edgeIt.next();
+			newList.add(currEdge);
+		}
+		return new RoadSegment(startNode, (Node) en, newList);
+	}
+	
+	public GraphSegment getPostSubsegment(GraphNode sn) {
+		Iterator<GraphEdge> edgeIt = edges.iterator();
+		GraphEdge currEdge = null;
+		LinkedList<GraphEdge> newList = new LinkedList<GraphEdge>();
+		while(currEdge.getEndNode() != sn) { currEdge = edgeIt.next(); }
+		while(currEdge.getEndNode() != endNode) {
+			currEdge = edgeIt.next();
+			newList.add(currEdge);
+		}
+		return new RoadSegment((Node) sn, endNode, newList);
+		
 	}
 }

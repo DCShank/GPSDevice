@@ -1,10 +1,14 @@
 package directions;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import map_data.Node;
+import map_data.RoadSegment;
 
 /**
  * SKELETON CLASS
@@ -33,8 +37,11 @@ public class Director {
 	
 	private GraphNode endNode;
 	
+	private Set<GraphSegment> tempSegments;
+	
 	public Director(Graph g) {
 		graph = g;
+		tempSegments = new HashSet<GraphSegment>();
 	}
 	
 	/**
@@ -100,7 +107,63 @@ public class Director {
 	 * @return The list of directions for immediate use.
 	 */
 	private List<GraphEdge> calcDir() {
-		return null;
+		ArrayList<GraphNode> nodeIndices = new ArrayList<GraphNode>();
+		ArrayList<GraphEdge> predEdges = new ArrayList<GraphEdge>();
+		ArrayList<GraphNode> visited = new ArrayList<GraphNode>();
+		ArrayList<Double> distances = new ArrayList<Double>();
+		
+		boolean startOnSegment = false;
+		boolean endOnSegment = false;
+		if(startNode.getSegmentIt().hasNext()) { startOnSegment = true; }
+		if(endNode.getSegmentIt().hasNext()) { endOnSegment = true; }
+		
+	}
+	
+	/**
+	 * Creates one or two new segments that go from the start node to the nearby
+	 * nodes with segments.
+	 * @precondition The start node must not have outgoing segments.
+	 */
+	private void splitStartSeg() {
+		Iterator<GraphSegment> sIt = graph.getSegmentIterator();
+		while(sIt.hasNext()) {
+			GraphSegment s = sIt.next();
+			if(s.hasNode(startNode)) {
+				GraphSegment tempSeg = s.getPostSubsegment(startNode);
+				tempSegments.add(tempSeg);
+				graph.addSegment(tempSeg);
+			}
+		}
+	}
+	
+	private void splitEndSegment() {
+		Iterator<GraphSegment> sIt = graph.getSegmentIterator();
+		while(sIt.hasNext()) {
+			GraphSegment s = sIt.next();
+			if(s.hasNode(endNode)) {
+				GraphSegment tempSeg = s.getPreSubsegment(endNode);
+				tempSegments.add(tempSeg);
+				graph.addSegment(tempSeg);
+			}
+		}
+	}
+	
+	private void clearTempSegments() {
+		for(GraphSegment s : tempSegments) {
+			graph.removeSegment(s);
+		}
+	}
+	
+	private List<GraphEdge> extractDirections(List<GraphNode> nodeIndices, List<GraphEdge> predEdges) {
+		LinkedList<GraphEdge> dirList = new LinkedList<GraphEdge>();
+		GraphNode currNode = endNode;
+		while(currNode != startNode) {
+			int currIndex = nodeIndices.indexOf(currNode);
+			GraphEdge predEdge = predEdges.get(currIndex);
+			dirList.addLast(predEdge);
+			currNode = predEdge.getStartNode();
+		}
+		return dirList;
 	}
 	
 	/**
