@@ -253,4 +253,8 @@ public class Map implements Graph{
 	public Iterator<GraphSegment> getSegmentIterator() {
 		return segments.iterator();
 	}
+	
+	public int getNodeSize() {
+		return nodes.size();
+	}
 }

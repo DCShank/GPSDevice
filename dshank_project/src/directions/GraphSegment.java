@@ -1,6 +1,7 @@
 package directions;
 
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * A segment is essentially a super edge that extends from one intersection to another.
@@ -32,5 +33,7 @@ public interface GraphSegment extends GraphEdge {
 	 * @return	A Segment representing the edges from the start to the end node.
 	 */
 	public GraphSegment getPostSubsegment(GraphNode sn);
+	
+	public List<GraphEdge> getEdgeList();
 
 }

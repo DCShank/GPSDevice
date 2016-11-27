@@ -143,12 +143,13 @@ public class Application extends JFrame implements GPSListener {
 	class ButtonPanel extends JPanel {
 		JButton selStart;
 		JButton selEnd;
+		JButton getDir;
 
 		public ButtonPanel() {
-			ActionListener selListener = new ActionListener() {
+			ActionListener buttonPanelListener = new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					GraphNode n = mapPanel.popSelectedNode();
+					GraphNode n = mapPanel.getSelectedNode();
 					if (n != null && e.getActionCommand().equals("start")) {
 						GraphNode oldStart = dir.getStartNode();
 						if (oldStart != null) {
@@ -167,19 +168,27 @@ public class Application extends JFrame implements GPSListener {
 						mapPanel.addHighlightedNode((Node) n);
 						JOptionPane.showMessageDialog(null, "End node selected");
 					}
+					if (n != null && e.getActionCommand().equals("directions")) {
+						mapPanel.setDirections(dir.getDirections());
+						
+					}
 				}
 			};
 
 			selStart = new JButton("Select start");
 			selStart.setActionCommand("start");
-			selStart.addActionListener(selListener);
+			selStart.addActionListener(buttonPanelListener);
 			selEnd = new JButton("Select end");
 			selEnd.setActionCommand("end");
-			selEnd.addActionListener(selListener);
+			selEnd.addActionListener(buttonPanelListener);
+			getDir = new JButton("Get directions");
+			getDir.setActionCommand("directions");
+			getDir.addActionListener(buttonPanelListener);
 			this.setLayout(new GridLayout(0, 1));
 			this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 			this.add(selStart);
 			this.add(selEnd);
+			this.add(getDir);
 		}
 	}
 

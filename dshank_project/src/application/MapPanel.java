@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.JPanel;
@@ -48,6 +49,8 @@ public class MapPanel extends JPanel {
 	
 	private Node selectedNode = null;
 	
+	private List<GraphEdge> directions;
+	
 	private HashSet<Node> highlightedNodes;
 	private HashSet<Way> highlightedWays;
 	
@@ -62,6 +65,7 @@ public class MapPanel extends JPanel {
 		cenLatPix = scale.latToPixels(cenLat);
 		cenLon = (map.getLonMax()+map.getLonMin())/2.0;
 		cenLonPix = scale.lonToPixels(cenLon, cenLat);
+		directions = null;
 		
 		this.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 		initMouse();
@@ -117,10 +121,11 @@ public class MapPanel extends JPanel {
 				Node n = map.getNearNode(lon, lat, map.getRoadIt());
 				
 				selectedNode = n;
+				System.out.println(n.toString());
 				Iterator<GraphSegment> it = n.getSegmentIt();
-				while(it.hasNext()) {
-					addHighlightedNode((Node)it.next().getEndNode());
-				}
+//				while(it.hasNext()) {
+//					addHighlightedNode((Node)it.next().getEndNode());
+//				}
 				repaint();
 			}
 		};
@@ -203,7 +208,9 @@ public class MapPanel extends JPanel {
 			Node n = selectedNode;
 			g.fillOval(lonToScreen(n.getLon(), n.getLat())-3, latToScreen(n.getLat())-3, 7, 7);
 			g.setColor(c);
-			
+		}
+		if(directions != null) {
+			drawEdges(directions, Color.RED, g);
 		}
 	}
 	
@@ -227,6 +234,33 @@ public class MapPanel extends JPanel {
 			
 			g.drawLine(prevX, prevY, curX, curY);
 		}
+	}
+	
+	private void drawEdge(GraphEdge e, Graphics g) {
+		GraphNode prevNode = e.getStartNode();
+		GraphNode curNode = e.getEndNode();
+		
+		int prevY, prevX, curY, curX;
+		prevY = latToScreen(prevNode.getLat());
+		prevX = lonToScreen(prevNode.getLon(), prevNode.getLat());
+		curY = latToScreen(curNode.getLat());
+		curX = lonToScreen(curNode.getLon(), curNode.getLat());
+		
+		g.drawLine(prevX, prevY, curX, curY);
+	}
+	
+	public void drawEdges(List<GraphEdge> edges, Color c, Graphics g) {
+		Color currColor = g.getColor();
+		g.setColor(c);
+		for(GraphEdge e : edges) {
+			drawEdge(e, g);
+		}
+		g.setColor(currColor);
+	}
+	
+	public void setDirections(List<GraphEdge> edges) {
+		directions = edges;
+		repaint();
 	}
 	
 	/**
@@ -300,9 +334,8 @@ public class MapPanel extends JPanel {
 	 * Pops the currently selected node and sets selectedNode to null.
 	 * @return selectedNode.
 	 */
-	public Node popSelectedNode() {
+	public Node getSelectedNode() {
 		Node rtrnNode = selectedNode;
-		selectedNode = null;
 		return rtrnNode;
 	}
 	

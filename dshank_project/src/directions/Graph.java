@@ -24,6 +24,8 @@ public interface Graph {
 	
 	public Iterator<GraphSegment> getSegmentIterator();
 	
+	public int getNodeSize();
+	
 //	/**
 //	 * Returns a set of GraphNodes.
 //	 * @return The set of GraphNodes

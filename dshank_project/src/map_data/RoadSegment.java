@@ -126,9 +126,10 @@ public class RoadSegment implements GraphSegment {
 	 */
 	public GraphSegment getPreSubsegment(GraphNode en) {
 		Iterator<GraphEdge> edgeIt = edges.iterator();
-		GraphEdge currEdge = null;
+		GraphEdge currEdge = edgeIt.next();
 		LinkedList<GraphEdge> newList = new LinkedList<GraphEdge>();
-		while(currEdge.getEndNode() != en) {
+		newList.add(currEdge);
+		while(currEdge.getEndNode() != null && currEdge.getEndNode() != en) {
 			currEdge = edgeIt.next();
 			newList.add(currEdge);
 		}
@@ -137,14 +138,21 @@ public class RoadSegment implements GraphSegment {
 	
 	public GraphSegment getPostSubsegment(GraphNode sn) {
 		Iterator<GraphEdge> edgeIt = edges.iterator();
-		GraphEdge currEdge = null;
+		GraphEdge currEdge = edgeIt.next();
 		LinkedList<GraphEdge> newList = new LinkedList<GraphEdge>();
-		while(currEdge.getEndNode() != sn) { currEdge = edgeIt.next(); }
+		while(currEdge.getEndNode() != sn) { 
+			currEdge = edgeIt.next(); 
+			}
 		while(currEdge.getEndNode() != endNode) {
 			currEdge = edgeIt.next();
 			newList.add(currEdge);
 		}
 		return new RoadSegment((Node) sn, endNode, newList);
 		
+	}
+
+	@Override
+	public List<GraphEdge> getEdgeList() {
+		return edges;
 	}
 }

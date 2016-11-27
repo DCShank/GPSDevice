@@ -43,4 +43,8 @@ public interface GraphNode {
 	
 	public void removeSegment(GraphSegment seg);
 
+	public double getLat();
+	
+	public double getLon();
+
 }
