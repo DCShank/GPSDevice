@@ -134,13 +134,16 @@ public class Map implements Graph{
 	 */
 	public boolean inCircularSegment(double lon, double lat, double theta, double phi,
 										double radius, GraphNode node) {
-		Node n = (Node) node;
 		// Return false if the node is outside the possible range of the circular segment.
-		if(strat.getDistance(lon, lat, n.getLon(), n.getLat()) > radius) { return false; }
+//		System.out.println(!(strat.getDistance(lon, lat, n.getLon(), n.getLat()) > radius));
+//		System.out.println(n.getLon() + " " + n.getLat() + "\n");
+		double dist = strat.getDistance(lon, lat, node.getLon(), node.getLat());
+		System.out.println(dist);
+		if(strat.getDistance(lon, lat, node.getLon(), node.getLat()) > radius) { return false; }
 		double angleMin = phi - theta/2;
 		double angleMax = phi + theta/2;
 		// Should find the angle from North to the node...
-		double angleNode = Math.toDegrees(Math.atan2(n.getLat()-lat, n.getLon()-lon));
+		double angleNode = Math.toDegrees(Math.atan2(node.getLat()-lat, node.getLon()-lon));
 		return ((angleNode < angleMax) || (angleNode > angleMin));
 	}
 	
@@ -158,6 +161,7 @@ public class Map implements Graph{
 				prevNode = currNode;
 				currNode = nIt.next();
 				RoadEdge e = new RoadEdge(prevNode, currNode, strat);
+//				System.out.println(e.getLength());
 				prevNode.addGraphEdge((GraphEdge)e);
 				if(!w.isOneway()) {
 					currNode.addGraphEdge((GraphEdge)e.getReverse());
@@ -256,5 +260,9 @@ public class Map implements Graph{
 	
 	public int getNodeSize() {
 		return nodes.size();
+	}
+	
+	public Iterator<Node> getNodeIt() {
+		return nodes.values().iterator();
 	}
 }

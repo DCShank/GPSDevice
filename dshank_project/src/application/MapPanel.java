@@ -122,10 +122,14 @@ public class MapPanel extends JPanel {
 				
 				selectedNode = n;
 				System.out.println(n.toString());
-				Iterator<GraphSegment> it = n.getSegmentIt();
-//				while(it.hasNext()) {
-//					addHighlightedNode((Node)it.next().getEndNode());
-//				}
+				Iterator<Node> it = map.getNodeIt();
+				while(it.hasNext()) {
+					Node next = it.next();
+					if(map.inCircularSegment(screenToLon(e.getX(),e.getY()), screenToLat(e.getY()),
+							3.1415, 3.1415, 500, next)) {
+						highlightedNodes.add(next);
+					}
+				}
 				repaint();
 			}
 		};
