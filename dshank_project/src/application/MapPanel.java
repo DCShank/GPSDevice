@@ -121,12 +121,12 @@ public class MapPanel extends JPanel {
 				Node n = map.getNearNode(lon, lat, map.getRoadIt());
 				
 				selectedNode = n;
-				System.out.println(n.toString());
+//				System.out.println(n.toString());
 				Iterator<Node> it = map.getNodeIt();
 				while(it.hasNext()) {
 					Node next = it.next();
 					if(map.inCircularSegment(screenToLon(e.getX(),e.getY()), screenToLat(e.getY()),
-							3.1415, 3.1415, 500, next)) {
+							3.1415, 3.1415, 100, next)) {
 						highlightedNodes.add(next);
 					}
 				}

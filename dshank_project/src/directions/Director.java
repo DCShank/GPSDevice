@@ -50,7 +50,7 @@ public class Director {
 	 * Sets the start node to a specified node
 	 * @param n the node to set start to
 	 */
-	public void setStartNode(GraphNode n) {
+	public synchronized void setStartNode(GraphNode n) {
 		startNode = n;
 	}
 	
@@ -58,7 +58,7 @@ public class Director {
 	 * Sets the end node to a specified node
 	 * @param n the node to set end to
 	 */
-	public void setEndNode(GraphNode n) {
+	public synchronized void setEndNode(GraphNode n) {
 		endNode = n;
 	}
 	
@@ -66,7 +66,7 @@ public class Director {
 	 * Returns the start node.
 	 * @return the start node.
 	 */
-	public GraphNode getStartNode() {
+	public synchronized GraphNode getStartNode() {
 		return startNode;
 	}
 	
@@ -74,7 +74,7 @@ public class Director {
 	 * Returns the end node.
 	 * @return the end node.
 	 */
-	public GraphNode getEndNode() {
+	public synchronized GraphNode getEndNode() {
 		return endNode;
 	}
 	
@@ -93,10 +93,8 @@ public class Director {
 	 */
 	public List<GraphEdge> getDirections() {
 		if(startNode != null && endNode != null) {
-			System.out.println("Found somethin");
 			return calcDir();
 		}
-		System.out.println("Found nothin");
 		return null;
 	}
 	
@@ -113,7 +111,7 @@ public class Director {
 	 * Also writes the directions to the instance variable.
 	 * @return The list of directions for immediate use.
 	 */
-	private List<GraphEdge> calcDir() {
+	private synchronized List<GraphEdge> calcDir() {
 		ArrayList<GraphNode> indexedNodes = new ArrayList<GraphNode>(graph.getNodeSize());
 		ArrayList<GraphSegment> predSegs = new ArrayList<GraphSegment>(graph.getNodeSize());
 		ArrayList<GraphNode> visited = new ArrayList<GraphNode>(graph.getNodeSize());
@@ -133,7 +131,7 @@ public class Director {
 			// The index of the next node to visit
 			int visitNext = leastDistIndex(visited, distances);
 			if(visitNext == -1) {
-				break;
+				return null;
 			}
 			// Iterator over the segments of the next node to visit.
 			Iterator<GraphSegment> segIt = indexedNodes.get(visitNext).getSegmentIt();

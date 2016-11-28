@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -19,6 +20,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -26,6 +28,7 @@ import directions.Director;
 import directions.GPSEvent;
 import directions.GPSListener;
 import directions.Graph;
+import directions.GraphEdge;
 import directions.GraphNode;
 import map_data.Map;
 import map_data.Node;
@@ -37,6 +40,7 @@ public class Application extends JFrame implements GPSListener {
 	private MapPanel mapPanel;
 	private OSMParser prsr;
 	private Director dir;
+	private List<GraphEdge> directions;
 
 	/**
 	 * Constructor for the application which takes no argument.
@@ -150,27 +154,31 @@ public class Application extends JFrame implements GPSListener {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					GraphNode n = mapPanel.getSelectedNode();
-					if (n != null && e.getActionCommand().equals("start")) {
-						GraphNode oldStart = dir.getStartNode();
-						if (oldStart != null) {
-							mapPanel.removeHighlightedNode((Node) oldStart);
-						}
-						dir.setStartNode(n);
-						mapPanel.addHighlightedNode((Node) n);
-						JOptionPane.showMessageDialog(null, "Start node selected");
+					if (n != null && (e.getActionCommand().equals("start") || e.getActionCommand().equals("end"))) {
+						SwingWorker task = new NodeSetter(n, e.getActionCommand());
+						task.execute();
 					}
-					if (n != null && e.getActionCommand().equals("end")) {
-						GraphNode oldEnd = dir.getEndNode();
-						if (oldEnd != null) {
-							mapPanel.removeHighlightedNode((Node) oldEnd);
-						}
-						dir.setEndNode(n);
-						mapPanel.addHighlightedNode((Node) n);
-						JOptionPane.showMessageDialog(null, "End node selected");
-					}
+//						GraphNode oldStart = dir.getStartNode();
+//						if (oldStart != null) {
+//							mapPanel.removeHighlightedNode((Node) oldStart);
+//						}
+//						dir.setStartNode(n);
+//						mapPanel.addHighlightedNode((Node) n);
+//						JOptionPane.showMessageDialog(null, "Start node selected");
+//					}
+//					if (n != null && e.getActionCommand().equals("end")) {
+//						GraphNode oldEnd = dir.getEndNode();
+//						if (oldEnd != null) {
+//							mapPanel.removeHighlightedNode((Node) oldEnd);
+//						}
+//						dir.setEndNode(n);
+//						mapPanel.addHighlightedNode((Node) n);
+//						JOptionPane.showMessageDialog(null, "End node selected");
+//					}
 					if (n != null && e.getActionCommand().equals("directions")) {
-						mapPanel.setDirections(dir.getDirections());
-						
+//						List<GraphEdge> directions = dir.getDirections();
+						SwingWorker task = new DirectionFinder();
+						task.execute();
 					}
 				}
 			};
@@ -208,5 +216,57 @@ public class Application extends JFrame implements GPSListener {
 			new Application();
 		}
 	}
+	
+	class NodeSetter extends SwingWorker<Object, Object> {
+		GraphNode n;
+		String startOrEnd;
+		public NodeSetter(GraphNode n, String whichNode) {
+			this.n = n;
+			startOrEnd = whichNode;
+			
+		}
+		@Override
+		protected Object doInBackground() throws Exception {
+			if(startOrEnd.equals("start")) {
+				GraphNode oldStart = dir.getStartNode();
+				if (oldStart != null) {
+				mapPanel.removeHighlightedNode((Node) oldStart);
+				}
+				dir.setStartNode(n);
+				mapPanel.addHighlightedNode((Node) n);
+				JOptionPane.showMessageDialog(null, "Start node selected");
+			}
+			if(startOrEnd.equalsIgnoreCase("end")) {
+				GraphNode oldEnd = dir.getEndNode();
+				if (oldEnd != null) {
+				mapPanel.removeHighlightedNode((Node) oldEnd);
+				}
+				dir.setEndNode(n);
+				mapPanel.addHighlightedNode((Node) n);
+				JOptionPane.showMessageDialog(null, "End node selected");
+			}
+			return n;
+		}
+	}
 
+	class DirectionFinder extends SwingWorker<List<GraphEdge>, Object> {
+
+		@Override
+		protected List<GraphEdge> doInBackground() throws Exception {
+			return dir.getDirections();
+		}
+		
+		@Override
+		protected void done() {
+			try {
+				directions = get();
+				mapPanel.setDirections(directions);
+				if(directions == null) {
+					JOptionPane.showMessageDialog(null, "No such path exists");
+				}
+			} catch (Exception e) {
+				
+			}
+		}
+	}
 }

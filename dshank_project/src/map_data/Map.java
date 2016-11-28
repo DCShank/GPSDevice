@@ -137,8 +137,6 @@ public class Map implements Graph{
 		// Return false if the node is outside the possible range of the circular segment.
 //		System.out.println(!(strat.getDistance(lon, lat, n.getLon(), n.getLat()) > radius));
 //		System.out.println(n.getLon() + " " + n.getLat() + "\n");
-		double dist = strat.getDistance(lon, lat, node.getLon(), node.getLat());
-		System.out.println(dist);
 		if(strat.getDistance(lon, lat, node.getLon(), node.getLat()) > radius) { return false; }
 		double angleMin = phi - theta/2;
 		double angleMax = phi + theta/2;
