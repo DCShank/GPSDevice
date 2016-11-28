@@ -48,6 +48,7 @@ public class MapPanel extends JPanel {
 	public static final int DEFAULT_HEIGHT = 800;
 	
 	private Node selectedNode = null;
+	private Node hoveredNode = null;
 	
 	private List<GraphEdge> directions;
 	
@@ -83,6 +84,15 @@ public class MapPanel extends JPanel {
 			/** used for panning. */
 			private int x;
 			private int y;
+			
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				double lat = screenToLat(e.getY());
+				double lon = screenToLon(e.getX(), e.getY());
+				Node n = map.getNearNode(lon, lat, map.getRoadIt());
+				hoveredNode = n;
+				repaint();
+			}
 			
 			/**
 			 * Sets initial points for the pan operation.
@@ -204,12 +214,11 @@ public class MapPanel extends JPanel {
 			g.fillOval(lonToScreen(n.getLon(), n.getLat())-3, latToScreen(n.getLat())-3, 7, 7);
 			g.setColor(c);
 		}
+		if(hoveredNode != null) {
+			drawNode(hoveredNode, Color.ORANGE, g);
+		}
 		if(selectedNode != null) {
-			Color c = g.getColor();
-			g.setColor(Color.RED);
-			Node n = selectedNode;
-			g.fillOval(lonToScreen(n.getLon(), n.getLat())-3, latToScreen(n.getLat())-3, 7, 7);
-			g.setColor(c);
+			drawNode(selectedNode, Color.MAGENTA, g);
 		}
 		if(directions != null) {
 			drawEdges(directions, Color.RED, g);
@@ -220,7 +229,7 @@ public class MapPanel extends JPanel {
 	 * Draws a given way. Primarily a helper method for paintComponent.
 	 * @param way The way to be drawn.
 	 */
-	public void drawWay(Way way, Graphics g) {
+	private void drawWay(Way way, Graphics g) {
 		Iterator<Node> it = way.getNodeIt();
 		Node curNode = it.next();
 		Node prevNode = null;
@@ -251,13 +260,20 @@ public class MapPanel extends JPanel {
 		g.drawLine(prevX, prevY, curX, curY);
 	}
 	
-	public void drawEdges(List<GraphEdge> edges, Color c, Graphics g) {
+	private void drawEdges(List<GraphEdge> edges, Color c, Graphics g) {
 		Color currColor = g.getColor();
 		g.setColor(c);
 		for(GraphEdge e : edges) {
 			drawEdge(e, g);
 		}
 		g.setColor(currColor);
+	}
+	
+	private void drawNode(Node n, Color c, Graphics g) {
+		Color c2 = g.getColor();
+		g.setColor(c);
+		g.fillOval(lonToScreen(n.getLon(), n.getLat())-3, latToScreen(n.getLat())-3, 7, 7);
+		g.setColor(c2);
 	}
 	
 	public void setDirections(List<GraphEdge> edges) {
