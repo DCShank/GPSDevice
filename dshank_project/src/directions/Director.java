@@ -126,6 +126,9 @@ public class Director {
 		
 		if(!startNode.getSegmentIt().hasNext()) { splitStartSegment(); }
 		if(!endNode.getSegmentIt().hasNext()) { splitEndSegment(); }
+		for(GraphSegment seg : tempSegments) {
+			graph.addSegment(seg);
+		}
 		
 		while(!visited.contains(endNode)) {
 			// The index of the next node to visit
@@ -190,24 +193,27 @@ public class Director {
 	 */
 	private void splitStartSegment() {
 		Iterator<GraphSegment> sIt = graph.getSegmentIterator();
+		System.out.println("Split Start");
 		while(sIt.hasNext()) {
 			GraphSegment s = sIt.next();
 			if(s.hasNode(startNode)) {
 				GraphSegment tempSeg = s.getPostSubsegment(startNode);
 				tempSegments.add(tempSeg);
-				graph.addSegment(tempSeg);
+				System.out.println(tempSeg.toString());
 			}
 		}
 	}
 	
 	private void splitEndSegment() {
 		Iterator<GraphSegment> sIt = graph.getSegmentIterator();
+		System.out.println("Split End");
 		while(sIt.hasNext()) {
 			GraphSegment s = sIt.next();
 			if(s.hasNode(endNode)) {
+				System.out.println(s.toString());
 				GraphSegment tempSeg = s.getPreSubsegment(endNode);
 				tempSegments.add(tempSeg);
-				graph.addSegment(tempSeg);
+				System.out.println(tempSeg.toString());
 			}
 		}
 	}
@@ -216,6 +222,7 @@ public class Director {
 		for(GraphSegment s : tempSegments) {
 			graph.removeSegment(s);
 		}
+		tempSegments = new HashSet<GraphSegment>();
 	}
 	
 	private List<GraphEdge> extractDirections(List<GraphNode> nodeIndices, List<GraphSegment> predSegs) {

@@ -124,6 +124,7 @@ public class Node implements GraphNode {
 	
 	/**
 	 * Returns the edge that leads to the specified node.
+	 * @precondition The edge must exist
 	 */
 	public GraphEdge getEdgeTo(GraphNode n) {
 		return toNodeEdges.get(n);
@@ -150,6 +151,13 @@ public class Node implements GraphNode {
 	@Override
 	public int hashCode() {
 		return id.hashCode();
+	}
+	
+	@Override
+	public String toString() {
+		String rtrn = "";
+		rtrn += "[ID: " + id + ", Lat: " + lat + ", Lon: " + lon + ", Degree: " + degree + "]";
+		return rtrn;
 	}
 
 }

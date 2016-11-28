@@ -55,6 +55,7 @@ public class RoadSegment implements GraphSegment {
 			nodes.add((Node) e.getStartNode());
 			nodes.add((Node) e.getEndNode());
 		}
+		// This doesn't actually work because you can have two segments that go from a node to itself.
 		id = startNode.getID() + endNode.getID();
 	}
 	
@@ -97,8 +98,7 @@ public class RoadSegment implements GraphSegment {
 
 	@Override
 	public int hashCode() {
-		String concatID = startNode.getID() + endNode.getID();
-		return concatID.hashCode();
+		return edges.hashCode();
 	}
 	
 	/**
@@ -111,7 +111,8 @@ public class RoadSegment implements GraphSegment {
 		if(other == this) { return true; }
 		if(other.getClass() != this.getClass()) { return false; }
 		RoadSegment o = (RoadSegment) other;
-		return id.equals(o.id);
+
+		return id.equals(o.id) && edges.equals(o.edges);
 	}
 
 	@Override
@@ -154,5 +155,13 @@ public class RoadSegment implements GraphSegment {
 	@Override
 	public List<GraphEdge> getEdgeList() {
 		return edges;
+	}
+	
+	@Override
+	public String toString() {
+		String rtrnString = "";
+		rtrnString += "Start Node: " + startNode.toString();
+		rtrnString += "  End Node: " + endNode.toString();
+		return rtrnString;
 	}
 }

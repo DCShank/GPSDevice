@@ -19,7 +19,7 @@ import java.util.Set;
  * @author david
  *
  */
-public class Map implements Graph{
+public class Map implements Graph {
 	/** Maps id's to nodes */
 	private HashMap<String,Node> nodes;
 	/** maps id's to ways */
@@ -186,6 +186,9 @@ public class Map implements Graph{
 		Iterator<Way> wayIt = getRoadIt();
 		while(wayIt.hasNext()) {
 			Way w = wayIt.next();
+			if(w.getName().equals("Triangle Dr")) {
+				System.out.println("Found it");
+			}
 			Iterator<Node> nIt = w.getNodeIt();
 			Node sn = nIt.next();
 			Node pn = sn;
@@ -197,15 +200,11 @@ public class Map implements Graph{
 				nn = nIt.next();
 				len += pn.getEdgeTo((GraphNode)nn).getLength();
 				nodes.add(nn);
-				if((nn.getDegree() != 1 && w.isOneway()) || (nn.getDegree() != 2 && !w.isOneway())) {
+				if((nn.getDegree() != 1 && w.isOneway()) || (nn.getDegree() != 2 && !w.isOneway()) || !nIt.hasNext()) {
 					RoadSegment seg = new RoadSegment(sn, nn, len, nodes);
-					sn.addGraphEdge(seg);
-					nn.addGraphEdge(seg);
-					segments.add(seg);
+					addSegment(seg);
 					if(!w.isOneway()) {
-						nn.addGraphEdge(seg.getReverse());
-						sn.addGraphEdge(seg.getReverse());
-						segments.add(seg.getReverse());
+						addSegment(seg.getReverse());
 					}
 					sn = nn;
 					nodes = new ArrayList<Node>();
@@ -226,17 +225,18 @@ public class Map implements Graph{
 		GraphNode en = seg.getEndNode();
 		sn.addGraphEdge(seg);
 		en.addGraphEdge(seg);
+		segments.add(seg);
 	}
 	
 	/**
 	 * Removes a segment from the graph and from the corresponding nodes.
 	 */
 	public void removeSegment(GraphSegment seg) {
-		if(segments.contains(seg)) {
-			segments.remove(seg);
-			seg.getStartNode().removeSegment(seg);
-			seg.getEndNode().removeSegment(seg);
-		}
+		GraphNode sn = seg.getStartNode();
+		GraphNode en = seg.getEndNode();
+		sn.removeSegment(seg);
+		en.removeSegment(seg);
+		segments.remove(seg);
 	}
 	
 	/**
