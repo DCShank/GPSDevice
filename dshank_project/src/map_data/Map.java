@@ -138,11 +138,22 @@ public class Map implements Graph{
 //		System.out.println(!(strat.getDistance(lon, lat, n.getLon(), n.getLat()) > radius));
 //		System.out.println(n.getLon() + " " + n.getLat() + "\n");
 		if(strat.getDistance(lon, lat, node.getLon(), node.getLat()) > radius) { return false; }
+		
 		double angleMin = phi - theta/2;
+		while(angleMin > 180) {
+			angleMin -= 360;
+		}
 		double angleMax = phi + theta/2;
-		// Should find the angle from North to the node...
+		while(angleMax > 180) {
+			angleMax -= 360;
+		}
 		double angleNode = Math.toDegrees(Math.atan2(node.getLat()-lat, node.getLon()-lon));
-		return ((angleNode < angleMax) || (angleNode > angleMin));
+		// This works somehow. Bad practice to leave in code found by trial and error but hey.
+		// This case only happens at around 180 degrees.
+		if(angleMin > angleMax) {
+			return !((angleNode > angleMax) && (angleNode < angleMin));
+		}
+		return ((angleNode < angleMax) && (angleNode > angleMin));
 	}
 	
 	/**

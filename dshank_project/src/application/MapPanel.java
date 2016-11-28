@@ -52,7 +52,6 @@ public class MapPanel extends JPanel {
 	private List<GraphEdge> directions;
 	
 	private HashSet<Node> highlightedNodes;
-	private HashSet<Way> highlightedWays;
 	
 	/**
 	 * Constructor for this object that takes a map to be displayed as the parameter
@@ -119,17 +118,16 @@ public class MapPanel extends JPanel {
 				double lat = screenToLat(e.getY());
 				double lon = screenToLon(e.getX(), e.getY());
 				Node n = map.getNearNode(lon, lat, map.getRoadIt());
-				
 				selectedNode = n;
 //				System.out.println(n.toString());
-				Iterator<Node> it = map.getNodeIt();
-				while(it.hasNext()) {
-					Node next = it.next();
-					if(map.inCircularSegment(screenToLon(e.getX(),e.getY()), screenToLat(e.getY()),
-							3.1415, 3.1415, 100, next)) {
-						highlightedNodes.add(next);
-					}
-				}
+//				Iterator<Node> it = map.getNodeIt();
+//				while(it.hasNext()) {
+//					Node next = it.next();
+//					if(map.inCircularSegment(screenToLon(e.getX(),e.getY()), screenToLat(e.getY()),
+//							30, testHeading, 750, next)) {
+//						highlightedNodes.add(next);
+//					}
+//				}
 				repaint();
 			}
 		};
