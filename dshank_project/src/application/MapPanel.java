@@ -54,7 +54,7 @@ public class MapPanel extends JPanel {
 	
 	private HashSet<Node> highlightedNodes;
 	
-	private double testHeading = 0.00;
+	private boolean inDrivingMode = false;
 	
 	/**
 	 * Constructor for this object that takes a map to be displayed as the parameter
@@ -218,15 +218,19 @@ public class MapPanel extends JPanel {
 		for(Node n : highlightedNodes) {
 			drawNode(n, Color.BLUE, g);
 		}
-		if(hoveredNode != null) {
+		if(hoveredNode != null)
 			drawNode(hoveredNode, Color.ORANGE, g);
-		}
-		if(selectedNode != null) {
+		if(selectedNode != null)
 			drawNode(selectedNode, Color.MAGENTA, g);
-		}
-		if(directions != null) {
+		if(directions != null)
 			drawEdges(directions, Color.RED, g);
+		if(inDrivingMode) {
+			g.setColor(Color.PINK);
+			g.fillOval(lonToScreen(cenLon, cenLat)-4, latToScreen(cenLat)-4, 9, 9);
+			
 		}
+		g.setColor(c);
+			
 	}
 	
 	/**
@@ -375,6 +379,10 @@ public class MapPanel extends JPanel {
 	 */
 	public void removeHighlightedNode(Node n) {
 		highlightedNodes.remove(n);
+	}
+	
+	public void setIsDriving(boolean isDriving) {
+		inDrivingMode = isDriving;
 	}
 
 }

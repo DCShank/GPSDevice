@@ -295,13 +295,10 @@ public class Director {
 		while(eIt.hasNext()) {
 			GraphEdge e = eIt.next();
 			if(graph.inCircularSegment(lon, lat, 30, heading, e.getLength(), e.getEndNode())) {
-				System.out.println("Apparently on course");
 				return directions;
 			}
-			
 		}
 		startNode = graph.getNearNode(lon, lat, graph.getNodeIterator());
-		System.out.println("Off course");
 		return calcDir();
 	}
 

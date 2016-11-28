@@ -280,12 +280,42 @@ public class Application extends JFrame implements GPSListener{
 				mapPanel.setDirections(directions);
 				if(directions == null) {
 					messageDisplay.setText("No route exists.");;
+				} else {
+					messageDisplay.setText("Route found!");
 				}
-				messageDisplay.setText("Route found!");
 			} catch (Exception e) {
 				messageDisplay.setText("An ERROR has occurred!");
 			}
 		}
+	}
+	
+	class RouteChecker extends SwingWorker<List<GraphEdge>, Object> {
+		GPSEvent event;
+		List<GraphEdge> oldDir = directions;
+		public RouteChecker(GPSEvent e) {
+			event = e;
+		}
+		@Override
+		protected List<GraphEdge> doInBackground() throws Exception {
+			return dir.updateDirections(event.getLatitude(), event.getLongitude(), event.getHeading());
+		}
+		@Override
+		protected void done() {
+			try {
+				directions = get();
+				mapPanel.setDirections(directions);
+				if(directions == null) {
+					messageDisplay.setText("No route exists.");;
+				} else if (!oldDir.equals(directions)){
+					messageDisplay.setText("Route updated.");
+				} else {
+					messageDisplay.setText("On route to destination");
+				}
+			} catch (Exception e) {
+				
+			}
+		}
+		
 	}
 
 	@Override
@@ -297,7 +327,9 @@ public class Application extends JFrame implements GPSListener{
 			newHead = 360 + newHead;
 		}
 		mapPanel.setCenter(lon, lat);
-		SwingWorker task = new DirectionFinder();
+		mapPanel.setIsDriving(true);
+//		SwingWorker task = new DirectionFinder();
+		RouteChecker task = new RouteChecker(e);
 		task.execute();
 	}
 }
