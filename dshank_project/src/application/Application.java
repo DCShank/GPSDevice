@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,9 +25,11 @@ import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.starkeffect.highway.GPSDevice;
+import com.starkeffect.highway.GPSEvent;
+import com.starkeffect.highway.GPSListener;
+
 import directions.Director;
-import directions.GPSEvent;
-import directions.GPSListener;
 import directions.Graph;
 import directions.GraphEdge;
 import directions.GraphNode;
@@ -34,13 +37,14 @@ import map_data.Map;
 import map_data.Node;
 import map_data.OSMParser;
 
-public class Application extends JFrame implements GPSListener {
+public class Application extends JFrame implements GPSListener{
 
 	private Map map;
 	private MapPanel mapPanel;
 	private OSMParser prsr;
 	private Director dir;
 	private List<GraphEdge> directions;
+	private GPSDevice gps;
 
 	/**
 	 * Constructor for the application which takes no argument.
@@ -84,12 +88,25 @@ public class Application extends JFrame implements GPSListener {
 		prsr = new OSMParser(file);
 		prsr.parse();
 		map = prsr.getMap();
+		// Clear away the old stark gps, dereference it as much as possible, and delete the old frame.
+		if (gps != null) {
+			gps.removeGPSListener(this);
+			gps = null;
+			Frame[] frames = getFrames();
+			for(Frame f : frames) {
+				if(!f.getTitle().equals("Map Application")) {
+					f.dispose();
+				}
+			}
+		}
 		// Remove the old map panel if one exists.
 		if (mapPanel != null) {
 			remove(mapPanel);
 		}
 		mapPanel = new MapPanel(map);
 		dir = new Director((Graph)map);
+		gps = new GPSDevice(file.getAbsolutePath());
+		gps.addGPSListener(this);
 		getContentPane().add(mapPanel, BorderLayout.CENTER);
 		pack();
 	}
@@ -123,15 +140,6 @@ public class Application extends JFrame implements GPSListener {
 		fileMenu.add(loadMap);
 		menuBar.add(fileMenu);
 		setJMenuBar(menuBar);
-	}
-	
-	/**
-	 * Processes a GPSEvent and updates everything important, including the
-	 * Director and MapPanel.
-	 * @param e The GPSEvent with information.
-	 */
-	public void processEvent(GPSEvent e) {
-		
 	}
 
 	/**
@@ -268,5 +276,10 @@ public class Application extends JFrame implements GPSListener {
 				
 			}
 		}
+	}
+
+	@Override
+	public void processEvent(GPSEvent e) {
+		System.out.println(e.getHeading());
 	}
 }
