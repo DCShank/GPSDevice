@@ -24,7 +24,11 @@ public interface Graph {
 	
 	public Iterator<GraphSegment> getSegmentIterator();
 	
+	public Iterator<GraphNode> getNodeIterator();
+	
 	public int getNodeSize();
+	
+	public GraphNode getNearNode(double lon, double lat, Iterator<GraphNode> it);
 	
 //	/**
 //	 * Returns a set of GraphNodes.

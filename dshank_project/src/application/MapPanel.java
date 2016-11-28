@@ -47,12 +47,14 @@ public class MapPanel extends JPanel {
 	public static final int DEFAULT_WIDTH = 1200;
 	public static final int DEFAULT_HEIGHT = 800;
 	
-	private Node selectedNode = null;
-	private Node hoveredNode = null;
+	private GraphNode selectedNode = null;
+	private GraphNode hoveredNode = null;
 	
 	private List<GraphEdge> directions;
 	
 	private HashSet<Node> highlightedNodes;
+	
+	private double testHeading = 0.00;
 	
 	/**
 	 * Constructor for this object that takes a map to be displayed as the parameter
@@ -69,6 +71,7 @@ public class MapPanel extends JPanel {
 		
 		this.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 		initMouse();
+		this.setBackground(Color.DARK_GRAY);
 		this.addMouseListener(mouse);
 		this.addMouseWheelListener(mouse);
 		this.addMouseMotionListener(mouse);
@@ -89,7 +92,7 @@ public class MapPanel extends JPanel {
 			public void mouseMoved(MouseEvent e) {
 				double lat = screenToLat(e.getY());
 				double lon = screenToLon(e.getX(), e.getY());
-				Node n = map.getNearNode(lon, lat, map.getRoadIt());
+				GraphNode n = map.getNearNode(lon, lat, map.getNodeIterator());
 				hoveredNode = n;
 				repaint();
 			}
@@ -127,9 +130,9 @@ public class MapPanel extends JPanel {
 			public void mouseClicked(MouseEvent e) {
 				double lat = screenToLat(e.getY());
 				double lon = screenToLon(e.getX(), e.getY());
-				Node n = map.getNearNode(lon, lat, map.getRoadIt());
+				GraphNode n = map.getNearNode(lon, lat, map.getNodeIterator());
 				selectedNode = n;
-				System.out.println(n.toString());
+//				System.out.println(n.toString());
 //				Iterator<Node> it = map.getNodeIt();
 //				while(it.hasNext()) {
 //					Node next = it.next();
@@ -138,6 +141,7 @@ public class MapPanel extends JPanel {
 //						highlightedNodes.add(next);
 //					}
 //				}
+//				testHeading += 30;
 				repaint();
 			}
 		};
@@ -199,6 +203,8 @@ public class MapPanel extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		Color c = g.getColor();
+		g.setColor(Color.WHITE);
 		Iterator<Way> wayIt = map.getWayIt();
 		while(wayIt.hasNext()) {
 			Way w = wayIt.next();
@@ -208,11 +214,9 @@ public class MapPanel extends JPanel {
 				highlightWay(w, g);
 			}
 		}
+		g.setColor(c);
 		for(Node n : highlightedNodes) {
-			Color c = g.getColor();
-			g.setColor(Color.BLUE);
-			g.fillOval(lonToScreen(n.getLon(), n.getLat())-3, latToScreen(n.getLat())-3, 7, 7);
-			g.setColor(c);
+			drawNode(n, Color.BLUE, g);
 		}
 		if(hoveredNode != null) {
 			drawNode(hoveredNode, Color.ORANGE, g);
@@ -269,7 +273,7 @@ public class MapPanel extends JPanel {
 		g.setColor(currColor);
 	}
 	
-	private void drawNode(Node n, Color c, Graphics g) {
+	private void drawNode(GraphNode n, Color c, Graphics g) {
 		Color c2 = g.getColor();
 		g.setColor(c);
 		g.fillOval(lonToScreen(n.getLon(), n.getLat())-3, latToScreen(n.getLat())-3, 7, 7);
@@ -288,7 +292,7 @@ public class MapPanel extends JPanel {
 	public void highlightWay(Way way, Graphics g) {
 		Color currentColor = g.getColor();
 		Graphics2D g2 = (Graphics2D) g;
-		g.setColor(Color.BLUE);
+		g.setColor(Color.cyan);
 		drawWay(way, g);
 		g.setColor(currentColor);
 	}
@@ -352,8 +356,8 @@ public class MapPanel extends JPanel {
 	 * Pops the currently selected node and sets selectedNode to null.
 	 * @return selectedNode.
 	 */
-	public Node getSelectedNode() {
-		Node rtrnNode = selectedNode;
+	public GraphNode getSelectedNode() {
+		GraphNode rtrnNode = selectedNode;
 		return rtrnNode;
 	}
 	

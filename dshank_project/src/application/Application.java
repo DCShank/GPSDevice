@@ -16,6 +16,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -45,6 +46,7 @@ public class Application extends JFrame implements GPSListener{
 	private Director dir;
 	private List<GraphEdge> directions;
 	private GPSDevice gps;
+	private JLabel messageDisplay;
 
 	/**
 	 * Constructor for the application which takes no argument.
@@ -57,7 +59,12 @@ public class Application extends JFrame implements GPSListener{
 		content.setLayout(new BorderLayout());
 		createMenuBar();
 		ButtonPanel buttons = new ButtonPanel();
+		messageDisplay = new JLabel();
+		messageDisplay.setHorizontalAlignment(JLabel.CENTER);
+		messageDisplay.setText("Message display.");
+		messageDisplay.setToolTipText("Displays system updates.");
 		content.add(buttons, BorderLayout.WEST);
+		content.add(messageDisplay, BorderLayout.SOUTH);
 		pack();
 		setVisible(true);
 	}
@@ -242,7 +249,8 @@ public class Application extends JFrame implements GPSListener{
 				}
 				dir.setStartNode(n);
 				mapPanel.addHighlightedNode((Node) n);
-				JOptionPane.showMessageDialog(null, "Start node selected");
+//				JOptionPane.showMessageDialog(null, "Start node selected");
+				messageDisplay.setText("Start node selected.");
 			}
 			if(startOrEnd.equalsIgnoreCase("end")) {
 				GraphNode oldEnd = dir.getEndNode();
@@ -251,7 +259,8 @@ public class Application extends JFrame implements GPSListener{
 				}
 				dir.setEndNode(n);
 				mapPanel.addHighlightedNode((Node) n);
-				JOptionPane.showMessageDialog(null, "End node selected");
+//				JOptionPane.showMessageDialog(null, "End node selected");
+				messageDisplay.setText("End node selected.");
 			}
 			return n;
 		}
@@ -270,16 +279,25 @@ public class Application extends JFrame implements GPSListener{
 				directions = get();
 				mapPanel.setDirections(directions);
 				if(directions == null) {
-					JOptionPane.showMessageDialog(null, "No such path exists");
+					messageDisplay.setText("No route exists.");;
 				}
+				messageDisplay.setText("Route found!");
 			} catch (Exception e) {
-				
+				messageDisplay.setText("An ERROR has occurred!");
 			}
 		}
 	}
 
 	@Override
 	public void processEvent(GPSEvent e) {
-		System.out.println(e.getHeading());
+		double lon = e.getLongitude();
+		double lat = e.getLatitude();
+		double newHead = e.getHeading() + 90;
+		if(newHead < 0) {
+			newHead = 360 + newHead;
+		}
+		mapPanel.setCenter(lon, lat);
+		SwingWorker task = new DirectionFinder();
+		task.execute();
 	}
 }

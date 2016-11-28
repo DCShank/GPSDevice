@@ -33,6 +33,8 @@ public class Map implements Graph {
 	
 	private Set<GraphSegment> segments;
 	
+	private Set<GraphNode> roadNodes;
+	
 	private double lonMin, latMin, lonMax, latMax;
 	
 	private final DistanceStrategy strat = new HaversineDistance();
@@ -61,6 +63,7 @@ public class Map implements Graph {
 		this.namedWays = namedWays;
 		this.roadWays = roadWays;
 		this.nonRoadWays = nonRoadWays;
+		roadNodes = new HashSet<GraphNode>();
 		edgeInit();
 		segments = new HashSet();
 		segmentInit();
@@ -169,6 +172,8 @@ public class Map implements Graph {
 			while(nIt.hasNext()) {
 				prevNode = currNode;
 				currNode = nIt.next();
+				roadNodes.add((GraphNode) prevNode);
+				roadNodes.add((GraphNode) currNode);
 				RoadEdge e = new RoadEdge(prevNode, currNode, strat);
 //				System.out.println(e.getLength());
 				prevNode.addGraphEdge((GraphEdge)e);
@@ -248,12 +253,23 @@ public class Map implements Graph {
 	 * @param wayIt The iterator for the set of ways that you want to search through.
 	 * @return The node nearest to the point that is available in the way set.
 	 */
-	public Node getNearNode(double lon, double lat, Iterator<Way> wayIt) {
-		Node rtrnNode = wayIt.next().getNearestNode(lon, lat, strat);
+	public GraphNode getNearNode(double lon, double lat, Iterator<GraphNode> it) {
+//		Node rtrnNode = wayIt.next().getNearestNode(lon, lat, strat);
+//		double dist = strat.getDistance(lon, lat, rtrnNode.getLon(), rtrnNode.getLat());
+//		while(wayIt.hasNext()) {
+//			Way way = wayIt.next();
+//			Node n = way.getNearestNode(lon, lat, strat);
+//			double testDist = strat.getDistance(lon, lat, n.getLon(), n.getLat());
+//			if(testDist < dist) {
+//				rtrnNode = n;
+//				dist = testDist;
+//			}
+//		}
+//		return rtrnNode;
+		GraphNode rtrnNode = it.next();
 		double dist = strat.getDistance(lon, lat, rtrnNode.getLon(), rtrnNode.getLat());
-		while(wayIt.hasNext()) {
-			Way way = wayIt.next();
-			Node n = way.getNearestNode(lon, lat, strat);
+		while(it.hasNext()) {
+			GraphNode n = it.next();
 			double testDist = strat.getDistance(lon, lat, n.getLon(), n.getLat());
 			if(testDist < dist) {
 				rtrnNode = n;
@@ -273,5 +289,9 @@ public class Map implements Graph {
 	
 	public Iterator<Node> getNodeIt() {
 		return nodes.values().iterator();
+	}
+	
+	public Iterator<GraphNode> getNodeIterator() {
+		return roadNodes.iterator();
 	}
 }

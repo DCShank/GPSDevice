@@ -291,7 +291,18 @@ public class Director {
 	 * @return The new directions.
 	 */
 	public List<GraphEdge> updateDirections(double lat, double lon, double heading) {
-		return null;
+		Iterator<GraphEdge> eIt = directions.iterator();
+		while(eIt.hasNext()) {
+			GraphEdge e = eIt.next();
+			if(graph.inCircularSegment(lon, lat, 30, heading, e.getLength(), e.getEndNode())) {
+				System.out.println("Apparently on course");
+				return directions;
+			}
+			
+		}
+		startNode = graph.getNearNode(lon, lat, graph.getNodeIterator());
+		System.out.println("Off course");
+		return calcDir();
 	}
 
 }
