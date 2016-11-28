@@ -70,19 +70,19 @@ public class Map implements Graph {
 	}
 	
 	/**
-	 * Gives an iterator over the ways of the Map.
-	 * @return An Iterator<Way> of the ways in the Map.
+	 * Returns the minimum longitude value.
+	 * @return The minimum longitude.
 	 */
-	public Iterator<Way> getWayIt() {
-		return ways.values().iterator();
+	public double getLonMin() {
+		return lonMin;
 	}
 	
-	public Iterator<Way> getRoadIt() {
-		return roadWays.values().iterator();
-	}
-	
-	public Iterator<Way> getNonRoadIt() {
-		return nonRoadWays.values().iterator();
+	/**
+	 * Returns the maximum longitude value.
+	 * @return The maximum longitude
+	 */
+	public double getLonMax() {
+		return lonMax;
 	}
 	
 	/**
@@ -102,40 +102,37 @@ public class Map implements Graph {
 	}
 	
 	/**
-	 * Returns the minimum longitude value.
-	 * @return The minimum longitude.
+	 * Gives an iterator over the ways of the Map.
+	 * @return An Iterator<Way> of the ways in the Map.
 	 */
-	public double getLonMin() {
-		return lonMin;
+	public Iterator<Way> getWayIt() {
+		return ways.values().iterator();
 	}
 	
 	/**
-	 * Returns the maximum longitude value.
-	 * @return The maximum longitude
+	 * Gives an iterator over the drivable road ways.
+	 * @return An Iterator<Way> of the road ways in the map.
 	 */
-	public double getLonMax() {
-		return lonMax;
+	public Iterator<Way> getRoadIt() {
+		return roadWays.values().iterator();
 	}
 	
 	/**
-	 * Determines if a node is within a circular segment with some start position,
-	 * heading, angle, and radius.
+	 * Determines if a node is within a "circular wedge" with some start position,
+	 * heading, angle, and radius. A circular wedge is a section of a circle from the center
+	 * to the outside edge, with some angle from one side of the wedge to the other.
 	 * 
-	 * I don't know if this works. Will need to be tested.
-	 * 
-	 * Also I don't know what direction and from what starting point the heading
-	 * is going to be given so this is all essentially a sample of what the code
-	 * should be like.
+	 * All angles are in degrees.
 	 * 
 	 * @param lon The initial longitude of the circular segment.
 	 * @param lat The initial latitude of the circular segment.
 	 * @param theta	 The angle Theta of the circular segment.
-	 * @param phi The angle from north the the center of theta.
+	 * @param phi The angle counterclockwise from east of the center of the wedge.
 	 * @param radius The radius of the circular segment.
 	 * @param n The node that's being checked.
 	 * @return True if the node is in the circular segment, false otherwise.
 	 */
-	public boolean inCircularSegment(double lon, double lat, double theta, double phi,
+	public boolean inCircularWedge(double lon, double lat, double theta, double phi,
 										double radius, GraphNode node) {
 		// Return false if the node is outside the possible range of the circular segment.
 //		System.out.println(!(strat.getDistance(lon, lat, n.getLon(), n.getLat()) > radius));
@@ -191,9 +188,6 @@ public class Map implements Graph {
 		Iterator<Way> wayIt = getRoadIt();
 		while(wayIt.hasNext()) {
 			Way w = wayIt.next();
-			if(w.getName().equals("Triangle Dr")) {
-				System.out.println("Found it");
-			}
 			Iterator<Node> nIt = w.getNodeIt();
 			Node sn = nIt.next();
 			Node pn = sn;
@@ -221,6 +215,8 @@ public class Map implements Graph {
 		}
 	}
 	
+	// Methods required for the Graph interface.
+	
 	/**
 	 * Adds a segment to the graph and the corresponding start and end nodes.
 	 * @param seg The segment to be added.
@@ -235,6 +231,7 @@ public class Map implements Graph {
 	
 	/**
 	 * Removes a segment from the graph and from the corresponding nodes.
+	 * @param seg The segment to be removed.
 	 */
 	public void removeSegment(GraphSegment seg) {
 		GraphNode sn = seg.getStartNode();
@@ -245,27 +242,13 @@ public class Map implements Graph {
 	}
 	
 	/**
-	 * Returns the nearest node on a given set of ways.
-	 * In this case the set of ways is parameterized as an iterator because map only
-	 * really gives out iterators.
+	 * Returns the nearest node to some point for a given node iterator.
 	 * @param lon The longitude of the point to find a node near.
 	 * @param lat The latitude of the point to find a node near.
-	 * @param wayIt The iterator for the set of ways that you want to search through.
 	 * @return The node nearest to the point that is available in the way set.
 	 */
-	public GraphNode getNearNode(double lon, double lat, Iterator<GraphNode> it) {
-//		Node rtrnNode = wayIt.next().getNearestNode(lon, lat, strat);
-//		double dist = strat.getDistance(lon, lat, rtrnNode.getLon(), rtrnNode.getLat());
-//		while(wayIt.hasNext()) {
-//			Way way = wayIt.next();
-//			Node n = way.getNearestNode(lon, lat, strat);
-//			double testDist = strat.getDistance(lon, lat, n.getLon(), n.getLat());
-//			if(testDist < dist) {
-//				rtrnNode = n;
-//				dist = testDist;
-//			}
-//		}
-//		return rtrnNode;
+	public GraphNode getNearNode(double lon, double lat) {
+		Iterator<GraphNode> it = getNodeIterator();
 		GraphNode rtrnNode = it.next();
 		double dist = strat.getDistance(lon, lat, rtrnNode.getLon(), rtrnNode.getLat());
 		while(it.hasNext()) {
@@ -279,18 +262,26 @@ public class Map implements Graph {
 		return rtrnNode;
 	}
 	
+	/**
+	 * Returns the number of drivable nodes in the graph.
+	 * @return int The number of nodes in roadNodes.
+	 */
+	public int getNodeSize() {
+		return roadNodes.size();
+	}
+	
+	/**
+	 * Provides an iterator for the segments of the graph.
+	 * @return An iterator over the segments of the graph.
+	 */
 	public Iterator<GraphSegment> getSegmentIterator() {
 		return segments.iterator();
 	}
 	
-	public int getNodeSize() {
-		return nodes.size();
-	}
-	
-	public Iterator<Node> getNodeIt() {
-		return nodes.values().iterator();
-	}
-	
+	/**
+	 * Provides an iterator for the drivable road nodes of the graph.
+	 * @return An iterator for the drivable nodes.
+	 */
 	public Iterator<GraphNode> getNodeIterator() {
 		return roadNodes.iterator();
 	}

@@ -92,7 +92,7 @@ public class MapPanel extends JPanel {
 			public void mouseMoved(MouseEvent e) {
 				double lat = screenToLat(e.getY());
 				double lon = screenToLon(e.getX(), e.getY());
-				GraphNode n = map.getNearNode(lon, lat, map.getNodeIterator());
+				GraphNode n = map.getNearNode(lon, lat);
 				hoveredNode = n;
 				repaint();
 			}
@@ -130,7 +130,7 @@ public class MapPanel extends JPanel {
 			public void mouseClicked(MouseEvent e) {
 				double lat = screenToLat(e.getY());
 				double lon = screenToLon(e.getX(), e.getY());
-				GraphNode n = map.getNearNode(lon, lat, map.getNodeIterator());
+				GraphNode n = map.getNearNode(lon, lat);
 				selectedNode = n;
 //				System.out.println(n.toString());
 //				Iterator<Node> it = map.getNodeIt();

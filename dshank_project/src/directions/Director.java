@@ -294,11 +294,11 @@ public class Director {
 		Iterator<GraphEdge> eIt = directions.iterator();
 		while(eIt.hasNext()) {
 			GraphEdge e = eIt.next();
-			if(graph.inCircularSegment(lon, lat, 30, heading, e.getLength(), e.getEndNode())) {
+			if(graph.inCircularWedge(lon, lat, 30, heading, e.getLength(), e.getEndNode())) {
 				return directions;
 			}
 		}
-		startNode = graph.getNearNode(lon, lat, graph.getNodeIterator());
+		startNode = graph.getNearNode(lon, lat);
 		return calcDir();
 	}
 
