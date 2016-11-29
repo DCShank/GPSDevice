@@ -58,6 +58,12 @@ public class Application extends JFrame implements GPSListener{
 	private JLabel messageDisplay;
 	
 	private boolean followGPS = false;
+	private boolean inDriveMode = false;
+	
+	private GPSEvent prevEvent = null;
+	
+	private JButton getDir;
+	private JToggleButton driveThere;
 
 	/**
 	 * Constructor for the application which takes no argument.
@@ -175,10 +181,10 @@ public class Application extends JFrame implements GPSListener{
 	class ButtonPanel extends JPanel {
 		JButton selStart;
 		JButton selEnd;
-		JButton getDir;
+//		JButton getDir;
 		JButton clearDir;
 		JToggleButton trackPos;
-		JButton driveThere;
+//		JToggleButton driveThere;
 		
 
 		public ButtonPanel() {
@@ -198,11 +204,37 @@ public class Application extends JFrame implements GPSListener{
 						followGPS = trackPos.isSelected();
 					}
 					if (e.getActionCommand().equals("clear")) {
+						selStart.setEnabled(true);
+						getDir.setEnabled(false);
+						driveThere.setEnabled(true);
+						driveThere.setSelected(false);
+						inDriveMode = false;
 						dir.clearDirections();
 						mapPanel.setDirections(null);
 						mapPanel.setStart(null);
 						mapPanel.setEnd(null);
 						mapPanel.repaint();
+						messageDisplay.setText("All selections have been cleared.");
+					}
+					if (e.getActionCommand().equals("drive")) {
+						if(driveThere.isSelected()) {
+							if(prevEvent != null) {
+								inDriveMode = true;
+								dir.setStartNode(map.getNearNode(prevEvent.getLongitude(), prevEvent.getLatitude()));
+								mapPanel.setStart(null);
+								selStart.setEnabled(false);
+								DirectionFinder task = new DirectionFinder();
+								task.execute();
+								messageDisplay.setText("Drive there mode enabled.");
+							} else {
+								messageDisplay.setText("No GPS coordinates to drive from!");
+								driveThere.setSelected(false);
+							}
+						} else {
+							inDriveMode = false;
+							selStart.setEnabled(true);
+							messageDisplay.setText("Drive there mode disabled.");
+						}
 					}
 				}
 			};
@@ -217,6 +249,8 @@ public class Application extends JFrame implements GPSListener{
 			// Init the get directions button
 			getDir = new JButton("Get directions");
 			getDir.setActionCommand("directions");
+			getDir.setEnabled(false);
+			getDir.setToolTipText("Must have selected a start and end node to get directions");
 			getDir.addActionListener(buttonPanelListener);
 			// Init the clear directions button
 			clearDir = new JButton("Clear directions");
@@ -227,7 +261,11 @@ public class Application extends JFrame implements GPSListener{
 			trackPos.setActionCommand("track");
 			trackPos.addActionListener(buttonPanelListener);
 			// Init the drive there button
-			
+			driveThere = new JToggleButton("Drive there", false);
+			driveThere.setActionCommand("drive");
+			driveThere.setEnabled(false);
+			driveThere.setToolTipText("Must have selected an end node to get driving directions");
+			driveThere.addActionListener(buttonPanelListener);
 			// Set up the button panel.
 			this.setLayout(new GridLayout(0, 1));
 			this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -236,6 +274,7 @@ public class Application extends JFrame implements GPSListener{
 			this.add(getDir);
 			this.add(clearDir);
 			this.add(trackPos);
+			this.add(driveThere);
 		}
 	}
 
@@ -267,19 +306,21 @@ public class Application extends JFrame implements GPSListener{
 		@Override
 		protected Object doInBackground() throws Exception {
 			if(n != null) {
-			if(startOrEnd.equals("start")) {
-				dir.setStartNode(n);
-//				mapPanel.addHighlightedNode((Node) n);
-				mapPanel.setStart(n);
-				messageDisplay.setText("Start node set.");
-			}
-			if(startOrEnd.equalsIgnoreCase("end")) {
-				dir.setEndNode(n);
-//				mapPanel.addHighlightedNode((Node) n);
-				mapPanel.setEnd(n);
-				messageDisplay.setText("End node set.");
-			}
-			return n;
+				if(startOrEnd.equals("start")) {
+					dir.setStartNode(n);
+					mapPanel.setStart(n);
+					messageDisplay.setText("Start node set.");
+				}
+				if(startOrEnd.equals("end")) {
+					dir.setEndNode(n);
+					mapPanel.setEnd(n);
+					driveThere.setEnabled(true);
+					messageDisplay.setText("End node set.");
+				}
+				if(dir.getStartNode() != null && dir.getEndNode() != null) {
+					getDir.setEnabled(true);
+				}
+				return n;
 			} else {
 				messageDisplay.setText("No node selected!");
 				return n;
@@ -288,7 +329,7 @@ public class Application extends JFrame implements GPSListener{
 	}
 
 	class DirectionFinder extends SwingWorker<List<GraphEdge>, Object> {
-		
+
 		public DirectionFinder() {
 			messageDisplay.setText("Searching for route...");
 		}
@@ -297,7 +338,7 @@ public class Application extends JFrame implements GPSListener{
 		protected List<GraphEdge> doInBackground() throws Exception {
 			return dir.getDirections();
 		}
-		
+
 		@Override
 		protected void done() {
 			try {
@@ -313,7 +354,7 @@ public class Application extends JFrame implements GPSListener{
 			}
 		}
 	}
-	
+
 	class RouteChecker extends SwingWorker<List<GraphEdge>, Object> {
 		GPSEvent event;
 		List<GraphEdge> oldDir = directions;
@@ -341,10 +382,9 @@ public class Application extends JFrame implements GPSListener{
 					messageDisplay.setText("On route to destination");
 				}
 			} catch (Exception e) {
-				
 			}
 		}
-		
+
 	}
 	
 	class MapLoader extends SwingWorker<Map, Object> {
@@ -392,12 +432,13 @@ public class Application extends JFrame implements GPSListener{
 
 	@Override
 	public void processEvent(GPSEvent e) {
+		prevEvent = e;
 		if(followGPS)
 			mapPanel.setCenter(e.getLongitude(), e.getLatitude());
 		mapPanel.setDriving(true, e.getLongitude(), e.getLatitude());
-		if(directions != null) {
-		RouteChecker task = new RouteChecker(e);
-		task.execute();
+		if(inDriveMode) {
+			RouteChecker task = new RouteChecker(e);
+			task.execute();
 		}
 	}
 }
