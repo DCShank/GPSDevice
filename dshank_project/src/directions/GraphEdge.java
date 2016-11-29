@@ -2,6 +2,12 @@ package directions;
 
 import map_data.Node;
 
+/**
+ * An edge on a graph that extends from one segment to another. Edges are expected to be
+ * directed.
+ * @author david
+ *
+ */
 public interface GraphEdge {
 
 	/**

@@ -2,6 +2,17 @@ package directions;
 
 import java.util.Iterator;
 
+/**
+ * A Node on a graph. Aggregated by a Graph. Can have edges.
+ * 
+ * A node on a graph. I think at some point I lost track of the point of the graph interfaces
+ * and found that I was using them where it wasn't necessary, which lead to it being helpful
+ * to have getLat and getLon.
+ * 
+ * I'll have to reconsider those. Maybe rename them to getY and getX
+ * @author david
+ *
+ */
 public interface GraphNode {
 	
 	/**
@@ -41,6 +52,10 @@ public interface GraphNode {
 	
 	public Iterator<GraphSegment> getIncomingSegmentIt();
 	
+	/**
+	 * Should be replaced with remove edge.
+	 * @param seg
+	 */
 	public void removeSegment(GraphSegment seg);
 
 	public double getLat();

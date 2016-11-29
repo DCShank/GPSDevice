@@ -36,8 +36,8 @@ public class Map implements Graph {
 	private Set<GraphNode> roadNodes;
 	
 	private double lonMin, latMin, lonMax, latMax;
-	
-	private final DistanceStrategy strat = new HaversineDistance();
+	/** The strategy used for finding distances over area. */
+	private final static DistanceStrategy strat = new HaversineDistance();
 	
 	/**
 	 * Constructor for the Map

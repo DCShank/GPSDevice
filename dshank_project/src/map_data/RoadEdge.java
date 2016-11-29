@@ -36,21 +36,6 @@ public class RoadEdge implements GraphEdge {
 		this.strat = strat;
 	}
 	
-	public RoadEdge getReverse() {
-		RoadEdge reverse = new RoadEdge(endNode, startNode, strat);
-		return reverse;
-	}
-	
-	/**
-	 * returns whether or not a specified node is one of the nodes connected to this edge.
-	 * @param n The specified node
-	 * @return Whether this edge connects to the specified node.
-	 */
-	@Override
-	public boolean hasNode(GraphNode n) {
-		return startNode.equals(n) || endNode.equals(n);
-	}
-	
 	/**
 	 * returns the length of this edge
 	 * @return the double value of the length between the two nodes.
@@ -87,13 +72,31 @@ public class RoadEdge implements GraphEdge {
 	}
 	
 	/**
+	 * Returns the "reversed" edge. A reversed edge opposite start and end nodes.
+	 * @return A new RoadEdge with opposite start and end nodes.
+	 */
+	public RoadEdge getReverse() {
+		RoadEdge reverse = new RoadEdge(endNode, startNode, strat);
+		return reverse;
+	}
+	
+	/**
+	 * returns whether or not a specified node is one of the nodes connected to this edge.
+	 * @param n The specified node
+	 * @return Whether this edge connects to the specified node.
+	 */
+	@Override
+	public boolean hasNode(GraphNode n) {
+		return startNode.equals(n) || endNode.equals(n);
+	}
+	
+	/**
 	 * I don't know if this works. I believe that because every node has a unique id that
-	 * each for every possible pair of nodes, concatID should be unique.
+	 * for every possible pair of nodes, concatID should be unique.
 	 */
 	@Override
 	public int hashCode() {
-		String concatID = startNode.getID() + endNode.getID();
-		return concatID.hashCode();
+		return id.hashCode();
 	}
 	
 	/**

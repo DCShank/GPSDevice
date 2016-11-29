@@ -10,9 +10,10 @@ import directions.GraphNode;
 import directions.GraphSegment;
 
 /**
- * Represents a node in an OSM map.
- * 
+ * Represents a node in an OSM map. Also implements GraphNode features.
  * Has a latitude, longitude, and ID.
+ * Also has lists of it's incoming and outgoing edges and segments.
+ * Has a degree. The degree measures the number of outgoing edges.
  * @author david
  *
  */
@@ -45,8 +46,8 @@ public class Node implements GraphNode {
 	 * @param idString The string representing the nodes id
 	 */
 	public Node(double longitude, double latitude, String idString) {
-		lat = latitude;
 		lon = longitude;
+		lat = latitude;
 		id = idString;
 		edges = new HashSet<GraphEdge>();
 		incomingEdges = new HashSet<GraphEdge>();
@@ -56,19 +57,19 @@ public class Node implements GraphNode {
 	}
 	
 	/**
-	 * Returns the Nodes latitude.
-	 * @return latitude
-	 */
-	public double getLat() {
-		return lat;
-	}
-	
-	/**
 	 * Returns the Nodes longitude
 	 * @return longitude
 	 */
 	public double getLon() {
 		return lon;
+	}
+	
+	/**
+	 * Returns the Nodes latitude.
+	 * @return latitude
+	 */
+	public double getLat() {
+		return lat;
 	}
 	
 	/**
@@ -101,6 +102,22 @@ public class Node implements GraphNode {
 		}
 	}
 	
+	/**
+	 * Removes a segment from this nodes lists of attached segments.
+	 * 
+	 * THIS SHOULD PROBABLY BE REPLACED BY A removeEdge METHOD
+	 */
+	public void removeSegment(GraphSegment seg) {
+		if(segments.contains(seg)) {
+			segments.remove(seg);
+		}
+		if(incomingSegments.contains(seg)) {
+			incomingSegments.remove(seg);
+		}
+	}
+	
+	// Iterators for all the edge and segment lists of the node.
+	
 	public Iterator<GraphEdge> getEdgeIt() {
 		return edges.iterator();
 	}
@@ -117,7 +134,12 @@ public class Node implements GraphNode {
 		return incomingSegments.iterator();
 	}
 
-	@Override
+	/**
+	 * Returns the 'degree' of the node.
+	 * This actually returns the 'Out degree' of the node. That is to say, the number of
+	 * outgoing edges from the node.
+	 * @return The degree (number of outgoing edges) of the node.
+	 */
 	public int getDegree() {
 		return degree;
 	}
@@ -125,18 +147,10 @@ public class Node implements GraphNode {
 	/**
 	 * Returns the edge that leads to the specified node.
 	 * @precondition The edge must exist
+	 * @return The edge that takes this node to the specified node.
 	 */
 	public GraphEdge getEdgeTo(GraphNode n) {
 		return toNodeEdges.get(n);
-	}
-	
-	public void removeSegment(GraphSegment seg) {
-		if(segments.contains(seg)) {
-			segments.remove(seg);
-		}
-		if(incomingSegments.contains(seg)) {
-			incomingSegments.remove(seg);
-		}
 	}
 	
 	@Override
@@ -153,6 +167,10 @@ public class Node implements GraphNode {
 		return id.hashCode();
 	}
 	
+	/**
+	 * Provides a human-readable representation of the data stored by the node. Useful for debugging.
+	 * @return Returns a string representing the node.
+	 */
 	@Override
 	public String toString() {
 		String rtrn = "";

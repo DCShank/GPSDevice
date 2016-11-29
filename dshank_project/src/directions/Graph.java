@@ -3,6 +3,11 @@ package directions;
 import java.util.Iterator;
 import java.util.Set;
 
+/**
+ * An interface that defines the behavior of an aggregator for the graph like objects in this project.
+ * @author david
+ *
+ */
 public interface Graph {
 	/**
 	 * Returns whether or not a GraphNode is within some circular wedge at some
