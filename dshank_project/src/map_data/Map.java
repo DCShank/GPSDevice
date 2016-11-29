@@ -269,6 +269,31 @@ public class Map implements Graph {
 		}
 		return rtrnNode;
 	}
+	/**
+	 * Returns the nearest node to some point for a given node iterator.
+	 * @param lon The longitude of the point to find a node near.
+	 * @param lat The latitude of the point to find a node near.
+	 * @param radius the radius of the circle to search in
+	 * @return The node nearest the position in the radius, or null if no such node exists.
+	 */
+	public GraphNode getNearNodeInRadius(double lon, double lat, double radius) {
+		Iterator<GraphNode> it = getNodeIterator();
+		GraphNode rtrnNode = it.next();
+		double dist = strat.getDistance(lon, lat, rtrnNode.getLon(), rtrnNode.getLat());
+		while(it.hasNext()) {
+			GraphNode n = it.next();
+			double testDist = strat.getDistance(lon, lat, n.getLon(), n.getLat());
+			if(testDist < dist) {
+				rtrnNode = n;
+				dist = testDist;
+			}
+		}
+		if(dist > radius) {
+			return null;
+		}
+		return rtrnNode;
+	}
+	
 	
 	/**
 	 * Returns the number of drivable nodes in the graph.

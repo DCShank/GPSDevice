@@ -23,6 +23,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JToggleButton;
 import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -175,37 +176,66 @@ public class Application extends JFrame implements GPSListener{
 		JButton selStart;
 		JButton selEnd;
 		JButton getDir;
+		JButton clearDir;
+		JToggleButton trackPos;
+		JButton driveThere;
+		
 
 		public ButtonPanel() {
 			ActionListener buttonPanelListener = new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					GraphNode n = mapPanel.getSelectedNode();
-					if (n != null && (e.getActionCommand().equals("start") || e.getActionCommand().equals("end"))) {
+					if ((e.getActionCommand().equals("start") || e.getActionCommand().equals("end"))) {
 						SwingWorker<Object, Object> task = new NodeSetter(n, e.getActionCommand());
 						task.execute();
 					}
-					if (n != null && e.getActionCommand().equals("directions")) {
+					if (e.getActionCommand().equals("directions")) {
 						SwingWorker<List<GraphEdge>, Object> task = new DirectionFinder();
 						task.execute();
 					}
+					if (e.getActionCommand().equals("track")) {
+						followGPS = trackPos.isSelected();
+					}
+					if (e.getActionCommand().equals("clear")) {
+						dir.clearDirections();
+						mapPanel.setDirections(null);
+						mapPanel.setStart(null);
+						mapPanel.setEnd(null);
+						mapPanel.repaint();
+					}
 				}
 			};
-
+			// Init the sel start node button
 			selStart = new JButton("Select start");
 			selStart.setActionCommand("start");
 			selStart.addActionListener(buttonPanelListener);
+			// Init the sel end node button
 			selEnd = new JButton("Select end");
 			selEnd.setActionCommand("end");
 			selEnd.addActionListener(buttonPanelListener);
+			// Init the get directions button
 			getDir = new JButton("Get directions");
 			getDir.setActionCommand("directions");
 			getDir.addActionListener(buttonPanelListener);
+			// Init the clear directions button
+			clearDir = new JButton("Clear directions");
+			clearDir.setActionCommand("clear");
+			clearDir.addActionListener(buttonPanelListener);
+			// Init the track position button.
+			trackPos = new JToggleButton("Track position", false);
+			trackPos.setActionCommand("track");
+			trackPos.addActionListener(buttonPanelListener);
+			// Init the drive there button
+			
+			// Set up the button panel.
 			this.setLayout(new GridLayout(0, 1));
 			this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 			this.add(selStart);
 			this.add(selEnd);
 			this.add(getDir);
+			this.add(clearDir);
+			this.add(trackPos);
 		}
 	}
 
@@ -236,27 +266,24 @@ public class Application extends JFrame implements GPSListener{
 		}
 		@Override
 		protected Object doInBackground() throws Exception {
+			if(n != null) {
 			if(startOrEnd.equals("start")) {
-				GraphNode oldStart = dir.getStartNode();
-				if (oldStart != null) {
-				mapPanel.removeHighlightedNode((Node) oldStart);
-				}
 				dir.setStartNode(n);
-				mapPanel.addHighlightedNode((Node) n);
-//				JOptionPane.showMessageDialog(null, "Start node selected");
-				messageDisplay.setText("Start node selected.");
+//				mapPanel.addHighlightedNode((Node) n);
+				mapPanel.setStart(n);
+				messageDisplay.setText("Start node set.");
 			}
 			if(startOrEnd.equalsIgnoreCase("end")) {
-				GraphNode oldEnd = dir.getEndNode();
-				if (oldEnd != null) {
-				mapPanel.removeHighlightedNode((Node) oldEnd);
-				}
 				dir.setEndNode(n);
-				mapPanel.addHighlightedNode((Node) n);
-//				JOptionPane.showMessageDialog(null, "End node selected");
-				messageDisplay.setText("End node selected.");
+//				mapPanel.addHighlightedNode((Node) n);
+				mapPanel.setEnd(n);
+				messageDisplay.setText("End node set.");
 			}
 			return n;
+			} else {
+				messageDisplay.setText("No node selected!");
+				return n;
+			}
 		}
 	}
 
@@ -365,9 +392,12 @@ public class Application extends JFrame implements GPSListener{
 
 	@Override
 	public void processEvent(GPSEvent e) {
-		mapPanel.setCenter(e.getLongitude(), e.getLatitude());
-		mapPanel.setIsDriving(true);
+		if(followGPS)
+			mapPanel.setCenter(e.getLongitude(), e.getLatitude());
+		mapPanel.setDriving(true, e.getLongitude(), e.getLatitude());
+		if(directions != null) {
 		RouteChecker task = new RouteChecker(e);
 		task.execute();
+		}
 	}
 }

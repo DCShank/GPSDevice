@@ -325,5 +325,9 @@ public class Director {
 		startNode = graph.getNearNode(lon, lat);
 		return calcDir();
 	}
+	
+	public void clearDirections() {
+		directions = null;
+	}
 
 }

@@ -62,4 +62,6 @@ public interface Graph {
 	 */
 	public GraphNode getNearNode(double x, double y);
 	
+	public GraphNode getNearNodeInRadius(double x, double y, double radius);
+
 }

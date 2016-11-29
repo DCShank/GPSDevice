@@ -18,6 +18,8 @@ import javax.swing.JPanel;
 import directions.GraphEdge;
 import directions.GraphNode;
 import directions.GraphSegment;
+import map_data.DistanceStrategy;
+import map_data.HaversineDistance;
 import map_data.Map;
 import map_data.Node;
 import map_data.Way;
@@ -47,15 +49,26 @@ public class MapPanel extends JPanel {
 	public static final int DEFAULT_WIDTH = 1200;
 	public static final int DEFAULT_HEIGHT = 800;
 	
+	private static final int PIX_TO_CUR = 35;
+	private double currentRad;
+	
+	public static final DistanceStrategy strat = new HaversineDistance();
+	
 	private GraphNode selectedNode = null;
 	private GraphNode hoveredNode = null;
+	private GraphNode start = null;
+	private GraphNode end = null;
 	
 	private List<GraphEdge> directions;
 	
 	private HashSet<Node> highlightedNodes;
 	
-	private double testHeading = 30;
+	private HashSet<Node> tempNodes;
 	
+	private double testHeading = 0;
+	
+	private double driverLon = 0;
+	private double driverLat = 0;
 	private boolean inDrivingMode = false;
 	
 	/**
@@ -70,6 +83,8 @@ public class MapPanel extends JPanel {
 		cenLon = (map.getLonMax()+map.getLonMin())/2.0;
 		cenLonPix = scale.lonToPixels(cenLon, cenLat);
 		directions = null;
+		currentRad = strat.getDistance(0, 0, scale.pixelsToLon(PIX_TO_CUR,PIX_TO_CUR),
+				scale.pixelsToLat(PIX_TO_CUR));
 		
 		this.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 		initMouse();
@@ -78,7 +93,8 @@ public class MapPanel extends JPanel {
 		this.addMouseWheelListener(mouse);
 		this.addMouseMotionListener(mouse);
 		
-		highlightedNodes = new HashSet();
+		highlightedNodes = new HashSet<Node>();
+		tempNodes = new HashSet<Node>();
 	}	
 	
 	/**
@@ -94,7 +110,7 @@ public class MapPanel extends JPanel {
 			public void mouseMoved(MouseEvent e) {
 				double lat = screenToLat(e.getY());
 				double lon = screenToLon(e.getX(), e.getY());
-				GraphNode n = map.getNearNode(lon, lat);
+				GraphNode n = map.getNearNodeInRadius(lon, lat, currentRad);
 				hoveredNode = n;
 				repaint();
 			}
@@ -125,6 +141,8 @@ public class MapPanel extends JPanel {
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				zoomToPosition(e.getX(), e.getY(), -e.getWheelRotation());
 				setCenter(cenLon, cenLat);
+				currentRad = strat.getDistance(0, 0, scale.pixelsToLon(PIX_TO_CUR,PIX_TO_CUR),
+						scale.pixelsToLat(PIX_TO_CUR));
 				repaint();
 			}
 			
@@ -132,18 +150,22 @@ public class MapPanel extends JPanel {
 			public void mouseClicked(MouseEvent e) {
 				double lat = screenToLat(e.getY());
 				double lon = screenToLon(e.getX(), e.getY());
-				GraphNode n = map.getNearNode(lon, lat);
+				GraphNode n = map.getNearNodeInRadius(lon, lat, currentRad);
 				selectedNode = n;
-				System.out.println(n.toString());
-				Iterator<GraphNode> it = map.getNodeIterator();
-				while(it.hasNext()) {
-					GraphNode next = it.next();
-					if(map.inCircularWedge(screenToLon(e.getX(),e.getY()), screenToLat(e.getY()),
-							30, testHeading, 25, next)) {
-						highlightedNodes.add((Node) next);
-					}
-				}
-				testHeading += 30;
+				
+				// Testing code
+//				System.out.println(n.toString());
+//				Iterator<GraphNode> it = map.getNodeIterator();
+//				tempNodes = new HashSet<Node>();
+//				while(it.hasNext()) {
+//					GraphNode next = it.next();
+//					if(map.inCircularWedge(screenToLon(e.getX(),e.getY()), screenToLat(e.getY()),
+//							120, testHeading, 500, next)) {
+//						tempNodes.add((Node) next);
+//					}
+//				}
+//				testHeading += 10;
+				
 				repaint();
 			}
 		};
@@ -220,15 +242,22 @@ public class MapPanel extends JPanel {
 		for(Node n : highlightedNodes) {
 			drawNode(n, Color.BLUE, g);
 		}
+		for(Node n : tempNodes) {
+			drawNode(n, Color.GREEN, g);
+		}
 		if(hoveredNode != null)
 			drawNode(hoveredNode, Color.ORANGE, g);
 		if(selectedNode != null)
 			drawNode(selectedNode, Color.MAGENTA, g);
 		if(directions != null)
 			drawEdges(directions, Color.RED, g);
+		if(start != null)
+			drawNode(start, Color.PINK, g);
+		if(end != null)
+			drawNode(end, Color.RED, g);
 		if(inDrivingMode) {
-			g.setColor(Color.PINK);
-			g.fillOval(lonToScreen(cenLon, cenLat)-4, latToScreen(cenLat)-4, 9, 9);
+			g.setColor(Color.WHITE);
+			g.fillOval(lonToScreen(driverLon, driverLat)-4, latToScreen(driverLat)-4, 9, 9);
 			
 		}
 		g.setColor(c);
@@ -381,8 +410,16 @@ public class MapPanel extends JPanel {
 		highlightedNodes.remove(n);
 	}
 	
-	public void setIsDriving(boolean isDriving) {
+	public void setDriving(boolean isDriving, double lon, double lat) {
+		driverLon = lon;
+		driverLat = lat;
 		inDrivingMode = isDriving;
 	}
-
+	
+	public void setStart(GraphNode s) {
+		start = s;
+	}
+	public void setEnd(GraphNode e) {
+		end = e;
+	}
 }
