@@ -197,7 +197,7 @@ public class Director {
 	private void splitStartSegment() {
 		Iterator<GraphSegment> sIt = graph.getSegmentIterator();
 		Set<GraphSegment> tempSegs = new HashSet<GraphSegment>();
-		System.out.println("Split Start");
+//		System.out.println("Split Start");
 		while(sIt.hasNext()) {
 			GraphSegment s = sIt.next();
 			if(s.hasNode(startNode)) {
@@ -215,11 +215,11 @@ public class Director {
 	private void splitEndSegment() {
 		Iterator<GraphSegment> sIt = graph.getSegmentIterator();
 		Set<GraphSegment> tempSegs = new HashSet<GraphSegment>();
-		System.out.println("Split End");
+//		System.out.println("Split End");
 		while(sIt.hasNext()) {
 			GraphSegment s = sIt.next();
 			if(s.hasNode(endNode)) {
-				System.out.println(s.toString());
+//				System.out.println(s.toString());
 				GraphSegment tempSeg = s.getPreSubsegment(endNode);
 				tempSegs.add(tempSeg);
 //				System.out.println(tempSeg.toString());
