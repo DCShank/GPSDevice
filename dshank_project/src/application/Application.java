@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -40,12 +41,19 @@ import map_data.OSMParser;
 
 public class Application extends JFrame implements GPSListener{
 
-	private Map map;
-	private MapPanel mapPanel;
+	/** Parses OSM data into a usable state. Used for making the Map */
 	private OSMParser prsr;
+	/** Map that contains all the map data for the current map */
+	private Map map;
+	/** Panel that displays map data for the current map. */
+	private MapPanel mapPanel;
+	/** Used for finding directions from one position to another on a graph. */
 	private Director dir;
+	/** Private list of the directions that are given to the map panel. */
 	private List<GraphEdge> directions;
+	/** Starks implementation of the GPS. Also provides real time position updates. */
 	private GPSDevice gps;
+	/** Label for displaying system relevant messages, such as found a route, without popups, */
 	private JLabel messageDisplay;
 
 	/**
@@ -137,7 +145,9 @@ public class Application extends JFrame implements GPSListener{
 				if (chooseVal == fc.APPROVE_OPTION) {
 					File file = fc.getSelectedFile();
 					try {
-						loadMap(file);
+//						loadMap(file);
+						MapLoader task = new MapLoader(file);
+						task.execute();
 					} catch (Exception x) {
 						JOptionPane.showMessageDialog(null, "Failed to load map.");
 					}
@@ -170,29 +180,11 @@ public class Application extends JFrame implements GPSListener{
 				public void actionPerformed(ActionEvent e) {
 					GraphNode n = mapPanel.getSelectedNode();
 					if (n != null && (e.getActionCommand().equals("start") || e.getActionCommand().equals("end"))) {
-						SwingWorker task = new NodeSetter(n, e.getActionCommand());
+						SwingWorker<Object, Object> task = new NodeSetter(n, e.getActionCommand());
 						task.execute();
 					}
-//						GraphNode oldStart = dir.getStartNode();
-//						if (oldStart != null) {
-//							mapPanel.removeHighlightedNode((Node) oldStart);
-//						}
-//						dir.setStartNode(n);
-//						mapPanel.addHighlightedNode((Node) n);
-//						JOptionPane.showMessageDialog(null, "Start node selected");
-//					}
-//					if (n != null && e.getActionCommand().equals("end")) {
-//						GraphNode oldEnd = dir.getEndNode();
-//						if (oldEnd != null) {
-//							mapPanel.removeHighlightedNode((Node) oldEnd);
-//						}
-//						dir.setEndNode(n);
-//						mapPanel.addHighlightedNode((Node) n);
-//						JOptionPane.showMessageDialog(null, "End node selected");
-//					}
 					if (n != null && e.getActionCommand().equals("directions")) {
-//						List<GraphEdge> directions = dir.getDirections();
-						SwingWorker task = new DirectionFinder();
+						SwingWorker<List<GraphEdge>, Object> task = new DirectionFinder();
 						task.execute();
 					}
 				}
@@ -267,6 +259,10 @@ public class Application extends JFrame implements GPSListener{
 	}
 
 	class DirectionFinder extends SwingWorker<List<GraphEdge>, Object> {
+		
+		public DirectionFinder() {
+			messageDisplay.setText("Searching for route...");
+		}
 
 		@Override
 		protected List<GraphEdge> doInBackground() throws Exception {
@@ -317,6 +313,49 @@ public class Application extends JFrame implements GPSListener{
 		}
 		
 	}
+	
+	class MapLoader extends SwingWorker<Map, Object> {
+
+		private File file;
+		public MapLoader(File f) {
+			file = f;
+			messageDisplay.setText("Loading map...");
+		}
+		@Override
+		protected Map doInBackground() throws Exception {
+			
+			prsr = new OSMParser(file);
+			prsr.parse();
+			map = prsr.getMap();
+			return map;
+		}
+		
+		@Override
+		protected void done() {
+			if (gps != null) {
+				gps.removeGPSListener(Application.this);
+				gps = null;
+				Frame[] frames = getFrames();
+				for(Frame f : frames) {
+					if(!f.getTitle().equals("Map Application")) {
+						f.dispose();
+					}
+				}
+			}
+			if (mapPanel != null) {
+				remove(mapPanel);
+			}
+			try {
+				mapPanel = new MapPanel(get());
+			} catch (Exception e) {
+			}
+			dir = new Director((Graph)map);
+			gps = new GPSDevice(file.getAbsolutePath());
+			gps.addGPSListener(Application.this);
+			getContentPane().add(mapPanel, BorderLayout.CENTER);
+			pack();
+		}
+	}
 
 	@Override
 	public void processEvent(GPSEvent e) {
@@ -328,7 +367,6 @@ public class Application extends JFrame implements GPSListener{
 		}
 		mapPanel.setCenter(lon, lat);
 		mapPanel.setIsDriving(true);
-//		SwingWorker task = new DirectionFinder();
 		RouteChecker task = new RouteChecker(e);
 		task.execute();
 	}

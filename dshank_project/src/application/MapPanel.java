@@ -80,7 +80,7 @@ public class MapPanel extends JPanel {
 	}	
 	
 	/**
-	 * 
+	 * Initializes all the mouse functions.
 	 */
 	private void initMouse() {
 		mouse = new MouseAdapter() {
