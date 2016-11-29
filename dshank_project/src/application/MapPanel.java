@@ -54,6 +54,8 @@ public class MapPanel extends JPanel {
 	
 	private HashSet<Node> highlightedNodes;
 	
+	private double testHeading = 30;
+	
 	private boolean inDrivingMode = false;
 	
 	/**
@@ -132,16 +134,16 @@ public class MapPanel extends JPanel {
 				double lon = screenToLon(e.getX(), e.getY());
 				GraphNode n = map.getNearNode(lon, lat);
 				selectedNode = n;
-//				System.out.println(n.toString());
-//				Iterator<Node> it = map.getNodeIt();
-//				while(it.hasNext()) {
-//					Node next = it.next();
-//					if(map.inCircularSegment(screenToLon(e.getX(),e.getY()), screenToLat(e.getY()),
-//							30, testHeading, 750, next)) {
-//						highlightedNodes.add(next);
-//					}
-//				}
-//				testHeading += 30;
+				System.out.println(n.toString());
+				Iterator<GraphNode> it = map.getNodeIterator();
+				while(it.hasNext()) {
+					GraphNode next = it.next();
+					if(map.inCircularWedge(screenToLon(e.getX(),e.getY()), screenToLat(e.getY()),
+							30, testHeading, 25, next)) {
+						highlightedNodes.add((Node) next);
+					}
+				}
+				testHeading += 30;
 				repaint();
 			}
 		};

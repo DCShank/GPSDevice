@@ -148,12 +148,20 @@ public class Map implements Graph {
 			angleMax -= 360;
 		}
 		double angleNode = Math.toDegrees(Math.atan2(node.getLat()-lat, node.getLon()-lon));
+//		System.out.println(angleNode + " Angle Node");
+//		System.out.println(angleMax + " Angle Max");
+//		System.out.println(angleMin + " Angle Min");
 		// This works somehow. Bad practice to leave in code found by trial and error but hey.
 		// This case only happens at around 180 degrees.
 		if(angleMin > angleMax) {
 			return !((angleNode > angleMax) && (angleNode < angleMin));
 		}
 		return ((angleNode < angleMax) && (angleNode > angleMin));
+	}
+	
+	public boolean inCircle(double lon, double lat, double radius, GraphNode node) {
+		if(strat.getDistance(lon, lat, node.getLon(), node.getLat()) > radius) { return false; }
+		return true;
 	}
 	
 	/**

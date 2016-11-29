@@ -55,6 +55,8 @@ public class Application extends JFrame implements GPSListener{
 	private GPSDevice gps;
 	/** Label for displaying system relevant messages, such as found a route, without popups, */
 	private JLabel messageDisplay;
+	
+	private boolean followGPS = false;
 
 	/**
 	 * Constructor for the application which takes no argument.
@@ -293,7 +295,11 @@ public class Application extends JFrame implements GPSListener{
 		}
 		@Override
 		protected List<GraphEdge> doInBackground() throws Exception {
-			return dir.updateDirections(event.getLatitude(), event.getLongitude(), event.getHeading());
+			double newHead = event.getHeading() + 90;
+			if(newHead < 0) {
+				newHead = 360 + newHead;
+			}
+			return dir.updateDirections(event.getLatitude(), event.getLongitude(), newHead);
 		}
 		@Override
 		protected void done() {
@@ -359,13 +365,7 @@ public class Application extends JFrame implements GPSListener{
 
 	@Override
 	public void processEvent(GPSEvent e) {
-		double lon = e.getLongitude();
-		double lat = e.getLatitude();
-		double newHead = e.getHeading() + 90;
-		if(newHead < 0) {
-			newHead = 360 + newHead;
-		}
-		mapPanel.setCenter(lon, lat);
+		mapPanel.setCenter(e.getLongitude(), e.getLatitude());
 		mapPanel.setIsDriving(true);
 		RouteChecker task = new RouteChecker(e);
 		task.execute();

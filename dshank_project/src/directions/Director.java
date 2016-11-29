@@ -23,6 +23,9 @@ import map_data.RoadSegment;
  *
  */
 public class Director {
+	
+	public static final double DEFAULT_ANGLE = 120;
+	public static final double DEFAULT_RADIUS = 40;
 	private final Graph graph;
 	/** A list of edges to follow to reach a destination */
 	private List<GraphEdge> directions;
@@ -126,9 +129,9 @@ public class Director {
 		
 		if(!startNode.getSegmentIt().hasNext()) { splitStartSegment(); }
 		if(!endNode.getSegmentIt().hasNext()) { splitEndSegment(); }
-		for(GraphSegment seg : tempSegments) {
-			graph.addSegment(seg);
-		}
+//		for(GraphSegment seg : tempSegments) {
+//			graph.addSegment(seg);
+//		}
 		
 		while(!visited.contains(endNode)) {
 			// The index of the next node to visit
@@ -193,28 +196,39 @@ public class Director {
 	 */
 	private void splitStartSegment() {
 		Iterator<GraphSegment> sIt = graph.getSegmentIterator();
+		Set<GraphSegment> tempSegs = new HashSet<GraphSegment>();
 		System.out.println("Split Start");
 		while(sIt.hasNext()) {
 			GraphSegment s = sIt.next();
 			if(s.hasNode(startNode)) {
 				GraphSegment tempSeg = s.getPostSubsegment(startNode);
-				tempSegments.add(tempSeg);
-				System.out.println(tempSeg.toString());
+				tempSegs.add(tempSeg);
+//				System.out.println(tempSeg.toString());
 			}
+		}
+		tempSegments.addAll(tempSegs);
+		for(GraphSegment seg : tempSegs) {
+			graph.addSegment(seg);
 		}
 	}
 	
 	private void splitEndSegment() {
 		Iterator<GraphSegment> sIt = graph.getSegmentIterator();
+		Set<GraphSegment> tempSegs = new HashSet<GraphSegment>();
 		System.out.println("Split End");
 		while(sIt.hasNext()) {
 			GraphSegment s = sIt.next();
 			if(s.hasNode(endNode)) {
 				System.out.println(s.toString());
 				GraphSegment tempSeg = s.getPreSubsegment(endNode);
-				tempSegments.add(tempSeg);
-				System.out.println(tempSeg.toString());
+				tempSegs.add(tempSeg);
+//				System.out.println(tempSeg.toString());
 			}
+		}
+		// This is necessary because you can't add things to graph while iterating.
+		tempSegments.addAll(tempSegs);
+		for(GraphSegment seg : tempSegs) {
+			graph.addSegment(seg);
 		}
 	}
 	
@@ -249,6 +263,16 @@ public class Director {
 	 * @return
 	 */
 	private boolean onCourse(double lon, double lat, double heading) {
+		Iterator<GraphEdge> eIt = directions.iterator();
+		while(eIt.hasNext()) {
+			GraphEdge e = eIt.next();
+			GraphNode n = e.getEndNode();
+			double len = e.getLength();
+			if( graph.inCircularWedge(lon, lat, DEFAULT_ANGLE, heading, len * 1.2, n)
+					|| (graph.inCircle(lon, lat, DEFAULT_RADIUS, n))) {
+				return true;
+			}
+		}
 		return false;
 	}
 	
@@ -294,7 +318,7 @@ public class Director {
 		Iterator<GraphEdge> eIt = directions.iterator();
 		while(eIt.hasNext()) {
 			GraphEdge e = eIt.next();
-			if(graph.inCircularWedge(lon, lat, 30, heading, e.getLength(), e.getEndNode())) {
+			if(onCourse(lon, lat, heading)) {
 				return directions;
 			}
 		}

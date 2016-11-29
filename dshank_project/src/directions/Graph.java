@@ -22,6 +22,8 @@ public interface Graph {
 	 */
 	public boolean inCircularWedge(double x, double y, double theta, double phi,
 										double radius, GraphNode n);
+	
+	public boolean inCircle(double x, double y, double radius, GraphNode n);
 	/**
 	 * Adds a segment to the graph.
 	 * @param seg The segment to be added.
