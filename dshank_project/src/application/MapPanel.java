@@ -295,7 +295,6 @@ public class MapPanel extends JPanel {
 	 */
 	public void highlightWay(Way way, Graphics g) {
 		Color currentColor = g.getColor();
-		Graphics2D g2 = (Graphics2D) g;
 		g.setColor(Color.cyan);
 		drawWay(way, g);
 		g.setColor(currentColor);
@@ -310,7 +309,6 @@ public class MapPanel extends JPanel {
 	 */
 	public void highlightWays(Iterator<Way> it, Color c, Graphics g) {
 		Color currentColor = g.getColor();
-		Graphics2D g2 = (Graphics2D) g;
 		g.setColor(c);
 		while(it.hasNext()) {
 			drawWay(it.next(), g);

@@ -327,11 +327,6 @@ public class Application extends JFrame implements GPSListener{
 			prsr = new OSMParser(file);
 			prsr.parse();
 			map = prsr.getMap();
-			return map;
-		}
-		
-		@Override
-		protected void done() {
 			if (gps != null) {
 				gps.removeGPSListener(Application.this);
 				gps = null;
@@ -342,6 +337,13 @@ public class Application extends JFrame implements GPSListener{
 					}
 				}
 			}
+			gps = new GPSDevice(file.getAbsolutePath());
+			gps.addGPSListener(Application.this);
+			return map;
+		}
+		
+		@Override
+		protected void done() {
 			if (mapPanel != null) {
 				remove(mapPanel);
 			}
@@ -350,8 +352,6 @@ public class Application extends JFrame implements GPSListener{
 			} catch (Exception e) {
 			}
 			dir = new Director((Graph)map);
-			gps = new GPSDevice(file.getAbsolutePath());
-			gps.addGPSListener(Application.this);
 			getContentPane().add(mapPanel, BorderLayout.CENTER);
 			pack();
 		}
