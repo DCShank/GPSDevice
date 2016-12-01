@@ -111,6 +111,7 @@ public class MapPanel extends JPanel {
 				double lat = screenToLat(e.getY());
 				double lon = screenToLon(e.getX(), e.getY());
 				GraphNode n = map.getNearNodeInRadius(lon, lat, currentRad);
+//				GraphNode n = map.getNearNode(lon, lat);
 				hoveredNode = n;
 				repaint();
 			}

@@ -1,5 +1,11 @@
 package map_data;
 
+/**
+ * Calculates the distance between two points over the surface of the earth.
+ * 
+ * @author david
+ *
+ */
 public class HaversineDistance implements DistanceStrategy {
 	/** Radius of the earth in meters */
 	private static final double RADIUS_EARTH = 6371000;

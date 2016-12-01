@@ -129,6 +129,11 @@ public class Director {
 				return 0;
 			}
 		};
+		// I found a paper (from stony brook!) that claimed that just using an ordinary
+		// priority queue was actually more efficient than a decPriority queue.
+		// http://www3.cs.stonybrook.edu/~rezaul/papers/TR-07-54.pdf
+		// Really fascinating. This works by simply adding something again if the distance
+		// decreases.
 		PriorityQueue<GraphNode> distQueue = new PriorityQueue<GraphNode>(distComp);
 		distances.put(startNode, 0.0);
 		distQueue.add(startNode);
@@ -314,6 +319,8 @@ public class Director {
 	}
 	
 	public void clearDirections() {
+		startNode = null;
+		endNode = null;
 		directions = null;
 	}
 
