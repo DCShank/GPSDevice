@@ -1,10 +1,13 @@
 package directions;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Set;
 
 import map_data.Node;
@@ -115,78 +118,63 @@ public class Director {
 	 * @return The list of directions for immediate use.
 	 */
 	private synchronized List<GraphEdge> calcDir() {
-		ArrayList<GraphNode> indexedNodes = new ArrayList<GraphNode>(graph.getNodeSize());
-		ArrayList<GraphSegment> predSegs = new ArrayList<GraphSegment>(graph.getNodeSize());
-		ArrayList<GraphNode> visited = new ArrayList<GraphNode>(graph.getNodeSize());
-		ArrayList<Double> distances = new ArrayList<Double>(graph.getNodeSize());
-		for(int i = 0; i < graph.getNodeSize(); i++) {
-			predSegs.add(null);
-			visited.add(null);
-			distances.add(null);
-		}
-		indexedNodes.add(startNode);
-		distances.set(0, 0.0);
+		HashMap<GraphNode, GraphSegment> predSegs = new HashMap<GraphNode, GraphSegment>(8192);
+		HashSet<GraphNode> visited = new HashSet<GraphNode>(8192);
+		HashMap<GraphNode, Double> distances = new HashMap<GraphNode, Double>(8192);
+		Comparator<GraphNode> distComp = new Comparator<GraphNode>() {
+			@Override
+			public int compare(GraphNode o1, GraphNode o2) {
+				if(distances.get(o1) < distances.get(o2)) { return -1; }
+				if(distances.get(o1) > distances.get(o2)) { return 1; }
+				return 0;
+			}
+		};
+		PriorityQueue<GraphNode> distQueue = new PriorityQueue<GraphNode>(distComp);
+		distances.put(startNode, 0.0);
+		distQueue.add(startNode);
 		
 		if(!startNode.getSegmentIt().hasNext()) { splitStartSegment(); }
 		if(!endNode.getSegmentIt().hasNext()) { splitEndSegment(); }
-//		for(GraphSegment seg : tempSegments) {
-//			graph.addSegment(seg);
-//		}
 		
 		while(!visited.contains(endNode)) {
 			// The index of the next node to visit
-			int visitNext = leastDistIndex(visited, distances);
-			if(visitNext == -1) {
+			GraphNode visitNext = leastDistIndex(visited, distQueue);
+			if(visitNext == null) {
 				return null;
 			}
 			// Iterator over the segments of the next node to visit.
-			Iterator<GraphSegment> segIt = indexedNodes.get(visitNext).getSegmentIt();
+			Iterator<GraphSegment> segIt = visitNext.getSegmentIt();
 			// Iterate for each segment
 			while(segIt.hasNext()) {
 				GraphSegment s = segIt.next();
 				GraphNode nextNode = s.getEndNode();
 				// If a node is visited, don't bother.
 				if(!visited.contains(nextNode)) {
-					// If a node hasn't been indexed add it to indexed and fill in the important data.
-					if(!indexedNodes.contains(nextNode)) {
-						// Index the new end node.
-						indexedNodes.add(s.getEndNode());
-						// Set the distance of the newly indexed node to the distance to it's predessor + the segment
-						distances.set(indexedNodes.indexOf(nextNode), distances.get(visitNext) + s.getLength());
-						// Set the predecessor segment.
-						predSegs.set(indexedNodes.indexOf(nextNode), s);
-					}
-					int nextIndex = indexedNodes.indexOf(nextNode);
+					
 					double newDist =  distances.get(visitNext) + s.getLength();
-					// If the new distance is less than the previously recorded data, record the new distance and
-					// set the new predecessor edge.
-					if(newDist < distances.get(nextIndex)) {
-						distances.set(nextIndex, newDist);
-						predSegs.set(nextIndex, s);
+					if(distances.get(nextNode) == null || distances.get(nextNode) > newDist) {
+						distances.put(nextNode, newDist);
+						predSegs.put(nextNode, s);
+						distQueue.add(nextNode);
 					}
 				}
 				
 			}
-			visited.set(visitNext, indexedNodes.get(visitNext));
+			visited.add(visitNext);
 		}
 		
-		directions = new LinkedList<GraphEdge>(extractDirections(indexedNodes, predSegs));
+		directions = new LinkedList<GraphEdge>(extractDirections(predSegs));
 		clearTempSegments();
 		return directions;
 		
 	}
 	
-	private int leastDistIndex(List<GraphNode> visited, List<Double> distances) {
-		int rtrnIndex = -1;
-		for(int i = 0; i < distances.size(); i++) {
-			// While the following two conditionals could be compacted into one, this is more legible.
-			if(visited.get(i) == null && distances.get(i) != null) {
-				if((rtrnIndex == -1) || (distances.get(i) < distances.get(rtrnIndex))) {
-					rtrnIndex = i;
-				}
-			}
+	private GraphNode leastDistIndex(Set<GraphNode> visited, PriorityQueue<GraphNode> distQueue) {
+		GraphNode nextNode = distQueue.poll();
+		while(visited.contains(nextNode) && nextNode != null) {
+			nextNode = distQueue.poll();
 		}
-		return rtrnIndex;
+		return nextNode;
 	}
 	
 	/**
@@ -239,12 +227,11 @@ public class Director {
 		tempSegments = new HashSet<GraphSegment>();
 	}
 	
-	private List<GraphEdge> extractDirections(List<GraphNode> nodeIndices, List<GraphSegment> predSegs) {
+	private List<GraphEdge> extractDirections(HashMap<GraphNode, GraphSegment> predSegs) {
 		LinkedList<GraphSegment> dirSegList = new LinkedList<GraphSegment>();
 		GraphNode currNode = endNode;
 		while(currNode != startNode) {
-			int currIndex = nodeIndices.indexOf(currNode);
-			GraphSegment predSeg = predSegs.get(currIndex);
+			GraphSegment predSeg = predSegs.get(currNode);
 			dirSegList.addLast(predSeg);
 			currNode = predSeg.getStartNode();
 		}
