@@ -155,7 +155,7 @@ public class MapPanel extends JPanel {
 				selectedNode = n;
 				
 				// Testing code
-//				System.out.println(n.toString());
+				System.out.println(n.toString());
 //				Iterator<GraphNode> it = map.getNodeIterator();
 //				tempNodes = new HashSet<Node>();
 //				while(it.hasNext()) {

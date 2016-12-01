@@ -44,9 +44,9 @@ public interface GraphNode {
 	 * Returns the degree, or number of outgoing edges, of the node.
 	 * @return The degree of the node. 0 if the node has no outgoing edges.
 	 */
-	public int getDegree();
-	
 	public int getOutDegree();
+	
+	public int getInDegree();
 	
 	public void addGraphEdge(GraphEdge e);
 	

@@ -13,7 +13,7 @@ import directions.GraphSegment;
  * Represents a node in an OSM map. Also implements GraphNode features.
  * Has a latitude, longitude, and ID.
  * Also has lists of it's incoming and outgoing edges and segments.
- * Has a degree. The degree measures the number of outgoing edges.
+ * Has a outDegree. The outDegree measures the number of outgoing edges.
  * @author david
  *
  */
@@ -21,8 +21,8 @@ public class Node implements GraphNode {
 	private final double lon;
 	private final double lat;
 	private final String id;
-	private int degree = 0;
 	private int outDegree = 0;
+	private int inDegree = 0;
 	/** 
 	 * These edges are the edges with this node as the start node. Edges are
 	 * directed.
@@ -90,13 +90,14 @@ public class Node implements GraphNode {
 		if(edge instanceof RoadEdge && edge.getStartNode().equals(this)) {
 			edges.add(edge);
 			toNodeEdges.put(edge.getEndNode(), edge);
-			degree += 1;
+			outDegree += 1;
 		}
 		if(edge instanceof RoadSegment && edge.getStartNode().equals(this)) {
 			segments.add((RoadSegment) edge);
 		}
 		if(edge instanceof RoadEdge && edge.getEndNode().equals(this)) {
 			incomingEdges.add(edge);
+			inDegree += 1;
 		}
 		if(edge instanceof RoadSegment && edge.getEndNode().equals(this)) {
 			incomingSegments.add((RoadSegment)edge);
@@ -136,14 +137,25 @@ public class Node implements GraphNode {
 	}
 
 	/**
-	 * Returns the 'degree' of the node.
-	 * This actually returns the 'Out degree' of the node. That is to say, the number of
-	 * outgoing edges from the node.
-	 * @return The degree (number of outgoing edges) of the node.
+	 * Returns the out degree of the node.
+	 * The out degree is the number of outgoing edges.
+	 * @return The out degree (number of outgoing edges) of the node.
 	 */
-	public int getDegree() {
-		return degree;
+	@Override
+	public int getOutDegree() {
+		return outDegree;
 	}
+
+	/**
+	 *  Returns the in degree of the node.
+	 *  The in degree is the number of incoming edges.
+	 *  @return The in degree (number of incoming edges) of the node.
+	 */
+	@Override
+	public int getInDegree() {
+		return inDegree;
+	}
+
 	
 	/**
 	 * Returns the edge that leads to the specified node.
@@ -175,13 +187,7 @@ public class Node implements GraphNode {
 	@Override
 	public String toString() {
 		String rtrn = "";
-		rtrn += "[ID: " + id + ", Lat: " + lat + ", Lon: " + lon + ", Degree: " + degree + "]";
+		rtrn += "[ID: " + id + ", Lat: " + lat + ", Lon: " + lon + ", Degree: " + outDegree + "]";
 		return rtrn;
 	}
-
-	@Override
-	public int getOutDegree() {
-		return outDegree;
-	}
-
 }

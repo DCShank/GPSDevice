@@ -216,8 +216,8 @@ public class Map implements Graph {
 				len += pn.getEdgeTo((GraphNode)nn).getLength();
 				nodes.add(nn);
 				// If we arrive at an intersection or dead end create a segment
-				if((nn.getDegree() != 1 && w.isOneway()) 
-						|| (nn.getDegree() != 2 && !w.isOneway()) || !nIt.hasNext()) {
+				if(((nn.getOutDegree() != 1 || nn.getInDegree() != 1) && w.isOneway()) 
+						|| ((nn.getOutDegree() != 2 || nn.getInDegree() != 2) && !w.isOneway()) || !nIt.hasNext()) {
 					RoadSegment seg = new RoadSegment(sn, nn, len, nodes);
 					addSegment(seg);
 					// If the segment is two way create the reverse segment
