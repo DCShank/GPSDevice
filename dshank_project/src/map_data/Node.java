@@ -22,6 +22,7 @@ public class Node implements GraphNode {
 	private final double lat;
 	private final String id;
 	private int degree = 0;
+	private int outDegree = 0;
 	/** 
 	 * These edges are the edges with this node as the start node. Edges are
 	 * directed.
@@ -176,6 +177,11 @@ public class Node implements GraphNode {
 		String rtrn = "";
 		rtrn += "[ID: " + id + ", Lat: " + lat + ", Lon: " + lon + ", Degree: " + degree + "]";
 		return rtrn;
+	}
+
+	@Override
+	public int getOutDegree() {
+		return outDegree;
 	}
 
 }

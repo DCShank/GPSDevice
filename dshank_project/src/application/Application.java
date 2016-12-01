@@ -42,13 +42,13 @@ import map_data.OSMParser;
 
 public class Application extends JFrame implements GPSListener{
 
-	/** Parses OSM data into a usable state. Used for making the Map */
+	/** Parses OSM data into a usable state. Used for making the Graph */
 	private OSMParser prsr;
-	/** Map that contains all the map data for the current map */
+	/** Graph that contains all the map data for the current map */
 	private Map map;
 	/** Panel that displays map data for the current map. */
 	private MapPanel mapPanel;
-	/** Used for finding directions from one position to another on a graph. */
+	/** Used for finding directions from one position to another on a map. */
 	private Director dir;
 	/** Private list of the directions that are given to the map panel. */
 	private List<GraphEdge> directions;
@@ -69,7 +69,7 @@ public class Application extends JFrame implements GPSListener{
 	 * Constructor for the application which takes no argument.
 	 */
 	public Application() throws Exception {
-		setTitle("Map Application");
+		setTitle("Graph Application");
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); // Irritating
 		setPreferredSize(new Dimension(MapPanel.DEFAULT_WIDTH, MapPanel.DEFAULT_HEIGHT));
 		Container content = getContentPane();
@@ -78,6 +78,7 @@ public class Application extends JFrame implements GPSListener{
 		ButtonPanel buttons = new ButtonPanel();
 		messageDisplay = new JLabel();
 		messageDisplay.setHorizontalAlignment(JLabel.CENTER);
+		messageDisplay.setFont(messageDisplay.getFont().deriveFont(20f));
 		messageDisplay.setText("Message display.");
 		messageDisplay.setToolTipText("Displays system updates.");
 		content.add(buttons, BorderLayout.WEST);
@@ -118,7 +119,7 @@ public class Application extends JFrame implements GPSListener{
 			gps = null;
 			Frame[] frames = getFrames();
 			for(Frame f : frames) {
-				if(!f.getTitle().equals("Map Application")) {
+				if(!f.getTitle().equals("Graph Application")) {
 					f.dispose();
 				}
 			}
@@ -128,7 +129,7 @@ public class Application extends JFrame implements GPSListener{
 			remove(mapPanel);
 		}
 		mapPanel = new MapPanel(map);
-		dir = new Director((Graph)map);
+		dir = new Director(map);
 		gps = new GPSDevice(file.getAbsolutePath());
 		gps.addGPSListener(this);
 		getContentPane().add(mapPanel, BorderLayout.CENTER);
@@ -143,8 +144,8 @@ public class Application extends JFrame implements GPSListener{
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
 		final JFileChooser fc = new JFileChooser();
-		JMenuItem loadMap = new JMenuItem("Load Map");
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("OSM Map files", "osm");
+		JMenuItem loadMap = new JMenuItem("Load Graph");
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("OSM Graph files", "osm");
 		fc.setFileFilter(filter);
 		// The action listener displays a file chooser dialog and lets display a
 		// new file.
@@ -308,12 +309,12 @@ public class Application extends JFrame implements GPSListener{
 			if(n != null) {
 				if(startOrEnd.equals("start")) {
 					dir.setStartNode(n);
-					mapPanel.setStart(n);
+					mapPanel.setStart((Node)n);
 					messageDisplay.setText("Start node set.");
 				}
 				if(startOrEnd.equals("end")) {
 					dir.setEndNode(n);
-					mapPanel.setEnd(n);
+					mapPanel.setEnd((Node)n);
 					driveThere.setEnabled(true);
 					messageDisplay.setText("End node set.");
 				}
@@ -405,7 +406,7 @@ public class Application extends JFrame implements GPSListener{
 				gps = null;
 				Frame[] frames = getFrames();
 				for(Frame f : frames) {
-					if(!f.getTitle().equals("Map Application")) {
+					if(!f.getTitle().equals("Graph Application")) {
 						f.dispose();
 					}
 				}
@@ -424,7 +425,7 @@ public class Application extends JFrame implements GPSListener{
 				mapPanel = new MapPanel(get());
 			} catch (Exception e) {
 			}
-			dir = new Director((Graph)map);
+			dir = new Director(map);
 			getContentPane().add(mapPanel, BorderLayout.CENTER);
 			pack();
 		}

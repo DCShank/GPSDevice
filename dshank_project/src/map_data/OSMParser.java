@@ -79,7 +79,7 @@ public class OSMParser {
 	 * Returns a map with all the currently parsed data. Note that the data
 	 * must be parsed vefore this is called for useful effects.
 	 * @precondition Parse must be called on a parseable file before this is called.
-	 * @return A Map containing all the parsed data.
+	 * @return A Graph containing all the parsed data.
 	 */
 	public Map getMap() {
 		Map map = new Map(minLon, minLat, maxLon, maxLat, nodes, ways, namedWays, roadWays, nonRoadWays);

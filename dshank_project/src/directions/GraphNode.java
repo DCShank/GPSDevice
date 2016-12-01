@@ -46,6 +46,8 @@ public interface GraphNode {
 	 */
 	public int getDegree();
 	
+	public int getOutDegree();
+	
 	public void addGraphEdge(GraphEdge e);
 	
 	public Iterator<GraphSegment> getSegmentIt();
@@ -57,9 +59,4 @@ public interface GraphNode {
 	 * @param seg
 	 */
 	public void removeSegment(GraphSegment seg);
-
-	public double getLat();
-	
-	public double getLon();
-
 }

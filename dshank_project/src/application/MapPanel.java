@@ -54,10 +54,10 @@ public class MapPanel extends JPanel {
 	
 	public static final DistanceStrategy strat = new HaversineDistance();
 	
-	private GraphNode selectedNode = null;
-	private GraphNode hoveredNode = null;
-	private GraphNode start = null;
-	private GraphNode end = null;
+	private Node selectedNode = null;
+	private Node hoveredNode = null;
+	private Node start = null;
+	private Node end = null;
 	
 	private List<GraphEdge> directions;
 	
@@ -110,7 +110,7 @@ public class MapPanel extends JPanel {
 			public void mouseMoved(MouseEvent e) {
 				double lat = screenToLat(e.getY());
 				double lon = screenToLon(e.getX(), e.getY());
-				GraphNode n = map.getNearNodeInRadius(lon, lat, currentRad);
+				Node n = map.getNearNodeInRadius(lon, lat, currentRad);
 //				GraphNode n = map.getNearNode(lon, lat);
 				hoveredNode = n;
 				repaint();
@@ -151,7 +151,7 @@ public class MapPanel extends JPanel {
 			public void mouseClicked(MouseEvent e) {
 				double lat = screenToLat(e.getY());
 				double lon = screenToLon(e.getX(), e.getY());
-				GraphNode n = map.getNearNodeInRadius(lon, lat, currentRad);
+				Node n = map.getNearNodeInRadius(lon, lat, currentRad);
 				selectedNode = n;
 				
 				// Testing code
@@ -288,8 +288,8 @@ public class MapPanel extends JPanel {
 	}
 	
 	private void drawEdge(GraphEdge e, Graphics g) {
-		GraphNode prevNode = e.getStartNode();
-		GraphNode curNode = e.getEndNode();
+		Node prevNode = (Node) e.getStartNode();
+		Node curNode = (Node) e.getEndNode();
 		
 		int prevY, prevX, curY, curX;
 		prevY = latToScreen(prevNode.getLat());
@@ -309,7 +309,7 @@ public class MapPanel extends JPanel {
 		g.setColor(currColor);
 	}
 	
-	private void drawNode(GraphNode n, Color c, Graphics g) {
+	private void drawNode(Node n, Color c, Graphics g) {
 		Color c2 = g.getColor();
 		g.setColor(c);
 		g.fillOval(lonToScreen(n.getLon(), n.getLat())-3, latToScreen(n.getLat())-3, 7, 7);
@@ -417,10 +417,10 @@ public class MapPanel extends JPanel {
 		inDrivingMode = isDriving;
 	}
 	
-	public void setStart(GraphNode s) {
+	public void setStart(Node s) {
 		start = s;
 	}
-	public void setEnd(GraphNode e) {
+	public void setEnd(Node e) {
 		end = e;
 	}
 }

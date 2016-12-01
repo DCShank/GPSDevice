@@ -10,12 +10,11 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
 
+import map_data.Map;
 import map_data.Node;
 import map_data.RoadSegment;
 
 /**
- * SKELETON CLASS
- * 
  * A class that will produce directions from a start point to an end point.
  * Much easier to make mutable than otherwise because 
  * 
@@ -29,10 +28,10 @@ public class Director {
 	
 	public static final double DEFAULT_ANGLE = 120;
 	public static final double DEFAULT_RADIUS = 40;
-	private final Graph graph;
+	private final Map map;
 	/** A list of edges to follow to reach a destination */
 	private List<GraphEdge> directions;
-	/** A list of the nodes traversed by this graph. */
+	/** A list of the nodes traversed by this map. */
 	private List<GraphNode> dirNodes;
 	/** A set of nodes. Useful for checking if a node is in the directions. */
 	private Set<GraphNode> nodeSet;
@@ -45,8 +44,8 @@ public class Director {
 	
 	private Set<GraphSegment> tempSegments;
 	
-	public Director(Graph g) {
-		graph = g;
+	public Director(Map m) {
+		map = m;
 		tempSegments = new HashSet<GraphSegment>();
 		startNode = null;
 		endNode = null;
@@ -188,7 +187,7 @@ public class Director {
 	 * @precondition The start node must not have outgoing segments.
 	 */
 	private void splitStartSegment() {
-		Iterator<GraphSegment> sIt = graph.getSegmentIterator();
+		Iterator<GraphSegment> sIt = map.getSegmentIterator();
 		Set<GraphSegment> tempSegs = new HashSet<GraphSegment>();
 //		System.out.println("Split Start");
 		while(sIt.hasNext()) {
@@ -201,12 +200,12 @@ public class Director {
 		}
 		tempSegments.addAll(tempSegs);
 		for(GraphSegment seg : tempSegs) {
-			graph.addSegment(seg);
+			map.addSegment(seg);
 		}
 	}
 	
 	private void splitEndSegment() {
-		Iterator<GraphSegment> sIt = graph.getSegmentIterator();
+		Iterator<GraphSegment> sIt = map.getSegmentIterator();
 		Set<GraphSegment> tempSegs = new HashSet<GraphSegment>();
 //		System.out.println("Split End");
 		while(sIt.hasNext()) {
@@ -218,16 +217,16 @@ public class Director {
 //				System.out.println(tempSeg.toString());
 			}
 		}
-		// This is necessary because you can't add things to graph while iterating.
+		// This is necessary because you can't add things to map while iterating.
 		tempSegments.addAll(tempSegs);
 		for(GraphSegment seg : tempSegs) {
-			graph.addSegment(seg);
+			map.addSegment(seg);
 		}
 	}
 	
 	private void clearTempSegments() {
 		for(GraphSegment s : tempSegments) {
-			graph.removeSegment(s);
+			map.removeSegment(s);
 		}
 		tempSegments = new HashSet<GraphSegment>();
 	}
@@ -260,8 +259,8 @@ public class Director {
 			GraphEdge e = eIt.next();
 			GraphNode n = e.getEndNode();
 			double len = e.getLength();
-			if( graph.inCircularWedge(lon, lat, DEFAULT_ANGLE, heading, len * 1.2, n)
-					|| (graph.inCircle(lon, lat, DEFAULT_RADIUS, n))) {
+			if( map.inCircularWedge(lon, lat, DEFAULT_ANGLE, heading, len * 1.2, (Node) n)
+					|| (map.inCircle(lon, lat, DEFAULT_RADIUS,(Node) n))) {
 				return true;
 			}
 		}
@@ -314,7 +313,7 @@ public class Director {
 				return directions;
 			}
 		}
-		startNode = graph.getNearNode(lon, lat);
+		startNode = map.getNearNode(lon, lat);
 		return calcDir();
 	}
 	

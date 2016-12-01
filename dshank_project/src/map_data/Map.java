@@ -31,18 +31,18 @@ public class Map implements Graph {
 	
 	private HashMap<String,Way> nonRoadWays;
 	
-	private Set<GraphSegment> segments;
+	private Set<RoadSegment> segments = new HashSet<RoadSegment>();
 	
-	private Set<GraphNode> roadNodes;
+	private Set<Node> roadNodes = new HashSet<Node>();
 	
-	private Set<GraphNode> tempNodes = new HashSet<GraphNode>();
+	private Set<Node> tempNodes = new HashSet<Node>();
 	
 	private double lonMin, latMin, lonMax, latMax;
 	/** The strategy used for finding distances over area. */
 	private final static DistanceStrategy strat = new HaversineDistance();
 	
 	/**
-	 * Constructor for the Map
+	 * Constructor for the Graph
 	 * @param minLon The minimum bound for longitude
 	 * @param minLat The minimum bound for latitude
 	 * @param maxLon The maximum bound for longitude
@@ -65,9 +65,7 @@ public class Map implements Graph {
 		this.namedWays = namedWays;
 		this.roadWays = roadWays;
 		this.nonRoadWays = nonRoadWays;
-		roadNodes = new HashSet<GraphNode>();
 		edgeInit();
-		segments = new HashSet();
 		segmentInit();
 	}
 	
@@ -104,8 +102,8 @@ public class Map implements Graph {
 	}
 	
 	/**
-	 * Gives an iterator over the ways of the Map.
-	 * @return An Iterator<Way> of the ways in the Map.
+	 * Gives an iterator over the ways of the Graph.
+	 * @return An Iterator<Way> of the ways in the Graph.
 	 */
 	public Iterator<Way> getWayIt() {
 		return ways.values().iterator();
@@ -135,7 +133,7 @@ public class Map implements Graph {
 	 * @return True if the node is in the circular segment, false otherwise.
 	 */
 	public boolean inCircularWedge(double lon, double lat, double theta, double phi,
-										double radius, GraphNode node) {
+										double radius, Node node) {
 		// Return false if the node is outside the possible range of the circular segment.
 //		System.out.println(!(strat.getDistance(lon, lat, n.getLon(), n.getLat()) > radius));
 //		System.out.println(n.getLon() + " " + n.getLat() + "\n");
@@ -161,7 +159,7 @@ public class Map implements Graph {
 		return ((angleNode < angleMax) && (angleNode > angleMin));
 	}
 	
-	public boolean inCircle(double lon, double lat, double radius, GraphNode node) {
+	public boolean inCircle(double lon, double lat, double radius, Node node) {
 		if(strat.getDistance(lon, lat, node.getLon(), node.getLat()) > radius) { return false; }
 		return true;
 	}
@@ -179,8 +177,8 @@ public class Map implements Graph {
 			while(nIt.hasNext()) {
 				prevNode = currNode;
 				currNode = nIt.next();
-				roadNodes.add((GraphNode) prevNode);
-				roadNodes.add((GraphNode) currNode);
+				roadNodes.add(prevNode);
+				roadNodes.add(currNode);
 				RoadEdge e = new RoadEdge(prevNode, currNode, strat);
 //				System.out.println(e.getLength());
 				prevNode.addGraphEdge((GraphEdge)e);
@@ -193,33 +191,45 @@ public class Map implements Graph {
 	
 	/**
 	 * Initializes the segments for this map.
+	 * Segments are created only on ways. The possible cases for segments are as follows:
+	 * 		S = wayStart	 E = wayEnd 	I = intersection 	D = deadEnd
+	 * 		S -> E, S -> I, S -> D, 
+	 * 		I -> E, I -> I, I -> D.
+	 * In conclusion, segments can go from a the start of a way or an intersection to the
+	 * an intersection, or the end of a way, or a dead end.
 	 */
 	private void segmentInit() {
 		Iterator<Way> wayIt = getRoadIt();
 		while(wayIt.hasNext()) {
 			Way w = wayIt.next();
 			Iterator<Node> nIt = w.getNodeIt();
-			Node sn = nIt.next();
+			// Initialize the variables for segment creation
+			Node sn = nIt.next();	
 			Node pn = sn;
 			Node nn = null;
 			double len = 0;
 			ArrayList<Node>nodes = new ArrayList<Node>();
 			nodes.add(sn);
+			// Iterate over all the nodes in the way, creating segments
 			while(nIt.hasNext()) {
 				nn = nIt.next();
 				len += pn.getEdgeTo((GraphNode)nn).getLength();
 				nodes.add(nn);
-				if((nn.getDegree() != 1 && w.isOneway()) || (nn.getDegree() != 2 && !w.isOneway()) || !nIt.hasNext()) {
+				// If we arrive at an intersection or dead end create a segment
+				if((nn.getDegree() != 1 && w.isOneway()) 
+						|| (nn.getDegree() != 2 && !w.isOneway()) || !nIt.hasNext()) {
 					RoadSegment seg = new RoadSegment(sn, nn, len, nodes);
 					addSegment(seg);
-					if(!w.isOneway()) {
+					// If the segment is two way create the reverse segment
+					if(!w.isOneway())
 						addSegment(seg.getReverse());
-					}
+					// Reset the variables for the next segment.
 					sn = nn;
 					nodes = new ArrayList<Node>();
 					nodes.add(sn);
 					len = 0;
 				}
+				// The next node becomes the previous node for the next iteration of the loop.
 				pn = nn;
 			}
 		}
@@ -232,11 +242,14 @@ public class Map implements Graph {
 	 * @param seg The segment to be added.
 	 */
 	public void addSegment(GraphSegment seg) {
-		GraphNode sn = seg.getStartNode();
-		GraphNode en = seg.getEndNode();
-		sn.addGraphEdge(seg);
-		en.addGraphEdge(seg);
-		segments.add(seg);
+		if(seg instanceof RoadSegment) {
+			RoadSegment s = (RoadSegment) seg;
+			GraphNode sn = seg.getStartNode();
+			GraphNode en = seg.getEndNode();
+			sn.addGraphEdge(seg);
+			en.addGraphEdge(seg);
+			segments.add(s);
+		}
 	}
 	
 	/**
@@ -258,34 +271,35 @@ public class Map implements Graph {
 	 * @return The node nearest to the point that is available in the way set.
 	 */
 	public GraphNode getNearNode(double lon, double lat) {
-		Iterator<GraphNode> it = getNodeIterator();
-		GraphNode rtrnNode = it.next();
-		double dist = strat.getDistance(lon, lat, rtrnNode.getLon(), rtrnNode.getLat());
-		while(it.hasNext()) {
-			GraphNode n = it.next();
-			double testDist = strat.getDistance(lon, lat, n.getLon(), n.getLat());
-			if(testDist < dist) {
-				rtrnNode = n;
-				dist = testDist;
-			}
-		}
-		return rtrnNode;
+		return getNearNodeInRadius(lon, lat, -1);
+//		Iterator<Node> it = roadNodes.iterator();
+//		Node rtrnNode = it.next();
+//		double dist = strat.getDistance(lon, lat, rtrnNode.getLon(), rtrnNode.getLat());
+//		while(it.hasNext()) {
+//			Node n = it.next();
+//			double testDist = strat.getDistance(lon, lat, n.getLon(), n.getLat());
+//			if(testDist < dist) {
+//				rtrnNode = n;
+//				dist = testDist;
+//			}
+//		}
+//		return rtrnNode;
 	}
 	/**
 	 * Returns the nearest node to some point within a radius for a given node iterator.
 	 * @param lon The longitude of the point to find a node near.
 	 * @param lat The latitude of the point to find a node near.
-	 * @param radius the radius of the circle to search in
+	 * @param radius the radius of the circle to search in. -1 for no limit.
 	 * @return The node nearest the position in the radius, or null if no such node exists.
 	 */
-	public GraphNode getNearNodeInRadius(double lon, double lat, double radius) {
-		Iterator<GraphNode> it = getNodeIterator();
-		GraphNode rtrnNode = null;
+	public Node getNearNodeInRadius(double lon, double lat, double radius) {
+		Iterator<Node> it = roadNodes.iterator();
+		Node rtrnNode = null;
 		double dist = -1;
 		while(it.hasNext()) {
-			GraphNode n = it.next();
+			Node n = it.next();
 			double testDist = strat.getDistance(lon, lat, n.getLon(), n.getLat());
-			if((rtrnNode == null && testDist < radius) || (rtrnNode != null && testDist < dist)) {
+			if((rtrnNode == null && (radius == -1 || testDist < radius)) || (rtrnNode != null && testDist < dist)) {
 				rtrnNode = n;
 				dist = testDist;
 			}
@@ -306,7 +320,7 @@ public class Map implements Graph {
 	 * @return An iterator over the segments of the graph.
 	 */
 	public Iterator<GraphSegment> getSegmentIterator() {
-		return segments.iterator();
+		return new HashSet<GraphSegment>(segments).iterator();
 	}
 	
 	/**
@@ -314,6 +328,6 @@ public class Map implements Graph {
 	 * @return An iterator for the drivable nodes.
 	 */
 	public Iterator<GraphNode> getNodeIterator() {
-		return roadNodes.iterator();
+		return new HashSet<GraphNode>(roadNodes).iterator();
 	}
 }
