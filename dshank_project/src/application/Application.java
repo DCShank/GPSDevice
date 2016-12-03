@@ -77,7 +77,7 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 		messageDisplay = new JLabel();
 		messageDisplay.setHorizontalAlignment(JLabel.CENTER);
 		messageDisplay.setFont(messageDisplay.getFont().deriveFont(20f));
-		messageDisplay.setText("Message display.");
+		messageDisplay.setText("Lest click to select the start node, right click to select the end node.");
 		messageDisplay.setToolTipText("Displays system updates.");
 		content.add(buttons, BorderLayout.NORTH);
 		content.add(messageDisplay, BorderLayout.SOUTH);
@@ -226,6 +226,7 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 						mapPanel.setStart(null);
 						mapPanel.setEnd(null);
 						mapPanel.repaint();
+						updateAppState();
 						messageDisplay.setText("All selections have been cleared.");
 					}
 					if (e.getActionCommand().equals("drive")) {
@@ -451,7 +452,12 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 		if(dir.getEndNode() != e.getEndNode())
 			messageDisplay.setText("End node selected.");
 		dir.setEndNode(e.getEndNode());
-		dir.setStartNode(e.getStartNode());
+		if(driveThere.isSelected()) {
+			mapPanel.setStart(null);
+			messageDisplay.setText("Cannot select start nodes while in drive there mode.");
+		} else {
+			dir.setStartNode(e.getStartNode());
+		}
 		if(e.movedMap()) {
 			if(trackPos.isSelected()) {
 				messageDisplay.setText("Moved map, exiting tracking.");
