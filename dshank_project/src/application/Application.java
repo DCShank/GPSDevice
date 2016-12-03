@@ -40,7 +40,7 @@ import map_data.Map;
 import map_data.Node;
 import map_data.OSMParser;
 
-public class Application extends JFrame implements GPSListener{
+public class Application extends JFrame implements GPSListener, MapPanelListener{
 
 	/** Parses OSM data into a usable state. Used for making the Graph */
 	private OSMParser prsr;
@@ -57,13 +57,11 @@ public class Application extends JFrame implements GPSListener{
 	/** Label for displaying system relevant messages, such as found a route, without popups, */
 	private JLabel messageDisplay;
 	
-	private boolean followGPS = false;
-	private boolean inDriveMode = false;
-	
 	private GPSEvent prevEvent = null;
 	
 	private JButton getDir;
 	private JToggleButton driveThere;
+	private JToggleButton trackPos;
 
 	/**
 	 * Constructor for the application which takes no argument.
@@ -129,6 +127,7 @@ public class Application extends JFrame implements GPSListener{
 			remove(mapPanel);
 		}
 		mapPanel = new MapPanel(map);
+		mapPanel.addListener(this);
 		dir = new Director(map);
 		gps = new GPSDevice(file.getAbsolutePath());
 		gps.addGPSListener(this);
@@ -200,7 +199,7 @@ public class Application extends JFrame implements GPSListener{
 		JButton selEnd;
 //		JButton getDir;
 		JButton clearDir;
-		JToggleButton trackPos;
+//		JToggleButton trackPos;
 //		JToggleButton driveThere;
 		
 
@@ -217,15 +216,11 @@ public class Application extends JFrame implements GPSListener{
 						SwingWorker<List<GraphEdge>, Object> task = new DirectionFinder();
 						task.execute();
 					}
-					if (e.getActionCommand().equals("track")) {
-						followGPS = trackPos.isSelected();
-					}
 					if (e.getActionCommand().equals("clear")) {
 						selStart.setEnabled(true);
 						getDir.setEnabled(false);
 						driveThere.setEnabled(true);
 						driveThere.setSelected(false);
-						inDriveMode = false;
 						dir.clearDirections();
 						mapPanel.setDirections(null);
 						mapPanel.setStart(null);
@@ -236,7 +231,6 @@ public class Application extends JFrame implements GPSListener{
 					if (e.getActionCommand().equals("drive")) {
 						if(driveThere.isSelected()) {
 							if(prevEvent != null) {
-								inDriveMode = true;
 								dir.setStartNode(map.getNearNode(prevEvent.getLongitude(), prevEvent.getLatitude()));
 								mapPanel.setStart(null);
 								selStart.setEnabled(false);
@@ -248,10 +242,14 @@ public class Application extends JFrame implements GPSListener{
 								driveThere.setSelected(false);
 							}
 						} else {
-							inDriveMode = false;
 							selStart.setEnabled(true);
 							messageDisplay.setText("Drive there mode disabled.");
 						}
+					}
+					if (e.getActionCommand().equals("track")) {
+						mapPanel.setTrackPos(trackPos.isSelected());
+						if(trackPos.isSelected())
+							mapPanel.setCenter(prevEvent.getLongitude(), prevEvent.getLatitude());
 					}
 				}
 			};
@@ -286,8 +284,8 @@ public class Application extends JFrame implements GPSListener{
 			// Set up the button panel.
 			this.setLayout(new GridLayout(1, 0));
 			this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-			this.add(selStart);
-			this.add(selEnd);
+//			this.add(selStart);
+//			this.add(selEnd);
 			this.add(getDir);
 			this.add(clearDir);
 			this.add(trackPos);
@@ -317,9 +315,9 @@ public class Application extends JFrame implements GPSListener{
 					driveThere.setEnabled(true);
 					messageDisplay.setText("End node set.");
 				}
-				if(dir.getStartNode() != null && dir.getEndNode() != null) {
-					getDir.setEnabled(true);
-				}
+//				if(dir.getStartNode() != null && dir.getEndNode() != null) {
+//					getDir.setEnabled(true);
+//				}
 				return n;
 			} else {
 				messageDisplay.setText("No node selected!");
@@ -433,12 +431,46 @@ public class Application extends JFrame implements GPSListener{
 	@Override
 	public void processEvent(GPSEvent e) {
 		prevEvent = e;
-		if(followGPS)
+		if(trackPos.isSelected())
 			mapPanel.setCenter(e.getLongitude(), e.getLatitude());
-		mapPanel.setDriving(true, e.getLongitude(), e.getLatitude());
-		if(inDriveMode) {
+		mapPanel.setDriver(e.getLongitude(), e.getLatitude());
+		if(driveThere.isSelected()) {
 			RouteChecker task = new RouteChecker(e);
 			task.execute();
 		}
+	}
+	
+	@Override
+	public void processEvent(MapPanelEvent e) {
+		dir.setEndNode(e.getEndNode());
+		dir.setStartNode(e.getStartNode());
+		getDir.setEnabled(e.getStartNode() != null && e.getEndNode() != null && !driveThere.isSelected());
+		driveThere.setEnabled(e.getEndNode() != null);
+		trackPos.setEnabled(e.getEndNode() != null && prevEvent != null);
+		if(e.getEndNode() == null) {
+			driveThere.setSelected(false);
+			trackPos.setSelected(false);
+			mapPanel.setTrackPos(false);
+		}
+			dir.setStartNode(e.getStartNode());
+		if(e.movedMap()) {
+			if(trackPos.isSelected()) {
+				messageDisplay.setText("Moved map, exiting tracking.");
+				trackPos.setSelected(false);
+			}
+			mapPanel.setTrackPos(false);
+		}
+	}
+	
+	public void updateAppState() {
+		if(dir.getEndNode() == null) {
+			driveThere.setSelected(false);
+			trackPos.setSelected(false);
+			mapPanel.setTrackPos(false);
+		}
+		trackPos.setEnabled(dir.getEndNode() != null && prevEvent != null);
+		driveThere.setEnabled(dir.getEndNode() != null && prevEvent != null);
+		getDir.setEnabled(dir.getStartNode() != null && dir.getEndNode() != null && !driveThere.isSelected());
+		
 	}
 }

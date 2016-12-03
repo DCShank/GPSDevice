@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -66,9 +67,11 @@ public class MapPanel extends JPanel {
 	
 	private double testHeading = 0;
 	
-	private double driverLon = 0;
-	private double driverLat = 0;
-	private boolean inDrivingMode = false;
+	private Double driverLon = null;
+	private Double driverLat = null;
+	private boolean trackPos = false;
+	
+	private ArrayList<MapPanelListener> listeners = new ArrayList<MapPanelListener>();
 	
 	/**
 	 * Constructor for this object that takes a map to be displayed as the parameter
@@ -129,6 +132,8 @@ public class MapPanel extends JPanel {
 			 */
 			@Override
 			public void mouseDragged(MouseEvent e) {
+				trackPos = false;	// If you dragged the mouse, take us out of tracking mode.
+				updateListeners(true);
 				pan(scale.pixelsToLon(x-e.getX(),screenToLat(y)), scale.pixelsToLat(y-e.getY()));
 				y = e.getY();
 				x = e.getX();
@@ -139,7 +144,11 @@ public class MapPanel extends JPanel {
 			 */
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
-				zoomToPosition(e.getX(), e.getY(), -e.getWheelRotation());
+				if(!trackPos) {
+					zoomToPosition(e.getX(), e.getY(), -e.getWheelRotation());
+				} else {
+					scale.zoom(-e.getWheelRotation());
+				}
 				setCenter(cenLon, cenLat);
 				currentRad = strat.getDistance(0, 0, scale.pixelsToLon(PIX_TO_CUR,PIX_TO_CUR),
 						scale.pixelsToLat(PIX_TO_CUR));
@@ -151,7 +160,13 @@ public class MapPanel extends JPanel {
 				double lat = screenToLat(e.getY());
 				double lon = screenToLon(e.getX(), e.getY());
 				Node n = map.getNearNodeInRadius(lon, lat, currentRad);
-				selectedNode = n;
+				if(e.getButton() == e.BUTTON1)
+					start = n;
+				if(e.getButton() == e.BUTTON3)
+					end = n;
+				updateListeners(false);
+				
+//				selectedNode = n;
 				
 				// Testing code
 //				System.out.println(n.toString());
@@ -255,7 +270,7 @@ public class MapPanel extends JPanel {
 			drawNode(start, Color.PINK, g);
 		if(end != null)
 			drawNode(end, Color.RED, g);
-		if(inDrivingMode) {
+		if(driverLon != null && driverLat != null) {
 			g.setColor(Color.WHITE);
 			g.fillOval(lonToScreen(driverLon, driverLat)-4, latToScreen(driverLat)-4, 9, 9);
 			
@@ -410,10 +425,13 @@ public class MapPanel extends JPanel {
 		highlightedNodes.remove(n);
 	}
 	
-	public void setDriving(boolean isDriving, double lon, double lat) {
+	public void setDriver(double lon, double lat) {
 		driverLon = lon;
 		driverLat = lat;
-		inDrivingMode = isDriving;
+	}
+	
+	public void setTrackPos(boolean track) {
+		trackPos = track;
 	}
 	
 	public void setStart(Node s) {
@@ -421,5 +439,38 @@ public class MapPanel extends JPanel {
 	}
 	public void setEnd(Node e) {
 		end = e;
+	}
+	
+	public void addListener(MapPanelListener l) {
+		listeners.add(l);
+	}
+	
+	private void updateListeners(boolean movedMap) {
+		UpdateEvent e = new UpdateEvent();
+		e.hasMoved = movedMap;
+		for(MapPanelListener l : listeners) {
+			l.processEvent(e);
+		}
+	}
+	
+	class UpdateEvent implements MapPanelEvent {
+		
+		private boolean hasMoved = false;
+
+		@Override
+		public Node getStartNode() {
+			return start;
+		}
+
+		@Override
+		public Node getEndNode() {
+			return end;
+		}
+
+		@Override
+		public boolean movedMap() {
+			return hasMoved;
+		}
+		
 	}
 }
