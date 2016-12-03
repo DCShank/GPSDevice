@@ -9,9 +9,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -33,7 +31,6 @@ import com.starkeffect.highway.GPSEvent;
 import com.starkeffect.highway.GPSListener;
 
 import directions.Director;
-import directions.Graph;
 import directions.GraphEdge;
 import directions.GraphNode;
 import map_data.Map;
@@ -93,46 +90,8 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 	 */
 	public Application(File file) throws Exception {
 		this();
-		loadMap(file);
-		;
-	}
-
-	/**
-	 * Loads a given map file and displays it on the application frame.
-	 * 
-	 * @param file
-	 *            The file to be loaded.
-	 * @throws Exception
-	 *             Throws an exception if the file can't be loaded. This causes
-	 *             the file to stop being loaded and leaves the previous map
-	 *             being displayed.
-	 */
-	public void loadMap(File file) throws Exception {
-		prsr = new OSMParser(file);
-		prsr.parse();
-		map = prsr.getMap();
-		// Clear away the old stark gps, dereference it as much as possible, and delete the old frame.
-		if (gps != null) {
-			gps.removeGPSListener(this);
-			gps = null;
-			Frame[] frames = getFrames();
-			for(Frame f : frames) {
-				if(!f.getTitle().equals("Graph Application")) {
-					f.dispose();
-				}
-			}
-		}
-		// Remove the old map panel if one exists.
-		if (mapPanel != null) {
-			remove(mapPanel);
-		}
-		mapPanel = new MapPanel(map);
-		mapPanel.addListener(this);
-		dir = new Director(map);
-		gps = new GPSDevice(file.getAbsolutePath());
-		gps.addGPSListener(this);
-		getContentPane().add(mapPanel, BorderLayout.CENTER);
-		pack();
+		MapLoader load = new MapLoader(file);
+		load.execute();
 	}
 
 	/**
@@ -143,7 +102,7 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
 		final JFileChooser fc = new JFileChooser();
-		JMenuItem loadMap = new JMenuItem("Load Graph");
+		JMenuItem loadMap = new JMenuItem("Load Map");
 		FileNameExtensionFilter filter = new FileNameExtensionFilter("OSM Graph files", "osm");
 		fc.setFileFilter(filter);
 		// The action listener displays a file chooser dialog and lets display a
@@ -424,6 +383,7 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 			}
 			try {
 				mapPanel = new MapPanel(get());
+				mapPanel.addListener(Application.this);
 			} catch (Exception e) {
 			}
 			dir = new Director(map);
