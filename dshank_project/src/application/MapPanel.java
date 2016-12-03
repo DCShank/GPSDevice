@@ -16,9 +16,9 @@ import java.util.Set;
 
 import javax.swing.JPanel;
 
-import directions.GraphEdge;
-import directions.GraphNode;
-import directions.GraphSegment;
+import graph_interfaces.GraphEdge;
+import graph_interfaces.GraphNode;
+import graph_interfaces.GraphSegment;
 import map_data.DistanceStrategy;
 import map_data.HaversineDistance;
 import map_data.Map;
@@ -46,7 +46,7 @@ public class MapPanel extends JPanel {
 	/** Strategy for converting to pixels from lat/lon and to lat/lon from pixels. */
 	private final ScaleStrategy scale = new MapScale();
 	
-	public static final int DEFAULT_WIDTH = 1200;
+	public static final int DEFAULT_WIDTH = 1420;
 	public static final int DEFAULT_HEIGHT = 800;
 	
 	private static final int PIX_TO_CUR = 35;
@@ -367,7 +367,7 @@ public class MapPanel extends JPanel {
 	 * @param lat The lat value to find the position of.
 	 * @return The number of pixels below the top of the screen.
 	 */
-	public int latToScreen(double lat) {
+	private int latToScreen(double lat) {
 		return scale.latToPixels(lat-cenLat) + getHeight() / 2;
 	}
 	
@@ -377,7 +377,7 @@ public class MapPanel extends JPanel {
 	 * @param lat The lat of that lon value.
 	 * @return A value representing x pixels from the left side of the screen.
 	 */
-	public int lonToScreen(double lon, double lat) {
+	private int lonToScreen(double lon, double lat) {
 		return scale.lonToPixels(lon-cenLon, lat) + getWidth() / 2;
 	}
 	
@@ -386,7 +386,7 @@ public class MapPanel extends JPanel {
 	 * @param y The number of pixels below the top of the screen.
 	 * @return The latitude of that y position on the screen.
 	 */
-	public double screenToLat(int y) {
+	private double screenToLat(int y) {
 		return cenLat-scale.pixelsToLat((getHeight()/2)-y);
 	}
 	
@@ -396,7 +396,7 @@ public class MapPanel extends JPanel {
 	 * @param y the position below the top of the screen
 	 * @return the longitude at that position
 	 */
-	public double screenToLon(int x, int y) {
+	private double screenToLon(int x, int y) {
 		return cenLon+scale.pixelsToLon(x-getWidth()/2, screenToLat(y));
 	}
 	

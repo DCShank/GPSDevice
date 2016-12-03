@@ -1,17 +1,16 @@
 package map_data;
 
 import java.io.File;
-
-import directions.Graph;
-import directions.GraphEdge;
-import directions.GraphNode;
-import directions.GraphSegment;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
+import graph_interfaces.Graph;
+import graph_interfaces.GraphEdge;
+import graph_interfaces.GraphNode;
+import graph_interfaces.GraphSegment;
 
 /**
  * A representation of the data in an OSM map.

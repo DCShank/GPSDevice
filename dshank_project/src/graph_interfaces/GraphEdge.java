@@ -1,4 +1,4 @@
-package directions;
+package graph_interfaces;
 
 import map_data.Node;
 

@@ -1,7 +1,7 @@
 package map_data;
 
-import directions.GraphEdge;
-import directions.GraphNode;
+import graph_interfaces.GraphEdge;
+import graph_interfaces.GraphNode;
 
 /**
  * Represents an Edge on a graph with a length, Nodes, and adjacent edges to each Node.

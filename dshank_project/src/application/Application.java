@@ -21,6 +21,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
@@ -30,18 +31,17 @@ import com.starkeffect.highway.GPSDevice;
 import com.starkeffect.highway.GPSEvent;
 import com.starkeffect.highway.GPSListener;
 
-import directions.Director;
-import directions.GraphEdge;
-import directions.GraphNode;
+import graph_interfaces.GraphEdge;
+import graph_interfaces.GraphNode;
 import map_data.Map;
 import map_data.Node;
 import map_data.OSMParser;
 
 public class Application extends JFrame implements GPSListener, MapPanelListener{
 
-	/** Parses OSM data into a usable state. Used for making the Graph */
+	/** Parses OSM data into a usable state. Used for making the Map */
 	private OSMParser prsr;
-	/** Graph that contains all the map data for the current map */
+	/** Map that contains all the map data for the current map */
 	private Map map;
 	/** Panel that displays map data for the current map. */
 	private MapPanel mapPanel;
@@ -53,7 +53,7 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 	private GPSDevice gps;
 	/** Label for displaying system relevant messages, such as found a route, without popups, */
 	private JLabel messageDisplay;
-	
+	private JTextArea dirDisplay;
 	private GPSEvent prevEvent = null;
 	
 	private JButton getDir;
@@ -64,12 +64,13 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 	 * Constructor for the application which takes no argument.
 	 */
 	public Application() throws Exception {
-		setTitle("Graph Application");
+		setTitle("Map Application");
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); // Irritating
 		setPreferredSize(new Dimension(MapPanel.DEFAULT_WIDTH, MapPanel.DEFAULT_HEIGHT));
 		Container content = getContentPane();
 		content.setLayout(new BorderLayout());
 		createMenuBar();
+		dirDisplay = new JTextArea(20,25);
 		ButtonPanel buttons = new ButtonPanel();
 		messageDisplay = new JLabel();
 		messageDisplay.setHorizontalAlignment(JLabel.CENTER);
@@ -78,6 +79,7 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 		messageDisplay.setToolTipText("Displays system updates.");
 		content.add(buttons, BorderLayout.NORTH);
 		content.add(messageDisplay, BorderLayout.SOUTH);
+		content.add(dirDisplay, BorderLayout.EAST);
 		pack();
 		setVisible(true);
 	}
@@ -103,7 +105,7 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 		JMenu fileMenu = new JMenu("File");
 		final JFileChooser fc = new JFileChooser();
 		JMenuItem loadMap = new JMenuItem("Load Map");
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("OSM Graph files", "osm");
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("OSM Map files", "osm");
 		fc.setFileFilter(filter);
 		// The action listener displays a file chooser dialog and lets display a
 		// new file.
@@ -123,6 +125,7 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 		});
         fileMenu.add(loadMap);
         menuBar.add(fileMenu);
+        
         setJMenuBar(menuBar);
 	}
 
@@ -225,7 +228,7 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 			getDir.setToolTipText("Must have selected a start and end node to get directions");
 			getDir.addActionListener(buttonPanelListener);
 			// Init the clear directions button
-			clearDir = new JButton("Clear directions");
+			clearDir = new JButton("Clear selections");
 			clearDir.setActionCommand("clear");
 			clearDir.addActionListener(buttonPanelListener);
 			// Init the track position button.
@@ -276,6 +279,7 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 					messageDisplay.setText("No route exists.");;
 				} else {
 					messageDisplay.setText("Route found!");
+					dirDisplay.setText(dir.getDirString());
 				}
 			} catch (Exception e) {
 				messageDisplay.setText("An ERROR has occurred!");
@@ -311,6 +315,7 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 					messageDisplay.setText("No route exists.");;
 				} else if (!oldDir.equals(directions)){
 					messageDisplay.setText("Route updated.");
+					dirDisplay.setText(dir.getDirString());
 				} else {
 					messageDisplay.setText("On route to destination");
 				}
@@ -343,7 +348,7 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 				gps = null;
 				Frame[] frames = getFrames();
 				for(Frame f : frames) {
-					if(!f.getTitle().equals("Graph Application")) {
+					if(!f.getTitle().equals("Map Application")) {
 						f.dispose();
 					}
 				}
@@ -363,6 +368,7 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 				mapPanel.addListener(Application.this);
 			} catch (Exception e) {
 			}
+			messageDisplay.setText("Map loaded. Left click to select start, right click to select end.");
 			dir = new Director(map);
 			getContentPane().add(mapPanel, BorderLayout.CENTER);
 			pack();

@@ -1,6 +1,7 @@
-package directions;
+package application;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,6 +11,9 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
 
+import graph_interfaces.GraphEdge;
+import graph_interfaces.GraphNode;
+import graph_interfaces.GraphSegment;
 import map_data.Map;
 import map_data.Node;
 import map_data.RoadSegment;
@@ -32,7 +36,7 @@ public class Director {
 	/** A list of edges to follow to reach a destination */
 	private List<GraphEdge> directions;
 	
-	private List<GraphSegment> directionSegs;
+	private List<RoadSegment> directionSegs;
 	/** A list of the nodes traversed by this map. */
 	private List<GraphNode> dirNodes;
 	/** A set of nodes. Useful for checking if a node is in the directions. */
@@ -112,7 +116,22 @@ public class Director {
 	 * @return The string containing the directions.
 	 */
 	public String getDirString() {
-		return null;
+		String rtrnString = "";
+		String currName = directionSegs.get(0).getName();
+		double currLen = 0;
+		for(RoadSegment seg : directionSegs) {
+			if(seg.getName().equals(currName)) {
+				currLen += seg.getLength();
+			} else {
+				String lenStr = String.format("%.2f", currLen/1000);	// Format to 4 points
+				rtrnString += "Travel on " + currName + " for " + lenStr + "km.\n";
+				currName = seg.getName();
+				currLen = seg.getLength();
+			}
+		}
+		String lenStr = String.format("%.2f", currLen/1000);	// Format to 4 points
+		rtrnString += "Travel on " + currName + " for " + lenStr + "km.\n";
+		return rtrnString;
 	}
 	
 	/**
@@ -127,9 +146,10 @@ public class Director {
 		Comparator<GraphNode> distComp = new Comparator<GraphNode>() {
 			@Override
 			public int compare(GraphNode o1, GraphNode o2) {
-				if(distances.get(o1) < distances.get(o2)) { return -1; }
-				if(distances.get(o1) > distances.get(o2)) { return 1; }
-				return 0;
+				return distances.get(o1).compareTo(distances.get(o2));
+//				if(distances.get(o1) < distances.get(o2)) { return -1; }
+//				if(distances.get(o1) > distances.get(o2)) { return 1; }
+//				return 0;
 			}
 		};
 		// I found a paper (from stony brook!) that claimed that just using an ordinary
@@ -246,7 +266,7 @@ public class Director {
 		for(GraphSegment s : dirSegList) {
 			dirList.addAll(s.getEdgeList());
 		}
-		directionSegs = dirSegList;
+		directionSegs = new LinkedList<RoadSegment>((Collection<? extends RoadSegment>) dirSegList);
 		directions = dirList;
 		return dirList;
 	}

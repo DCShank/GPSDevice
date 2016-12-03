@@ -5,9 +5,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import directions.GraphEdge;
-import directions.GraphNode;
-import directions.GraphSegment;
+import graph_interfaces.GraphEdge;
+import graph_interfaces.GraphNode;
+import graph_interfaces.GraphSegment;
 
 /**
  * Represents a node in an OSM map. Also implements GraphNode features.

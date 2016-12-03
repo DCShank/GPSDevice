@@ -7,9 +7,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import directions.GraphEdge;
-import directions.GraphNode;
-import directions.GraphSegment;
+import graph_interfaces.GraphEdge;
+import graph_interfaces.GraphNode;
+import graph_interfaces.GraphSegment;
 
 /**
  * A super edge that extends from one intersection to another, or to a dead end.
@@ -122,7 +122,7 @@ public class RoadSegment implements GraphSegment {
 	 * Returns the ID of the segment.
 	 * 
 	 * WARNING: Segment ID's are NOT unique. Because the graph is directed, two segments can have
-	 * the same start and end node but go in opposite directions.
+	 * the same start and end node but go in opposite graph_interfaces.
 	 * 
 	 * This can probably be removed.
 	 */
@@ -132,7 +132,7 @@ public class RoadSegment implements GraphSegment {
 	}
 	
 	/**
-	 * Provides the reverse segment of this segment. The reversed segment has all its edges directions
+	 * Provides the reverse segment of this segment. The reversed segment has all its edges graph_interfaces
 	 * reversed and has its start and end nodes opposite.
 	 * @return The reverse road segment to this road segment.
 	 */
@@ -198,6 +198,10 @@ public class RoadSegment implements GraphSegment {
 	@Override
 	public List<GraphEdge> getEdgeList() {
 		return new LinkedList<GraphEdge>(edges);
+	}
+	
+	public String getName() {
+		return containedBy;
 	}
 
 	@Override
