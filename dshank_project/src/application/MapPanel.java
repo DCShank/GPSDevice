@@ -27,7 +27,6 @@ import map_data.Way;
 /**
  * Class that displays map data to a swing panel.
  * @author david
- *
  */
 public class MapPanel extends JPanel {
 	/** The map data to be represented */
@@ -155,7 +154,7 @@ public class MapPanel extends JPanel {
 				selectedNode = n;
 				
 				// Testing code
-				System.out.println(n.toString());
+//				System.out.println(n.toString());
 //				Iterator<GraphNode> it = map.getNodeIterator();
 //				tempNodes = new HashSet<Node>();
 //				while(it.hasNext()) {

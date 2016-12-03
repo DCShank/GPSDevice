@@ -81,7 +81,7 @@ public class Application extends JFrame implements GPSListener{
 		messageDisplay.setFont(messageDisplay.getFont().deriveFont(20f));
 		messageDisplay.setText("Message display.");
 		messageDisplay.setToolTipText("Displays system updates.");
-		content.add(buttons, BorderLayout.WEST);
+		content.add(buttons, BorderLayout.NORTH);
 		content.add(messageDisplay, BorderLayout.SOUTH);
 		pack();
 		setVisible(true);
@@ -155,8 +155,7 @@ public class Application extends JFrame implements GPSListener{
 				if (chooseVal == fc.APPROVE_OPTION) {
 					File file = fc.getSelectedFile();
 					try {
-//						loadMap(file);
-						MapLoader task = new MapLoader(file);
+                        MapLoader task = new MapLoader(file);
 						task.execute();
 					} catch (Exception x) {
 						JOptionPane.showMessageDialog(null, "Failed to load map.");
@@ -164,9 +163,26 @@ public class Application extends JFrame implements GPSListener{
 				}
 			}
 		});
-		fileMenu.add(loadMap);
-		menuBar.add(fileMenu);
-		setJMenuBar(menuBar);
+        fileMenu.add(loadMap);
+        menuBar.add(fileMenu);
+        setJMenuBar(menuBar);
+	}
+
+	/**
+	 * Main method for initialzing the program. Takes an OSM file as the
+	 * argument.
+	 * 
+	 * @param args
+	 *            OSM file to be displayed first.
+	 * @throws Exception
+	 *             Throws an exception if something goes wrong with the file.
+	 */
+	public static void main(String[] args) throws Exception {
+		if (args.length > 0) {
+			new Application(new File(args[0]));
+		} else {
+			new Application();
+		}
 	}
 
 	/**
@@ -268,7 +284,7 @@ public class Application extends JFrame implements GPSListener{
 			driveThere.setToolTipText("Must have selected an end node to get driving directions");
 			driveThere.addActionListener(buttonPanelListener);
 			// Set up the button panel.
-			this.setLayout(new GridLayout(0, 1));
+			this.setLayout(new GridLayout(1, 0));
 			this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 			this.add(selStart);
 			this.add(selEnd);
@@ -276,23 +292,6 @@ public class Application extends JFrame implements GPSListener{
 			this.add(clearDir);
 			this.add(trackPos);
 			this.add(driveThere);
-		}
-	}
-
-	/**
-	 * Main method for initialzing the program. Takes an OSM file as the
-	 * argument.
-	 * 
-	 * @param args
-	 *            OSM file to be displayed first.
-	 * @throws Exception
-	 *             Throws an exception if something goes wrong with the file.
-	 */
-	public static void main(String[] args) throws Exception {
-		if (args.length > 0) {
-			new Application(new File(args[0]));
-		} else {
-			new Application();
 		}
 	}
 	
