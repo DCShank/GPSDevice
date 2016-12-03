@@ -28,6 +28,7 @@ public class RoadSegment implements GraphSegment {
 	private final String id;
 	private final Node startNode;
 	private final Node endNode;
+	private final String containedBy;
 	private double length;
 
 	/**
@@ -38,7 +39,8 @@ public class RoadSegment implements GraphSegment {
 	 * @param len The length of the segment from start to finish.
 	 * @param nodes The nodes that are in the segment.
 	 */
-	public RoadSegment(Node sn, Node en, double len, List<Node> nodes) {
+	public RoadSegment(Node sn, Node en, double len, String wayName, List<Node> nodes) {
+		containedBy = wayName;
 		startNode = sn;
 		endNode = en;
 		length = len;
@@ -62,7 +64,8 @@ public class RoadSegment implements GraphSegment {
 	 * @param en The end node.
 	 * @param edges The component edges that make up the segment.
 	 */
-	public RoadSegment(Node sn, Node en, List<GraphEdge> edges) {
+	public RoadSegment(Node sn, Node en, String wayName, List<GraphEdge> edges) {
+		containedBy = wayName;
 		startNode = sn;
 		endNode = en;
 		length = 0;
@@ -142,7 +145,7 @@ public class RoadSegment implements GraphSegment {
 		while(it.hasNext()) {
 			revList.addFirst((Node) it.next().getEndNode());
 		}
-		return new RoadSegment(endNode, startNode, length, revList);
+		return new RoadSegment(endNode, startNode, length, containedBy, revList);
 	}
 	
 	/**
@@ -159,7 +162,7 @@ public class RoadSegment implements GraphSegment {
 			currEdge = edgeIt.next();
 			newList.add(currEdge);
 		}
-		return new RoadSegment(startNode, (Node) en, newList);
+		return new RoadSegment(startNode, (Node) en, containedBy, newList);
 	}
 	
 	/**
@@ -178,7 +181,7 @@ public class RoadSegment implements GraphSegment {
 			currEdge = edgeIt.next();
 			newList.add(currEdge);
 		}
-		return new RoadSegment((Node) sn, endNode, newList);
+		return new RoadSegment((Node) sn, endNode, containedBy, newList);
 	}
 
 	@Override

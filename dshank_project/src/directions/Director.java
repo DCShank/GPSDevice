@@ -31,6 +31,8 @@ public class Director {
 	private final Map map;
 	/** A list of edges to follow to reach a destination */
 	private List<GraphEdge> directions;
+	
+	private List<GraphSegment> directionSegs;
 	/** A list of the nodes traversed by this map. */
 	private List<GraphNode> dirNodes;
 	/** A set of nodes. Useful for checking if a node is in the directions. */
@@ -94,12 +96,14 @@ public class Director {
 	
 	/**
 	 * Returns an ordered list of the directions from start to end.
-	 * @return An ordered list of GraphEdges from start to end.
+	 * @return An ordered list of GraphEdges from start to end, or null if no such list
+	 * exists or the input nodes are null.
 	 */
 	public List<GraphEdge> getDirections() {
 		if(startNode != null && endNode != null) {
 			return calcDir();
 		}
+		// If something goes wrong we return null.
 		return null;
 	}
 	
@@ -166,8 +170,7 @@ public class Director {
 			}
 			visited.add(visitNext);
 		}
-		
-		directions = new LinkedList<GraphEdge>(extractDirections(predSegs));
+		extractDirections(predSegs);
 		clearTempSegments();
 		return directions;
 		
@@ -243,6 +246,8 @@ public class Director {
 		for(GraphSegment s : dirSegList) {
 			dirList.addAll(s.getEdgeList());
 		}
+		directionSegs = dirSegList;
+		directions = dirList;
 		return dirList;
 	}
 	

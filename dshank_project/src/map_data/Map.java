@@ -179,7 +179,7 @@ public class Map implements Graph {
 				currNode = nIt.next();
 				roadNodes.add(prevNode);
 				roadNodes.add(currNode);
-				RoadEdge e = new RoadEdge(prevNode, currNode, strat);
+				RoadEdge e = new RoadEdge(prevNode, currNode, w.getName(), strat);
 //				System.out.println(e.getLength());
 				prevNode.addGraphEdge((GraphEdge)e);
 				if(!w.isOneway()) {
@@ -218,7 +218,7 @@ public class Map implements Graph {
 				// If we arrive at an intersection or dead end create a segment
 				if(((nn.getOutDegree() != 1 || nn.getInDegree() != 1) && w.isOneway()) 
 						|| ((nn.getOutDegree() != 2 || nn.getInDegree() != 2) && !w.isOneway()) || !nIt.hasNext()) {
-					RoadSegment seg = new RoadSegment(sn, nn, len, nodes);
+					RoadSegment seg = new RoadSegment(sn, nn, len, w.getName(), nodes);
 					addSegment(seg);
 					// If the segment is two way create the reverse segment
 					if(!w.isOneway())

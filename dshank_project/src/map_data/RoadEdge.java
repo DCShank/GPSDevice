@@ -20,6 +20,7 @@ public class RoadEdge implements GraphEdge {
 	private final Node startNode;
 	private final Node endNode;
 	private final double length;
+	private final String containedBy;
 	private final DistanceStrategy strat;
 	
 	/**
@@ -28,7 +29,8 @@ public class RoadEdge implements GraphEdge {
 	 * @param en the endNode
 	 * @param strat The strategy for finding the distance.
 	 */
-	public RoadEdge(Node sn, Node en, DistanceStrategy strat) {
+	public RoadEdge(Node sn, Node en, String wayName, DistanceStrategy strat) {
+		containedBy = wayName;
 		startNode = sn;
 		endNode = en;
 		id = startNode.getID() + endNode.getID();
@@ -76,7 +78,7 @@ public class RoadEdge implements GraphEdge {
 	 * @return A new RoadEdge with opposite start and end nodes.
 	 */
 	public RoadEdge getReverse() {
-		RoadEdge reverse = new RoadEdge(endNode, startNode, strat);
+		RoadEdge reverse = new RoadEdge(endNode, startNode, containedBy, strat);
 		return reverse;
 	}
 	
