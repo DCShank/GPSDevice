@@ -446,8 +446,11 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 	
 	@Override
 	public void processEvent(MapPanelEvent e) {
+		if(dir.getStartNode() != e.getStartNode())
+			messageDisplay.setText("Start node selected.");
+		if(dir.getEndNode() != e.getEndNode())
+			messageDisplay.setText("End node selected.");
 		dir.setEndNode(e.getEndNode());
-		dir.setStartNode(e.getStartNode());
 		dir.setStartNode(e.getStartNode());
 		if(e.movedMap()) {
 			if(trackPos.isSelected()) {
