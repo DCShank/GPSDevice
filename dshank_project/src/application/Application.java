@@ -166,11 +166,6 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 			ActionListener buttonPanelListener = new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					GraphNode n = mapPanel.getSelectedNode();
-					if ((e.getActionCommand().equals("start") || e.getActionCommand().equals("end"))) {
-						SwingWorker<Object, Object> task = new NodeSetter(n, e.getActionCommand());
-						task.execute();
-					}
 					if (e.getActionCommand().equals("directions")) {
 						SwingWorker<List<GraphEdge>, Object> task = new DirectionFinder();
 						task.execute();
@@ -255,40 +250,12 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 			this.add(driveThere);
 		}
 	}
-	
-	class NodeSetter extends SwingWorker<Object, Object> {
-		GraphNode n;
-		String startOrEnd;
-		public NodeSetter(GraphNode n, String whichNode) {
-			this.n = n;
-			startOrEnd = whichNode;
-			
-		}
-		@Override
-		protected Object doInBackground() throws Exception {
-			if(n != null) {
-				if(startOrEnd.equals("start")) {
-					dir.setStartNode(n);
-					mapPanel.setStart((Node)n);
-					messageDisplay.setText("Start node set.");
-				}
-				if(startOrEnd.equals("end")) {
-					dir.setEndNode(n);
-					mapPanel.setEnd((Node)n);
-					driveThere.setEnabled(true);
-					messageDisplay.setText("End node set.");
-				}
-//				if(dir.getStartNode() != null && dir.getEndNode() != null) {
-//					getDir.setEnabled(true);
-//				}
-				return n;
-			} else {
-				messageDisplay.setText("No node selected!");
-				return n;
-			}
-		}
-	}
 
+	/**
+	 * Finds directions in the background.
+	 * @author david
+	 *
+	 */
 	class DirectionFinder extends SwingWorker<List<GraphEdge>, Object> {
 
 		public DirectionFinder() {
@@ -316,6 +283,11 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 		}
 	}
 
+	/**
+	 * Checks your route in the background, and updates it if you're off course.
+	 * @author david
+	 *
+	 */
 	class RouteChecker extends SwingWorker<List<GraphEdge>, Object> {
 		GPSEvent event;
 		List<GraphEdge> oldDir = directions;
@@ -348,6 +320,11 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 
 	}
 	
+	/**
+	 * Loads the map in the background.
+	 * @author david
+	 *
+	 */
 	class MapLoader extends SwingWorker<Map, Object> {
 
 		private File file;
@@ -392,6 +369,9 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 		}
 	}
 
+	/**
+	 * Updates the state of the application based on an event from the gps device.
+	 */
 	@Override
 	public void processEvent(GPSEvent e) {
 		prevEvent = e;
@@ -405,6 +385,9 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 		}
 	}
 	
+	/**
+	 * Updates the state of the application based on an event from the map panel.
+	 */
 	@Override
 	public void processEvent(MapPanelEvent e) {
 		if(dir.getStartNode() != e.getStartNode())
@@ -428,6 +411,9 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 		updateAppState();
 	}
 	
+	/**
+	 * Updates the general state of the application. Primarily affects the various buttons.
+	 */
 	public void updateAppState() {
 		if(dir.getEndNode() == null) {
 			driveThere.setSelected(false);
