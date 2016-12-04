@@ -44,6 +44,8 @@ public class Director {
 	/** A list of the directions to follow in a human readable form. */
 	private String dirString;
 	
+	private GraphNode currNode;
+	
 	private GraphNode startNode;
 	
 	private GraphNode endNode;
@@ -114,19 +116,20 @@ public class Director {
 	/**
 	 * Returns the human-readable, line separated, direction string.
 	 * 
-	 * If the road has no name it suggests you travel on the river styx.
+	 * If the road has no name it suggests you travel on a road with no name.
 	 * 
 	 * @return The string containing the directions.
 	 */
 	public String getDirString() {
 		String rtrnString = "";
-		String currName = directionSegs.get(0).getName();
+		RoadSegment initSeg = directionSegs.get(0);
+		String currName = initSeg.getName();
 		String finalName;
 		double currLen = 0;
 		for(RoadSegment seg : directionSegs) {
 			finalName = currName;
 			if(currName.isEmpty()) {
-				finalName = "The River Styx";
+				finalName = "A Road With No Name";
 			}
 			if(seg.getName().equals(currName)) {
 				currLen += seg.getLength();
@@ -137,8 +140,13 @@ public class Director {
 				currLen = seg.getLength();
 			}
 		}
+		// I am too stupid to unfold this loop correctly so it finishes inside the loop
+		finalName = currName;
+		if(currName.isEmpty()) {
+			finalName = "A Road With No Name";
+		}
 		String lenStr = String.format("%.2f", currLen/1000);	// Format to 4 points
-		rtrnString += "Travel on " + currName + " for " + lenStr + "km.\n";
+		rtrnString += "Travel on " + finalName + " for " + lenStr + "km.\n";
 		return rtrnString;
 	}
 	
@@ -267,7 +275,7 @@ public class Director {
 		GraphNode currNode = endNode;
 		while(currNode != startNode) {
 			GraphSegment predSeg = predSegs.get(currNode);
-			dirSegList.addLast(predSeg);
+			dirSegList.addFirst(predSeg);
 			currNode = predSeg.getStartNode();
 		}
 		LinkedList<GraphEdge> dirList = new LinkedList<GraphEdge>();
@@ -281,10 +289,11 @@ public class Director {
 	
 	/**
 	 * Determines whether someone is off course based on their lon, lat, and heading.
+	 * If on course, updates currNode to the nearest node that the user is heading towards.
 	 * @param lon The longitude of the position.
 	 * @param lat The latitdue of the position
 	 * @param heading The heading.
-	 * @return
+	 * @return True if on course, false otherwise.
 	 */
 	private boolean onCourse(double lon, double lat, double heading) {
 		Iterator<GraphEdge> eIt = directions.iterator();
@@ -294,9 +303,11 @@ public class Director {
 			double len = e.getLength();
 			if( map.inCircularWedge(lon, lat, DEFAULT_ANGLE, heading, len * 1.2, (Node) n)
 					|| (map.inCircle(lon, lat, DEFAULT_RADIUS,(Node) n))) {
+				currNode = n;
 				return true;
 			}
 		}
+		currNode = null;
 		return false;
 	}
 	
@@ -313,19 +324,14 @@ public class Director {
 	}
 	
 	/**
-	 * Removes the first element of the list. essentially representing following
-	 * the directions forward one edge.
-	 */
-	private void moveForward() {
-		
-	}
-	
-	/**
 	 * Removes elements from the directions until you reach the selected node.
+	 * @precondition The node must be in directions.
 	 * @param n The node to progress to.
 	 */
 	private void moveForwardTo(GraphNode n) {
-		
+		while(!directions.get(0).getEndNode().equals(n)) {
+			directions.remove(0);
+		}
 	}
 	
 	/**
@@ -343,6 +349,7 @@ public class Director {
 		while(eIt.hasNext()) {
 			GraphEdge e = eIt.next();
 			if(onCourse(lon, lat, heading)) {
+				moveForwardTo(currNode);
 				return directions;
 			}
 		}

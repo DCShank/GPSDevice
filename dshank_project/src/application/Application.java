@@ -317,6 +317,7 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 					messageDisplay.setText("Route updated.");
 					dirDisplay.setText(dir.getDirString());
 				} else {
+					dirDisplay.setText(dir.getDirString());
 					messageDisplay.setText("On route to destination");
 				}
 			} catch (Exception e) {
