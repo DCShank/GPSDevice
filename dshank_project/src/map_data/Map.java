@@ -274,19 +274,8 @@ public class Map implements Graph {
 	 */
 	public GraphNode getNearNode(double lon, double lat) {
 		return getNearNodeInRadius(lon, lat, -1);
-//		Iterator<Node> it = roadNodes.iterator();
-//		Node rtrnNode = it.next();
-//		double dist = strat.getDistance(lon, lat, rtrnNode.getLon(), rtrnNode.getLat());
-//		while(it.hasNext()) {
-//			Node n = it.next();
-//			double testDist = strat.getDistance(lon, lat, n.getLon(), n.getLat());
-//			if(testDist < dist) {
-//				rtrnNode = n;
-//				dist = testDist;
-//			}
-//		}
-//		return rtrnNode;
 	}
+	
 	/**
 	 * Returns the nearest node to some point within a radius for a given node iterator.
 	 * @param lon The longitude of the point to find a node near.
@@ -369,8 +358,4 @@ public class Map implements Graph {
 			return -2;
 		return -4;
 	}
-	
-//	public Iterator<Way> getNonRoadIt() {
-//		return nonRoadWays.values().iterator();
-//	}
 }

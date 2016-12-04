@@ -30,10 +30,7 @@ public class OSMParser {
 	/** Collections of the various elements extracted from the file. */
 	private HashMap<String,Node> nodes;
 	private HashMap<String,Way> ways;
-	private HashMap<String,Way> namedWays;
 	private HashMap<String,Way> roadWays;
-	private HashMap<String,Way> nonRoadWays;
-	private HashMap<String,Relation> relations;
 	
 	/** Bounds for the map being parsed. */
 	private double minLon, maxLon, minLat, maxLat;

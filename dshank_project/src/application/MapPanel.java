@@ -33,8 +33,19 @@ import map_data.Way;
  * @author david
  */
 public class MapPanel extends JPanel {
+
+	/** Strategy for converting to pixels from lat/lon and to lat/lon from pixels. */
+	private static final ScaleStrategy scale = new MapScale();
+	/** Strategy for finding the distance between two points. */
+	public static final DistanceStrategy strat = new HaversineDistance();
 	
+	
+	public static final int DEFAULT_WIDTH = 1420;
+	public static final int DEFAULT_HEIGHT = 800;
+	
+	/** Strokes for drawing map elements with varying priority. */
 	private BasicStroke least,low,med,high,most;
+	/** Constant for scaling drawn items on the map. Could probably be moved to the scale object. */
 	private static final double PRI_CONST = .000075;
 	
 	/** The map data to be represented */
@@ -43,35 +54,22 @@ public class MapPanel extends JPanel {
 	private double cenLat;
 	/** the longitude displayed in the center of the display */
 	private double cenLon;
-	
 	/** The number of pixels to the center latitdue of the display, from the equator. */
 	private int cenLatPix;
 	/** The number of pixels to the center longitude of the display, from the prime meridian. */
 	private int cenLonPix;
+	
 	/** MouseAdapter that handles all mouse events */
 	private MouseAdapter mouse;
-	/** Strategy for converting to pixels from lat/lon and to lat/lon from pixels. */
-	private final ScaleStrategy scale = new MapScale();
-	
-	public static final int DEFAULT_WIDTH = 1420;
-	public static final int DEFAULT_HEIGHT = 800;
-	
+	/** Acceptable radius in pixels to the cursor before we stof finding nearby nodes. */
 	private static final int PIX_TO_CUR = 35;
 	private double currentRad;
 	
-	public static final DistanceStrategy strat = new HaversineDistance();
-	
-	private Node selectedNode = null;
 	private Node hoveredNode = null;
 	private Node start = null;
 	private Node end = null;
 	
 	private List<GraphEdge> directions;
-	
-	private HashSet<Node> highlightedNodes;
-	
-	private HashSet<Node> tempNodes;
-	
 	private Double driverLon = null;
 	private Double driverLat = null;
 	private boolean trackPos = false;
@@ -101,9 +99,6 @@ public class MapPanel extends JPanel {
 		this.addMouseListener(mouse);
 		this.addMouseWheelListener(mouse);
 		this.addMouseMotionListener(mouse);
-		
-		highlightedNodes = new HashSet<Node>();
-		tempNodes = new HashSet<Node>();
 	}	
 	
 	/**
@@ -115,6 +110,9 @@ public class MapPanel extends JPanel {
 			private int x;
 			private int y;
 			
+			/**
+			 * The nearest node is kept highlighted.
+			 */
 			@Override
 			public void mouseMoved(MouseEvent e) {
 				double lat = screenToLat(e.getY());
@@ -135,7 +133,8 @@ public class MapPanel extends JPanel {
 			}
 			
 			/**
-			 * Pans the map when it is dragged with a mouse.
+			 * Pans the map when it is dragged with a mouse. 
+			 * Exits tracking mode.
 			 */
 			@Override
 			public void mouseDragged(MouseEvent e) {
@@ -148,6 +147,7 @@ public class MapPanel extends JPanel {
 			}
 			/**
 			 * Zooms in the map when the mouse wheel is applied.
+			 * If you're in tracking mode it zooms in towards the driver.
 			 */
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
@@ -163,32 +163,22 @@ public class MapPanel extends JPanel {
 				repaint();
 			}
 			
+			/**
+			 * Handles mouse clicks. If you left click it should set the nearest node to the
+			 * start node and if you right click it should set the nearest node to the end node.
+			 */
+			@SuppressWarnings("static-access")
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				double lat = screenToLat(e.getY());
-				double lon = screenToLon(e.getX(), e.getY());
-				Node n = map.getNearNodeInRadius(lon, lat, currentRad);
+//				double lat = screenToLat(e.getY());
+//				double lon = screenToLon(e.getX(), e.getY());
+//				Node n = map.getNearNodeInRadius(lon, lat, currentRad);
+				Node n = hoveredNode; // One fewer calculation.
 				if(e.getButton() == e.BUTTON1)
 					start = n;
 				if(e.getButton() == e.BUTTON3)
 					end = n;
 				updateListeners(false);
-				
-//				selectedNode = n;
-				
-				// Testing code
-//				System.out.println(n.toString());
-//				Iterator<GraphNode> it = map.getNodeIterator();
-//				tempNodes = new HashSet<Node>();
-//				while(it.hasNext()) {
-//					GraphNode next = it.next();
-//					if(map.inCircularWedge(screenToLon(e.getX(),e.getY()), screenToLat(e.getY()),
-//							120, testHeading, 500, next)) {
-//						tempNodes.add((Node) next);
-//					}
-//				}
-//				testHeading += 10;
-				
 				repaint();
 			}
 		};
@@ -268,7 +258,7 @@ public class MapPanel extends JPanel {
 			case -2: g2.setStroke(low);
 			g.setColor(Color.BLUE);
 			break;
-			case -1: g2.setStroke(med);
+			case -1: g2.setStroke(low);
 			g.setColor(Color.GREEN);
 			break;
 			case 0: g2.setStroke(least);
@@ -293,28 +283,23 @@ public class MapPanel extends JPanel {
 			drawWay(w, g);
 		}
 		g.setColor(c);
-		for(Node n : highlightedNodes) {
-			drawNode(n, Color.BLUE, 4, g);
-		}
-		for(Node n : tempNodes) {
-			drawNode(n, Color.GREEN, 4, g);
-		}
-		if(hoveredNode != null)
-			drawNode(hoveredNode, Color.CYAN, 5, g);
-		if(selectedNode != null)
-			drawNode(selectedNode, Color.MAGENTA, 4, g);
 		if(directions != null) {
 			g2.setStroke(most);
 			drawEdges(directions, Color.MAGENTA, g);
 			g2.setStroke(new BasicStroke(1));
 		}
-		if(start != null)
-			drawNode(start, Color.PINK, 5, g);
-		if(end != null)
-			drawNode(end, Color.RED, 5, g);
-		if(driverLon != null && driverLat != null) {
-			drawPosition(driverLon, driverLat, Color.GREEN, 7, g);
-			
+		if(start != null) {
+			drawNodeFixedSize(start, Color.MAGENTA, 3, g);	// Minimum size if we're zoomed out
+			drawNode(start, Color.MAGENTA, 3, g);
+		} if(end != null) {
+			drawNodeFixedSize(end, Color.RED, 3, g);
+			drawNode(end, Color.RED, 3, g);
+		} if(hoveredNode != null) {
+			drawNodeFixedSize(hoveredNode, Color.CYAN, 3, g);
+			drawNode(hoveredNode, Color.CYAN, 3, g);
+		} if(driverLon != null && driverLat != null) {
+			drawPoint(driverLon, driverLat, Color.GREEN, 4, g);
+			drawPosition(driverLon, driverLat, Color.GREEN, 5, g);
 		}
 		g.setColor(c);
 			
@@ -372,6 +357,21 @@ public class MapPanel extends JPanel {
 		g.setColor(c2);
 	}
 	
+	private void drawNodeFixedSize(Node n, Color c, int r, Graphics g) {
+		Color c2 = g.getColor();
+		g.setColor(c);
+		g.fillOval(lonToScreen(n.getLon(), n.getLat())-r, latToScreen(n.getLat())-r, 2*r+1, 2*r+1);
+		g.setColor(c2);
+	}
+	
+	/**
+	 * Draws a position that scales with zoom.
+	 * @param lon longitude of the position
+	 * @param lat latitude of the position
+	 * @param c Color to draw the position
+	 * @param radius Radius of the circle to draw
+	 * @param g The giraffics object
+	 */
 	private void drawPosition(double lon, double lat, Color c, int radius, Graphics g) {
 		Color co = g.getColor();
 		g.setColor(c);
@@ -380,36 +380,24 @@ public class MapPanel extends JPanel {
 		g.setColor(co);
 	}
 	
+	/**
+	 * Draws a fixed size circle at some point.
+	 * @param lon The longitude of the point
+	 * @param lat The latitude of the point
+	 * @param c Color to draw the point
+	 * @param r Radius of the fixed size circle to draw at the point
+	 * @param g The graphics object
+	 */
+	private void drawPoint(double lon, double lat, Color c, int r, Graphics g) {
+		Color oc = g.getColor();	// The original color
+		g.setColor(c);
+		g.fillOval(lonToScreen(lon-r, lat), latToScreen(lat-r), 2*r+1, 2*r+1);
+		g.setColor(oc);
+	}
+	
 	public void setDirections(List<GraphEdge> edges) {
 		directions = edges;
 		repaint();
-	}
-	
-	/**
-	 * Highlights a given way.
-	 * @param way The Way to be highlighted.
-	 */
-	public void highlightWay(Way way, Graphics g) {
-		Color currentColor = g.getColor();
-		g.setColor(Color.cyan);
-		drawWay(way, g);
-		g.setColor(currentColor);
-	}
-	
-	/**
-	 * Highlights all ways for a given iterator.
-	 * I implemented this becauaes it seemed like a waste to constantly
-	 * get and reset the color and stroke for a larg set.
-	 * @param it
-	 * @param g
-	 */
-	public void highlightWays(Iterator<Way> it, Color c, Graphics g) {
-		Color currentColor = g.getColor();
-		g.setColor(c);
-		while(it.hasNext()) {
-			drawWay(it.next(), g);
-		}
-		g.setColor(currentColor);
 	}
 	
 	/**
@@ -448,31 +436,6 @@ public class MapPanel extends JPanel {
 	 */
 	private double screenToLon(int x, int y) {
 		return cenLon+scale.pixelsToLon(x-getWidth()/2, screenToLat(y));
-	}
-	
-	/**
-	 * Pops the currently selected node and sets selectedNode to null.
-	 * @return selectedNode.
-	 */
-	public GraphNode getSelectedNode() {
-		GraphNode rtrnNode = selectedNode;
-		return rtrnNode;
-	}
-	
-	/**
-	 * Adds a node to the set of highlighted nodes.
-	 * @param n THe node to be highlighted.
-	 */
-	public void addHighlightedNode(Node n) {
-		highlightedNodes.add(n);
-	}
-	
-	/**
-	 * Removes a node from the set of highlighted nodes.
-	 * @param n The node to be unhighlighted.
-	 */
-	public void removeHighlightedNode(Node n) {
-		highlightedNodes.remove(n);
 	}
 	
 	public void setDriver(double lon, double lat) {
