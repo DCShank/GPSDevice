@@ -60,5 +60,7 @@ public interface ScaleStrategy {
 	 * @param height The height of the window to be initialized for
 	 */
 	public void initZoom(double latMin, double latMax, int height);
+	
+	double getZoom();
 
 }

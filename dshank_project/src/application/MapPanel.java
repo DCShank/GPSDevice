@@ -30,6 +30,10 @@ import map_data.Way;
  * @author david
  */
 public class MapPanel extends JPanel {
+	
+	private BasicStroke least,low,med,high,most;
+	private static final double PRI_CONST = .000075;
+	
 	/** The map data to be represented */
 	private Map map;
 	/** The latitude displayed in the center of the display */
@@ -65,8 +69,6 @@ public class MapPanel extends JPanel {
 	
 	private HashSet<Node> tempNodes;
 	
-	private double testHeading = 0;
-	
 	private Double driverLon = null;
 	private Double driverLat = null;
 	private boolean trackPos = false;
@@ -87,6 +89,8 @@ public class MapPanel extends JPanel {
 		directions = null;
 		currentRad = strat.getDistance(0, 0, scale.pixelsToLon(PIX_TO_CUR,PIX_TO_CUR),
 				scale.pixelsToLat(PIX_TO_CUR));
+		
+		updateStrokes();
 		
 		this.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 		initMouse();
@@ -149,6 +153,7 @@ public class MapPanel extends JPanel {
 				} else {
 					scale.zoom(-e.getWheelRotation());
 				}
+				updateStrokes();
 				setCenter(cenLon, cenLat);
 				currentRad = strat.getDistance(0, 0, scale.pixelsToLon(PIX_TO_CUR,PIX_TO_CUR),
 						scale.pixelsToLat(PIX_TO_CUR));
@@ -231,10 +236,6 @@ public class MapPanel extends JPanel {
 		cenLon = scale.pixelsToLon(cenLonPix, cenLatPix);
 	}
 	
-	public void setHighlightedWays(Set<Way> highlightedWays) {
-		
-	}
-	
 	/**
 	 * Draws the map.
 	 * This includes drawing all ways, and highlighting ways of importance.
@@ -242,37 +243,63 @@ public class MapPanel extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		Graphics2D g2 = (Graphics2D) g;
 		Color c = g.getColor();
 		g.setColor(Color.WHITE);
-		Iterator<Way> wayIt = map.getWayIt();
+		Iterator<Way> wayIt = map.getNonRoadIt();
+		g.setColor(Color.LIGHT_GRAY);
 		while(wayIt.hasNext()) {
 			Way w = wayIt.next();
-			if(!w.isRoad()) {
-				drawWay(w, g);
-			} else {
-				highlightWay(w, g);
+			drawWay(w, g);
+		}
+		g.setColor(c);
+		wayIt = map.getPrioritizedWayIt();
+		while(wayIt.hasNext()) {
+			Way w = wayIt.next();
+			int priority = map.roadToInt(w.getType());
+			switch (priority) {
+			case 0: g2.setStroke(least);
+			g.setColor(Color.getHSBColor(64,0,50));
+			break;
+			case 1: g2.setStroke(low);
+			g.setColor(Color.YELLOW);
+			break;
+			case 2: g2.setStroke(med);
+			g.setColor(Color.YELLOW);
+			break;
+			case 3: g2.setStroke(high);
+			g.setColor(Color.ORANGE);
+			break;
+			case 4: g2.setStroke(most);
+			g.setColor(Color.RED);
+			break;
+			default: g2.setStroke(new BasicStroke(1));
+			break;
 			}
+			drawWay(w, g);
 		}
 		g.setColor(c);
 		for(Node n : highlightedNodes) {
-			drawNode(n, Color.BLUE, g);
+			drawNode(n, Color.BLUE, 4, g);
 		}
 		for(Node n : tempNodes) {
-			drawNode(n, Color.GREEN, g);
+			drawNode(n, Color.GREEN, 4, g);
 		}
 		if(hoveredNode != null)
-			drawNode(hoveredNode, Color.ORANGE, g);
+			drawNode(hoveredNode, Color.CYAN, 5, g);
 		if(selectedNode != null)
-			drawNode(selectedNode, Color.MAGENTA, g);
-		if(directions != null)
-			drawEdges(directions, Color.RED, g);
+			drawNode(selectedNode, Color.MAGENTA, 4, g);
+		if(directions != null) {
+			g2.setStroke(high);
+			drawEdges(directions, Color.MAGENTA, g);
+			g2.setStroke(new BasicStroke(1));
+		}
 		if(start != null)
-			drawNode(start, Color.PINK, g);
+			drawNode(start, Color.PINK, 5, g);
 		if(end != null)
-			drawNode(end, Color.RED, g);
+			drawNode(end, Color.RED, 5, g);
 		if(driverLon != null && driverLat != null) {
-			g.setColor(Color.WHITE);
-			g.fillOval(lonToScreen(driverLon, driverLat)-4, latToScreen(driverLat)-4, 9, 9);
+			drawPosition(driverLon, driverLat, Color.GREEN, 7, g);
 			
 		}
 		g.setColor(c);
@@ -323,11 +350,20 @@ public class MapPanel extends JPanel {
 		g.setColor(currColor);
 	}
 	
-	private void drawNode(Node n, Color c, Graphics g) {
+	private void drawNode(Node n, Color c, int radius, Graphics g) {
 		Color c2 = g.getColor();
 		g.setColor(c);
-		g.fillOval(lonToScreen(n.getLon(), n.getLat())-3, latToScreen(n.getLat())-3, 7, 7);
+		int r = (int)(radius * PRI_CONST * scale.getZoom());
+		g.fillOval(lonToScreen(n.getLon(), n.getLat())-r, latToScreen(n.getLat())-r, 2*r+1, 2*r+1);
 		g.setColor(c2);
+	}
+	
+	private void drawPosition(double lon, double lat, Color c, int radius, Graphics g) {
+		Color co = g.getColor();
+		g.setColor(c);
+		int r = (int) (radius * PRI_CONST * scale.getZoom());
+		g.fillOval(lonToScreen(lon, lat)-r, latToScreen(lat)-r, 2*r+1, 2*r+1);
+		g.setColor(co);
 	}
 	
 	public void setDirections(List<GraphEdge> edges) {
@@ -472,5 +508,16 @@ public class MapPanel extends JPanel {
 			return hasMoved;
 		}
 		
+	}
+	
+	private void updateStrokes() {
+		float zoomVal = (float) (PRI_CONST * scale.getZoom());repaint();
+		int cr = BasicStroke.CAP_ROUND;
+		int jr = BasicStroke.JOIN_ROUND;
+		most = new BasicStroke(3 * zoomVal, cr, jr);
+		high = new BasicStroke((float)(2.25 * zoomVal), cr, jr);
+		med = new BasicStroke((float)(1.75 * zoomVal), cr, jr);
+		low = new BasicStroke((float)(1.25 * zoomVal), cr, jr);
+		least = new BasicStroke(zoomVal, cr, jr);
 	}
 }

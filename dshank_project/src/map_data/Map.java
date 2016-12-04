@@ -2,9 +2,11 @@ package map_data;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Set;
 
 import graph_interfaces.Graph;
@@ -29,6 +31,8 @@ public class Map implements Graph {
 	private HashMap<String,Way> roadWays;
 	
 	private HashMap<String,Way> nonRoadWays;
+	
+	private ArrayList<Way> prioritizedWays;
 	
 	private Set<RoadSegment> segments = new HashSet<RoadSegment>();
 	
@@ -64,6 +68,15 @@ public class Map implements Graph {
 		this.namedWays = namedWays;
 		this.roadWays = roadWays;
 		this.nonRoadWays = nonRoadWays;
+		prioritizedWays = new ArrayList<Way>(roadWays.values());
+		prioritizedWays.sort(new Comparator<Way>() {
+
+			@Override
+			public int compare(Way o1, Way o2) {
+				return roadToInt(o1.getType()).compareTo(roadToInt(o2.getType()));
+			}
+			
+		});
 		edgeInit();
 		segmentInit();
 	}
@@ -328,5 +341,34 @@ public class Map implements Graph {
 	 */
 	public Iterator<GraphNode> getNodeIterator() {
 		return new HashSet<GraphNode>(roadNodes).iterator();
+	}
+	
+	public Iterator<Way> getPrioritizedWayIt() {
+		return prioritizedWays.iterator();
+	}
+	/**
+	 * Returns an integer priority for a given road type.
+	 * I don't quite follow the osm guidelines for this. They seemed to have more variation
+	 * than I desired.
+	 * @param s The string representing the road type
+	 * @return An integer value for the priority
+	 */
+	public Integer roadToInt(String s) {
+		if(s.equals("motorway") || s.equals("motorway_link"))
+			return 4;
+		if(s.equals("trunk") || s.equals("trunk_link"))
+			return 3;
+		if(s.equals("primary") || s.equals("primary_link"))
+			return 2;
+		if(s.equals("tertiary") || s.equals("secondary") || s.equals("tertiary_link")
+				|| s.equals("secondary_link"))
+			return 1;
+		if(s.equals("residential") || s.equals("unclassified") || s.equals("service"))
+			return 0;
+		return -1;
+	}
+	
+	public Iterator<Way> getNonRoadIt() {
+		return nonRoadWays.values().iterator();
 	}
 }

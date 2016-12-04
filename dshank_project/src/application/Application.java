@@ -428,6 +428,7 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 		trackPos.setEnabled(prevEvent != null);
 		driveThere.setEnabled(dir.getEndNode() != null && prevEvent != null);
 		getDir.setEnabled(dir.getStartNode() != null && dir.getEndNode() != null && !driveThere.isSelected());
-		
+
+		mapPanel.repaint();
 	}
 }

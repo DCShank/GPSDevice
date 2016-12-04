@@ -138,6 +138,10 @@ public class Way {
 		return rtrnNode;
 	}
 	
+	public String getType() {
+		return roadType;
+	}
+	
 	@Override
 	public boolean equals(Object other) {
 		if(other == null) { return false; }

@@ -116,5 +116,9 @@ public class MapScale implements ScaleStrategy{
 		double dl = Math.abs(latMax-latMin);
 		zoom = ((double)height)/dl;
 	}
+	
+	public double getZoom() {
+		return zoom;
+	}
 
 }
