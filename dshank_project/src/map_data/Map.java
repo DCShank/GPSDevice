@@ -154,12 +154,17 @@ public class Map implements Graph {
 				angleNode += 360;
 			}
 		}
-		System.out.println(angleNode + " Angle Node");
-		System.out.println(angleMax + " Angle Max");
-		System.out.println(angleMin + " Angle Min\n");
 		return ((angleNode < angleMax) && (angleNode > angleMin));
 	}
 	
+	/**
+	 * Determines if a node is contained by a circle.
+	 * @param lon Longitude of the circles center
+	 * @param lat Latitude of the circles center
+	 * @param radius Radius of th ecircle
+	 * @param node The node to be checked
+	 * @return True if the node is contained by the circle, false otherwise.
+	 */
 	public boolean inCircle(double lon, double lat, double radius, Node node) {
 		if(strat.getDistance(lon, lat, node.getLon(), node.getLat()) > radius) { return false; }
 		return true;
@@ -198,6 +203,9 @@ public class Map implements Graph {
 	 * 		I -> E, I -> I, I -> D.
 	 * In conclusion, segments can go from a the start of a way or an intersection to the
 	 * an intersection, or the end of a way, or a dead end.
+	 * 
+	 * Intersections can also occur when a one way street intersects a two way street, thus
+	 * we need to be careful to check both in degree and out degree.
 	 */
 	private void segmentInit() {
 		Iterator<Way> wayIt = roadWays.values().iterator();

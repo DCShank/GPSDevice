@@ -9,6 +9,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -45,7 +46,7 @@ public class MapPanel extends JPanel {
 	
 	/** Strokes for drawing map elements with varying priority. */
 	private BasicStroke least,low,med,high,most;
-	/** Constant for scaling drawn items on the map. Could probably be moved to the scale object. */
+	/** Constant for scaling drawn items on the map. Should probably be moved to the scale object. */
 	private static final double PRI_CONST = .000075;
 	
 	/** The map data to be represented */
@@ -201,7 +202,9 @@ public class MapPanel extends JPanel {
 	public void zoomToPosition(int lonPix, int latPix, int direction) {
 		double oldLat = screenToLat(latPix);
 		double oldLon = screenToLon(lonPix, latPix);
+		
 		scale.zoom(direction);
+		
 		double newLat = screenToLat(latPix);
 		double newLon = screenToLon(lonPix, latPix);
 		double latChange = newLat-oldLat;
@@ -230,24 +233,19 @@ public class MapPanel extends JPanel {
 	}
 	
 	/**
-	 * Draws the map.
-	 * This includes drawing all ways, and highlighting ways of importance.
+	 * Draws the map. each way is drawn with a color and stroke based
+	 * on its priority. Point objets are mostly drawn with a minimum size
+	 * and that scales past a certain point.
 	 */
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		
 		Graphics2D g2 = (Graphics2D) g;
 		Color c = g.getColor();
-//		g.setColor(Color.WHITE);
-//		Iterator<Way> wayIt = map.getNonRoadIt();
-//		g.setColor(Color.LIGHT_GRAY);
-//		while(wayIt.hasNext()) {
-//			Way w = wayIt.next();
-//			drawWay(w, g);
-//		}
-//		g.setColor(c);
-		Iterator<Way> wayIt;
-		wayIt = map.getPrioritizedWayIt();
+		
+		// Draws all the different ways based on their priority.
+		Iterator<Way> wayIt = map.getPrioritizedWayIt();
 		while(wayIt.hasNext()) {
 			Way w = wayIt.next();
 			int priority = map.wayToPri(w);
@@ -282,15 +280,17 @@ public class MapPanel extends JPanel {
 			}
 			drawWay(w, g);
 		}
-		g.setColor(c);
+		
 		if(directions != null) {
 			g2.setStroke(most);
 			drawEdges(directions, Color.MAGENTA, g);
 			g2.setStroke(new BasicStroke(1));
 		}
+		
+		// For many point objects I wanted to draw them with a minimum size.
 		if(start != null) {
 			drawNodeFixedSize(start, Color.MAGENTA, 3, g);	// Minimum size if we're zoomed out
-			drawNode(start, Color.MAGENTA, 3, g);
+			drawNode(start, Color.MAGENTA, 3, g);			// Size if we're zoomed in.
 		} if(end != null) {
 			drawNodeFixedSize(end, Color.RED, 3, g);
 			drawNode(end, Color.RED, 3, g);
@@ -301,6 +301,7 @@ public class MapPanel extends JPanel {
 			drawPoint(driverLon, driverLat, Color.GREEN, 4, g);
 			drawPosition(driverLon, driverLat, Color.GREEN, 5, g);
 		}
+		// Reset the color.
 		g.setColor(c);
 			
 	}
@@ -327,6 +328,11 @@ public class MapPanel extends JPanel {
 		}
 	}
 	
+	/**
+	 * Draws an edge from one point to another.
+	 * @param e The edge to draw
+	 * @param g Graphics object
+	 */
 	private void drawEdge(GraphEdge e, Graphics g) {
 		Node prevNode = (Node) e.getStartNode();
 		Node curNode = (Node) e.getEndNode();
@@ -340,7 +346,13 @@ public class MapPanel extends JPanel {
 		g.drawLine(prevX, prevY, curX, curY);
 	}
 	
-	private void drawEdges(List<GraphEdge> edges, Color c, Graphics g) {
+	/**
+	 * Draws a collection of edges.
+	 * @param edges
+	 * @param c
+	 * @param g
+	 */
+	private void drawEdges(Collection<GraphEdge> edges, Color c, Graphics g) {
 		Color currColor = g.getColor();
 		g.setColor(c);
 		for(GraphEdge e : edges) {
@@ -349,6 +361,13 @@ public class MapPanel extends JPanel {
 		g.setColor(currColor);
 	}
 	
+	/**
+	 * Draws a node that scales with the zoom level.
+	 * @param n The node to be drawn
+	 * @param c The color of the node
+	 * @param radius An arbitrary radius value to scale by
+	 * @param g The graphics object
+	 */
 	private void drawNode(Node n, Color c, int radius, Graphics g) {
 		Color c2 = g.getColor();
 		g.setColor(c);
@@ -357,6 +376,13 @@ public class MapPanel extends JPanel {
 		g.setColor(c2);
 	}
 	
+	/**
+	 * Draws a fixed size node
+	 * @param n The node to be drawn
+	 * @param c The color of the node
+	 * @param r The radius in pixels of the circle to be drawn
+	 * @param g The graphics object
+	 */
 	private void drawNodeFixedSize(Node n, Color c, int r, Graphics g) {
 		Color c2 = g.getColor();
 		g.setColor(c);
@@ -438,26 +464,49 @@ public class MapPanel extends JPanel {
 		return cenLon+scale.pixelsToLon(x-getWidth()/2, screenToLat(y));
 	}
 	
+	/**
+	 * Sets the position of the driver in latitude and longitude
+	 * @param lon Longitude of the driver
+	 * @param lat Latitude of hte driver
+	 */
 	public void setDriver(double lon, double lat) {
 		driverLon = lon;
 		driverLat = lat;
 	}
 	
+	/**
+	 * Sets whether we are tracking position
+	 * @param track True if we are tracking, false otherwise
+	 */
 	public void setTrackPos(boolean track) {
 		trackPos = track;
 	}
 	
+	/**
+	 * Sets the start node
+	 * @param s The start node
+	 */
 	public void setStart(Node s) {
 		start = s;
 	}
+	/**
+	 * Sets the end node
+	 * @param e The end node
+	 */
 	public void setEnd(Node e) {
 		end = e;
 	}
-	
+	/**
+	 * Adds an event listener for events from the map panel
+	 * @param l The listener to be added
+	 */
 	public void addListener(MapPanelListener l) {
 		listeners.add(l);
 	}
-	
+	/**
+	 * Updates the listeners with a new event
+	 * @param movedMap True if the map has been panned, false otherwise
+	 */
 	private void updateListeners(boolean movedMap) {
 		UpdateEvent e = new UpdateEvent();
 		e.hasMoved = movedMap;
@@ -465,7 +514,11 @@ public class MapPanel extends JPanel {
 			l.processEvent(e);
 		}
 	}
-	
+	/**
+	 * Class describing map panel events.
+	 * @author david
+	 *
+	 */
 	class UpdateEvent implements MapPanelEvent {
 		
 		private boolean hasMoved = false;
@@ -474,12 +527,10 @@ public class MapPanel extends JPanel {
 		public Node getStartNode() {
 			return start;
 		}
-
 		@Override
 		public Node getEndNode() {
 			return end;
 		}
-
 		@Override
 		public boolean movedMap() {
 			return hasMoved;
@@ -487,6 +538,13 @@ public class MapPanel extends JPanel {
 		
 	}
 	
+	/**
+	 * Updates all the strokes for the different priority ways.
+	 * 
+	 * I do this because I'm unsure if java would handle making a new
+	 * stroke every time I go through a case statement smartly.
+	 * This way it only has to update them when I zoom in.
+	 */
 	private void updateStrokes() {
 		float zoomVal = (float) (PRI_CONST * scale.getZoom());repaint();
 		int cr = BasicStroke.CAP_ROUND;

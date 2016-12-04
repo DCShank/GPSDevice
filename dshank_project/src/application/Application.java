@@ -69,17 +69,21 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 		setPreferredSize(new Dimension(MapPanel.DEFAULT_WIDTH, MapPanel.DEFAULT_HEIGHT));
 		Container content = getContentPane();
 		content.setLayout(new BorderLayout());
+		
 		createMenuBar();
-		dirDisplay = new JTextArea(20,25);
 		ButtonPanel buttons = new ButtonPanel();
+		dirDisplay = new JTextArea(20,25);
+		
 		messageDisplay = new JLabel();
 		messageDisplay.setHorizontalAlignment(JLabel.CENTER);
 		messageDisplay.setFont(messageDisplay.getFont().deriveFont(20f));
 		messageDisplay.setText("Lest click to select the start node, right click to select the end node.");
 		messageDisplay.setToolTipText("Displays system updates.");
+		
 		content.add(buttons, BorderLayout.NORTH);
 		content.add(messageDisplay, BorderLayout.SOUTH);
 		content.add(dirDisplay, BorderLayout.EAST);
+		
 		pack();
 		setVisible(true);
 	}
@@ -131,7 +135,7 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 	}
 
 	/**
-	 * Main method for initialzing the program. Takes an OSM file as the
+	 * Main method for initializing the program. Takes an OSM file as the
 	 * argument.
 	 * 
 	 * @param args
@@ -148,34 +152,32 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 	}
 
 	/**
-	 * A panel that holds all the buttons used by the application. Currently
-	 * holds select start and end nodes
-	 * 
-	 * In the future will have buttons for getting directions and activating the
-	 * gps.
-	 * 
+	 * A panel that holds all the buttons used by the application.
+	 * Some of the buttons are referenced outside of the scope of the panel, and
+	 * are thus made instance variables of the Application instead.
 	 * @author david
 	 *
 	 */
 	class ButtonPanel extends JPanel {
-		JButton selStart;
-		JButton selEnd;
 //		JButton getDir;
 		JButton clearDir;
 //		JToggleButton trackPos;
 //		JToggleButton driveThere;
 		
-
+		/**
+		 * Initializes the button panel.
+		 */
 		public ButtonPanel() {
 			ActionListener buttonPanelListener = new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					// Gets directions from start to end.
 					if (e.getActionCommand().equals("directions")) {
 						SwingWorker<List<GraphEdge>, Object> task = new DirectionFinder();
 						task.execute();
 					}
+					// Clears all the current selections.
 					if (e.getActionCommand().equals("clear")) {
-						selStart.setEnabled(true);
 						getDir.setEnabled(false);
 						driveThere.setEnabled(true);
 						driveThere.setSelected(false);
@@ -187,6 +189,8 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 						updateAppState();
 						messageDisplay.setText("All selections have been cleared.");
 					}
+					// If we select drive there, set the state of everything to driving.
+					// Unless we can't enter driver there mode.
 					if (e.getActionCommand().equals("drive")) {
 						if(driveThere.isSelected()) {
 							if(prevEvent != null) {
@@ -201,10 +205,10 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 								driveThere.setSelected(false);
 							}
 						} else {
-							selStart.setEnabled(true);
 							messageDisplay.setText("Drive there mode disabled.");
 						}
 					}
+					// If we select the track button, set the state of the map panel to tracking.
 					if (e.getActionCommand().equals("track")) {
 						mapPanel.setTrackPos(trackPos.isSelected());
 						if(trackPos.isSelected()) {
@@ -214,14 +218,6 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 					}
 				}
 			};
-			// Init the sel start node button
-			selStart = new JButton("Select start");
-			selStart.setActionCommand("start");
-			selStart.addActionListener(buttonPanelListener);
-			// Init the sel end node button
-			selEnd = new JButton("Select end");
-			selEnd.setActionCommand("end");
-			selEnd.addActionListener(buttonPanelListener);
 			// Init the get directions button
 			getDir = new JButton("Get directions");
 			getDir.setActionCommand("directions");
@@ -299,10 +295,6 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 		}
 		@Override
 		protected List<GraphEdge> doInBackground() throws Exception {
-			double newHead = event.getHeading() + 90;
-//			if(newHead > 180) {
-//				newHead = (newHead-180)*-1;
-//			}
 			return dir.updateDirections(event.getLatitude(), event.getLongitude(), event.getHeading());
 		}
 		@Override
@@ -341,8 +333,7 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 		protected Map doInBackground() throws Exception {
 			
 			prsr = new OSMParser(file);
-			prsr.parse();
-			map = prsr.getMap();
+			map = prsr.parse();
 			if (gps != null) {
 				gps.removeGPSListener(Application.this);
 				gps = null;
@@ -418,7 +409,7 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 	}
 	
 	/**
-	 * Updates the general state of the application. Primarily affects the various buttons.
+	 * Updates the general state of the application to be consistent. Generally useful for buttons.
 	 */
 	public void updateAppState() {
 		if(dir.getEndNode() == null) {

@@ -3,7 +3,8 @@ package application;
 import map_data.Node;
 
 /**
- * Interface for processing events from the mapPanel.
+ * Interface for events from the map panel.
+ * Describes what information is provided to the listener.
  * @author david
  *
  */

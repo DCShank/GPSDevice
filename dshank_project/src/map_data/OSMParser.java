@@ -47,11 +47,10 @@ public class OSMParser {
 	}
 	
 	/**
-	 * Parses the OSM file.
-	 * I'm going to be completely honest when I say that this is mostly
-	 * copied from the original OSMParser provided.
+	 * Parses the OSM file and returns the map represented by that data.
+	 * @return The Map representing the map data.
 	 */
-	public void parse() throws IOException, ParserConfigurationException, SAXException {
+	public Map parse() throws IOException, ParserConfigurationException, SAXException {
 		SAXParserFactory spf = SAXParserFactory.newInstance();
 		SAXParser saxParser = spf.newSAXParser();
 		XMLReader xmlReader = saxParser.getXMLReader();
@@ -68,6 +67,7 @@ public class OSMParser {
 			if (stream != null)
 				stream.close();
 		}
+		return getMap();
 	}
 	
 	/**
@@ -76,25 +76,9 @@ public class OSMParser {
 	 * @precondition Parse must be called on a parseable file before this is called.
 	 * @return A Graph containing all the parsed data.
 	 */
-	public Map getMap() {
+	private Map getMap() {
 		Map map = new Map(minLon, minLat, maxLon, maxLat, nodes, ways, roadWays);
 		return map;
-	}
-	
-	/**
-	 * Returns the HashMap containiing all the nodes.
-	 * @return The nodes HashMap
-	 */
-	public HashMap<String,Node> getNodes() {
-		return nodes;
-	}
-	
-	/**
-	 * Returns the Hashmap containing all the ways.
-	 * @return The ways HashMap
-	 */
-	public HashMap<String,Way> getWays() {
-		return ways;
 	}
 	
 	class OSMHandler extends DefaultHandler {
@@ -107,6 +91,7 @@ public class OSMParser {
 		private String name = "";
 		/** Stores whether or not a way is one way. */
 		private boolean oneway = false;
+		/** Stores all the tags for the way currently being parsed */
 		private HashMap<String, String> wayTags = new HashMap<String,String>();
 
 		/**
@@ -237,8 +222,8 @@ public class OSMParser {
 		}
 		
 		/**
-		 * Parses a tag for a way and if it's a useful tag extracts its data.
-		 * Tags that are useful in this case are highways and names.
+		 * Parses a tag and stores the data in the wayTags map.
+		 * If the tag makes the way one way updates that field.
 		 * @param atts
 		 */
 		private void parseWayTag(Attributes atts) {

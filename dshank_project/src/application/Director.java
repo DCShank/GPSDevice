@@ -30,7 +30,13 @@ import map_data.RoadSegment;
  */
 public class Director {
 	
+	/**
+	 * Default angle to search for the next node in the route in.
+	 */
 	public static final double DEFAULT_ANGLE = 120;
+	/**
+	 * Default radius to search for the next node in the route in.
+	 */
 	public static final double DEFAULT_RADIUS = 40;
 	private final Map map;
 	/** A list of edges to follow to reach a destination */
@@ -49,7 +55,7 @@ public class Director {
 	private GraphNode startNode;
 	
 	private GraphNode endNode;
-	
+	/** Temporary segments used to simplify shortest path finding. */
 	private Set<GraphSegment> tempSegments;
 	
 	public Director(Map m) {
@@ -159,20 +165,18 @@ public class Director {
 		HashMap<GraphNode, GraphSegment> predSegs = new HashMap<GraphNode, GraphSegment>(8192);
 		HashSet<GraphNode> visited = new HashSet<GraphNode>(8192);
 		HashMap<GraphNode, Double> distances = new HashMap<GraphNode, Double>(8192);
+		// Comparator that compares the distances of nodes.
 		Comparator<GraphNode> distComp = new Comparator<GraphNode>() {
 			@Override
 			public int compare(GraphNode o1, GraphNode o2) {
 				return distances.get(o1).compareTo(distances.get(o2));
-//				if(distances.get(o1) < distances.get(o2)) { return -1; }
-//				if(distances.get(o1) > distances.get(o2)) { return 1; }
-//				return 0;
 			}
 		};
 		// I found a paper (from stony brook!) that claimed that just using an ordinary
-		// priority queue was actually more efficient than a decPriority queue.
+		// priority queue was actually more slightly more efficient than a decPriority queue.
 		// http://www3.cs.stonybrook.edu/~rezaul/papers/TR-07-54.pdf
-		// Really fascinating. This works by simply adding something again if the distance
-		// decreases.
+		// Really cool, although I admit I only skimmed it. This works by simply adding something 
+		// again if the distance decreases.
 		PriorityQueue<GraphNode> distQueue = new PriorityQueue<GraphNode>(distComp);
 		distances.put(startNode, 0.0);
 		distQueue.add(startNode);
@@ -182,7 +186,7 @@ public class Director {
 		
 		while(!visited.contains(endNode)) {
 			// The index of the next node to visit
-			GraphNode visitNext = leastDistIndex(visited, distQueue);
+			GraphNode visitNext = getVisitNext(visited, distQueue);
 			if(visitNext == null) {
 				return null;
 			}
@@ -212,7 +216,14 @@ public class Director {
 		
 	}
 	
-	private GraphNode leastDistIndex(Set<GraphNode> visited, PriorityQueue<GraphNode> distQueue) {
+	/**
+	 * Finds the next node to visit.
+	 * If there are no nodes to visit it probably returns null.
+	 * @param visited The set of visted nodes.
+	 * @param distQueue The queue to search through
+	 * @return The next node to visit if one exists, null otherwise.
+	 */
+	private GraphNode getVisitNext(Set<GraphNode> visited, PriorityQueue<GraphNode> distQueue) {
 		GraphNode nextNode = distQueue.poll();
 		while(visited.contains(nextNode) && nextNode != null) {
 			nextNode = distQueue.poll();
@@ -243,26 +254,31 @@ public class Director {
 		}
 	}
 	
+	/**
+	 * Similar to splitStartSegment but it splits the end segment.
+	 * Used for spltting the segment of the end node when it doesn't start
+	 * on an intersection.
+	 * @precondition endNode must not be on an intersection.
+	 */
 	private void splitEndSegment() {
 		Iterator<GraphSegment> sIt = map.getSegmentIterator();
 		Set<GraphSegment> tempSegs = new HashSet<GraphSegment>();
-//		System.out.println("Split End");
 		while(sIt.hasNext()) {
 			GraphSegment s = sIt.next();
 			if(s.hasNode(endNode)) {
-//				System.out.println(s.toString());
 				GraphSegment tempSeg = s.getPreSubsegment(endNode);
 				tempSegs.add(tempSeg);
-//				System.out.println(tempSeg.toString());
 			}
 		}
-		// This is necessary because you can't add things to map while iterating.
 		tempSegments.addAll(tempSegs);
 		for(GraphSegment seg : tempSegs) {
 			map.addSegment(seg);
 		}
 	}
 	
+	/**
+	 * clears temp segments cleanly.
+	 */
 	private void clearTempSegments() {
 		for(GraphSegment s : tempSegments) {
 			map.removeSegment(s);
@@ -270,6 +286,11 @@ public class Director {
 		tempSegments = new HashSet<GraphSegment>();
 	}
 	
+	/**
+	 * Returns a list of edges that represent the directions.
+	 * @param predSegs The predecessor map.
+	 * @return List of directions.
+	 */
 	private List<GraphEdge> extractDirections(HashMap<GraphNode, GraphSegment> predSegs) {
 		LinkedList<GraphSegment> dirSegList = new LinkedList<GraphSegment>();
 		GraphNode currNode = endNode;
@@ -357,6 +378,9 @@ public class Director {
 		return calcDir();
 	}
 	
+	/**
+	 * Clears the directions.
+	 */
 	public void clearDirections() {
 		startNode = null;
 		endNode = null;

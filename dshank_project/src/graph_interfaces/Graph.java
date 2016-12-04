@@ -4,9 +4,13 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * An interface that defines the behavior of an aggregator for the graph like objects in this project.
+ * An interface that defines the behavior of a graph.
+ * A graph should be expected to have nodes, edges, and segments.
+ * 
+ * I'm not happy with the way this turned out. I should have made the graph class more important
+ * and had the various graph object be immutable.
+ * 
  * @author david
- *
  */
 public interface Graph {
 	/**

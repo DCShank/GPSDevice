@@ -11,6 +11,8 @@ import java.util.List;
  * Ways tend to be roads, geographic features, buildings, and pretty much anything
  * made up of lines.
  * 
+ * Ways have a map of their tags.
+ * 
  * @author david
  *
  */
@@ -108,27 +110,6 @@ public class Way {
 	}
 	
 	/**
-	 * Returns the node nearest to the specified coordinates on this way.
-	 * @param lon The longitude of the point to search for a node near to
-	 * @param lat The latitude of the point to search for a node near to
-	 * @return
-	 */
-	public Node getNearestNode(double lon, double lat, DistanceStrategy strat) {
-		Iterator<Node> it = nodes.iterator();
-		Node rtrnNode = it.next();
-		double dist = strat.getDistance(lon, lat, rtrnNode.getLon(), rtrnNode.getLat());
-		while(it.hasNext()) {
-			Node n = it.next();
-			double testDist = strat.getDistance(lon, lat, n.getLon(), n.getLat());
-			if(testDist < dist) {
-				rtrnNode = n;
-				dist = testDist;
-			}
-		}
-		return rtrnNode;
-	}
-	
-	/**
 	 * Convenience method for getting the highway tag.
 	 * @return The highway type of this way.
 	 */
@@ -138,6 +119,11 @@ public class Way {
 		return rtrn;
 	}
 	
+	/**
+	 * Returns the value for a given tag for this way.
+	 * @param tag The tage to get the value of
+	 * @return The value of the tag
+	 */
 	public String getTagVal(String tag) {
 		return tags.get(tag);
 	}
