@@ -111,14 +111,6 @@ public class Map implements Graph {
 		return ways.values().iterator();
 	}
 	
-//	/**
-//	 * Gives an iterator over the drivable road ways.
-//	 * @return An Iterator<Way> of the road ways in the map.
-//	 */
-//	public Iterator<Way> getRoadIt() {
-//		return roadWays.values().iterator();
-//	}
-	
 	/**
 	 * Determines if a node is within a "circular wedge" with some start position,
 	 * heading, angle, and radius. A circular wedge is a section of a circle from the center
@@ -129,35 +121,42 @@ public class Map implements Graph {
 	 * @param lon The initial longitude of the circular segment.
 	 * @param lat The initial latitude of the circular segment.
 	 * @param theta	 The angle Theta of the circular segment.
-	 * @param phi The angle counterclockwise from east of the center of the wedge.
+	 * @param phi The angle clockwise from north of the center of the wedge.
 	 * @param radius The radius of the circular segment.
 	 * @param n The node that's being checked.
 	 * @return True if the node is in the circular segment, false otherwise.
 	 */
 	public boolean inCircularWedge(double lon, double lat, double theta, double phi,
 										double radius, Node node) {
-		// Return false if the node is outside the possible range of the circular segment.
-//		System.out.println(!(strat.getDistance(lon, lat, n.getLon(), n.getLat()) > radius));
-//		System.out.println(n.getLon() + " " + n.getLat() + "\n");
 		if(strat.getDistance(lon, lat, node.getLon(), node.getLat()) > radius) { return false; }
 		
 		double angleMin = phi - theta/2;
 		while(angleMin > 180) {
 			angleMin -= 360;
 		}
+		// Angle min is now an angle between -180 and 180
 		double angleMax = phi + theta/2;
 		while(angleMax > 180) {
 			angleMax -= 360;
 		}
-		double angleNode = Math.toDegrees(Math.atan2(node.getLat()-lat, node.getLon()-lon));
-//		System.out.println(angleNode + " Angle Node");
-//		System.out.println(angleMax + " Angle Max");
-//		System.out.println(angleMin + " Angle Min");
-		// This works somehow. Bad practice to leave in code found by trial and error but hey.
-		// This case only happens at around 180 degrees.
-		if(angleMin > angleMax) {
-			return !((angleNode > angleMax) && (angleNode < angleMin));
+		// Angle max is now between -180 and 180
+		// If angle min > angle max, then you need to be careful
+		double angleNode = Math.toDegrees(Math.atan2(node.getLon()-lon, node.getLat()-lat));
+		if(node.getLon() - lon < 0 && node.getLat() - lat < 0) {
+			angleNode *= -1;
 		}
+		angleNode *= -1;
+		if(angleMin > angleMax) {
+			// If max < min, we're on the border of the third and fourth quadrants.
+			angleMax += 360;
+			if(angleNode < 0) {
+				// We may need to do this
+				angleNode += 360;
+			}
+		}
+		System.out.println(angleNode + " Angle Node");
+		System.out.println(angleMax + " Angle Max");
+		System.out.println(angleMin + " Angle Min\n");
 		return ((angleNode < angleMax) && (angleNode > angleMin));
 	}
 	

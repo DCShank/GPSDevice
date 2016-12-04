@@ -110,6 +110,7 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 		// The action listener displays a file chooser dialog and lets display a
 		// new file.
 		loadMap.addActionListener(new ActionListener() {
+			@SuppressWarnings("static-access")
 			public void actionPerformed(ActionEvent arg0) {
 				int chooseVal = fc.showOpenDialog(Application.this);
 				if (chooseVal == fc.APPROVE_OPTION) {
@@ -245,8 +246,6 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 			// Set up the button panel.
 			this.setLayout(new GridLayout(1, 0));
 			this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-//			this.add(selStart);
-//			this.add(selEnd);
 			this.add(getDir);
 			this.add(clearDir);
 			this.add(trackPos);
@@ -301,10 +300,10 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 		@Override
 		protected List<GraphEdge> doInBackground() throws Exception {
 			double newHead = event.getHeading() + 90;
-			if(newHead < 0) {
-				newHead = 360 + newHead;
-			}
-			return dir.updateDirections(event.getLatitude(), event.getLongitude(), newHead);
+//			if(newHead > 180) {
+//				newHead = (newHead-180)*-1;
+//			}
+			return dir.updateDirections(event.getLatitude(), event.getLongitude(), event.getHeading());
 		}
 		@Override
 		protected void done() {
