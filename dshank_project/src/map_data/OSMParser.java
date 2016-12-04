@@ -46,9 +46,7 @@ public class OSMParser {
 		file = f;
 		nodes = new HashMap<String,Node>();
 		ways = new HashMap<String,Way>();
-		namedWays = new HashMap<String,Way>();
 		roadWays = new HashMap<String,Way>();
-		nonRoadWays = new HashMap<String,Way>();
 	}
 	
 	/**
@@ -82,7 +80,7 @@ public class OSMParser {
 	 * @return A Graph containing all the parsed data.
 	 */
 	public Map getMap() {
-		Map map = new Map(minLon, minLat, maxLon, maxLat, nodes, ways, namedWays, roadWays, nonRoadWays);
+		Map map = new Map(minLon, minLat, maxLon, maxLat, nodes, ways, roadWays);
 		return map;
 	}
 	
@@ -110,10 +108,9 @@ public class OSMParser {
 		private String id = "";
 		/** Stores the name of an element as it's being parsed. */
 		private String name = "";
-		/** Stores the type of road of a way as it's being parsed. */
-		private String roadType = "";
 		/** Stores whether or not a way is one way. */
 		private boolean oneway = false;
+		private HashMap<String, String> wayTags = new HashMap<String,String>();
 
 		/**
 		 * Method called by SAX parser when start of document is encountered.
@@ -151,23 +148,17 @@ public class OSMParser {
 		 */
 		public void endElement(String namespaceURI, String localName, String qName) throws SAXParseException {
 			if(qName.equals("way")) {
-				Way way = new Way(id, name, roadType, tempNodes, oneway);
+				Way way = new Way(id, name,  wayTags, tempNodes, oneway);
 				ways.put(id, way);
 				// Put the ways into specific maps depending on their properties.
-				if(way.isNamed()) {
-					namedWays.put(name, way);
-				}
 				if(way.isRoad()) {
 					roadWays.put(id, way);
 				} 
-				else {
-					nonRoadWays.put(id, way);
-				}
 				// Reset the values for future elements.
 				id = "";
 				name = "";
-				roadType = "";
 				oneway = false;
+				wayTags = new HashMap<String,String>();
 			}
 		}
 		
@@ -256,12 +247,11 @@ public class OSMParser {
 		private void parseWayTag(Attributes atts) {
 			String key = atts.getValue("k");
 			String value = atts.getValue("v");
+			wayTags.put(key, value);
 			if(key.equals("name")) {
 				name = value;
 			} else if(key.equals("highway")) {
-				roadType = value;
 				if(value.equals("roundabout") || value.equals("motorway")) {
-					// These are apparently implicily one way.
 					oneway = true;
 				}
 			} else if(key.equals("oneway")) {

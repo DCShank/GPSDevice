@@ -14,7 +14,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
+import javax.swing.border.StrokeBorder;
 
 import graph_interfaces.GraphEdge;
 import graph_interfaces.GraphNode;
@@ -245,19 +248,29 @@ public class MapPanel extends JPanel {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
 		Color c = g.getColor();
-		g.setColor(Color.WHITE);
-		Iterator<Way> wayIt = map.getNonRoadIt();
-		g.setColor(Color.LIGHT_GRAY);
-		while(wayIt.hasNext()) {
-			Way w = wayIt.next();
-			drawWay(w, g);
-		}
-		g.setColor(c);
+//		g.setColor(Color.WHITE);
+//		Iterator<Way> wayIt = map.getNonRoadIt();
+//		g.setColor(Color.LIGHT_GRAY);
+//		while(wayIt.hasNext()) {
+//			Way w = wayIt.next();
+//			drawWay(w, g);
+//		}
+//		g.setColor(c);
+		Iterator<Way> wayIt;
 		wayIt = map.getPrioritizedWayIt();
 		while(wayIt.hasNext()) {
 			Way w = wayIt.next();
-			int priority = map.roadToInt(w.getType());
+			int priority = map.wayToPri(w);
 			switch (priority) {
+			case -3: g2.setStroke(low);
+			g.setColor(Color.PINK);
+			break;
+			case -2: g2.setStroke(low);
+			g.setColor(Color.BLUE);
+			break;
+			case -1: g2.setStroke(med);
+			g.setColor(Color.GREEN);
+			break;
 			case 0: g2.setStroke(least);
 			g.setColor(Color.getHSBColor(64,0,50));
 			break;
@@ -274,6 +287,7 @@ public class MapPanel extends JPanel {
 			g.setColor(Color.RED);
 			break;
 			default: g2.setStroke(new BasicStroke(1));
+			g2.setColor(Color.LIGHT_GRAY);
 			break;
 			}
 			drawWay(w, g);
@@ -290,7 +304,7 @@ public class MapPanel extends JPanel {
 		if(selectedNode != null)
 			drawNode(selectedNode, Color.MAGENTA, 4, g);
 		if(directions != null) {
-			g2.setStroke(high);
+			g2.setStroke(most);
 			drawEdges(directions, Color.MAGENTA, g);
 			g2.setStroke(new BasicStroke(1));
 		}

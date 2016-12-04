@@ -1,6 +1,7 @@
 package map_data;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -20,12 +21,11 @@ public class Way {
 	private ArrayList<Node> nodes;
 	/** The empty string if the Way has no name */
 	private String name;
-	/** The empty string if the Way has no road type */
-	private String roadType;
 	/** Boolean that declares if the road is one way. */
 	private boolean oneway;
-	
 	private boolean isRoad;
+	
+	private HashMap<String, String> tags;
 	
 	/**
 	 * Initializes the Way with the parameters given.
@@ -33,13 +33,14 @@ public class Way {
 	 * @param nodeList The list of nodes for the Way
 	 * @param wayName The Ways name if it has one
 	 */
-	public Way(String idString, String wayName, String wayType, List<Node> nodeList, boolean oneway) {
+	public Way(String idString, String wayName, HashMap<String, String> tagMap, List<Node> nodeList, boolean oneway) {
 		name = wayName;
 		id = idString;
 		nodes = new ArrayList<Node>(nodeList);
-		roadType = wayType;
 		this.oneway = oneway;
-		setRoad();	// I'm not sure how much I actually get out of this. It seems like it saves me a few 
+		tags = tagMap;
+		String roadType = getRoadType();
+		isRoad = !(roadType.isEmpty() || roadType.equals("footway") || roadType.equals("path"));
 	}
 	
 	/**
@@ -107,17 +108,6 @@ public class Way {
 	}
 	
 	/**
-	 * Sets the road field for this way.
-	 */
-	private void setRoad() {
-//		return roadType.equals("residential") || roadType.equals("primary")
-//				|| roadType.equals("turning_circle") || roadType.equals("tertiary")
-//				|| roadType.equals("trunk") || roadType.equals("service");
-		isRoad = !(roadType.isEmpty() || roadType.equals("footway") || roadType.equals("path"));
-		
-	}
-	
-	/**
 	 * Returns the node nearest to the specified coordinates on this way.
 	 * @param lon The longitude of the point to search for a node near to
 	 * @param lat The latitude of the point to search for a node near to
@@ -138,8 +128,18 @@ public class Way {
 		return rtrnNode;
 	}
 	
-	public String getType() {
-		return roadType;
+	/**
+	 * Convenience method for getting the highway tag.
+	 * @return The highway type of this way.
+	 */
+	public String getRoadType() {
+		String rtrn = tags.get("highway");
+		if(rtrn == null) {rtrn = ""; };
+		return rtrn;
+	}
+	
+	public String getTagVal(String tag) {
+		return tags.get(tag);
 	}
 	
 	@Override

@@ -25,21 +25,13 @@ public class Map implements Graph {
 	private HashMap<String,Node> nodes;
 	/** maps id's to ways */
 	private HashMap<String,Way> ways;
-	/** maps names to ways */
-	private HashMap<String,Way> namedWays;
-	/** maps id's to relations */
+	/** Maps id's to road ways. */
 	private HashMap<String,Way> roadWays;
-	
-	private HashMap<String,Way> nonRoadWays;
-	
+	/** An ordered list of ways, from least to most important. */
 	private ArrayList<Way> prioritizedWays;
 	
 	private Set<RoadSegment> segments = new HashSet<RoadSegment>();
-	
 	private Set<Node> roadNodes = new HashSet<Node>();
-	
-	private Set<Node> tempNodes = new HashSet<Node>();
-	
 	private double lonMin, latMin, lonMax, latMax;
 	/** The strategy used for finding distances over area. */
 	private final static DistanceStrategy strat = new HaversineDistance();
@@ -57,23 +49,21 @@ public class Map implements Graph {
 	 * @param nonRoadWays 
 	 */
 	public Map(double minLon, double minLat, double maxLon, double maxLat,
-				HashMap<String,Node> nodes, HashMap<String,Way> ways, HashMap<String,Way> namedWays,
-				HashMap<String,Way> roadWays, HashMap<String,Way> nonRoadWays) {
+				HashMap<String,Node> nodes, HashMap<String,Way> ways,
+				HashMap<String,Way> roadWays) {
 		lonMin = minLon;
 		latMin = minLat;
 		lonMax = maxLon;
 		latMax = maxLat;
 		this.nodes = nodes;
 		this.ways = ways;
-		this.namedWays = namedWays;
 		this.roadWays = roadWays;
-		this.nonRoadWays = nonRoadWays;
-		prioritizedWays = new ArrayList<Way>(roadWays.values());
+		prioritizedWays = new ArrayList<Way>(ways.values());
 		prioritizedWays.sort(new Comparator<Way>() {
 
 			@Override
 			public int compare(Way o1, Way o2) {
-				return roadToInt(o1.getType()).compareTo(roadToInt(o2.getType()));
+				return wayToPri(o1).compareTo(wayToPri(o2));
 			}
 			
 		});
@@ -121,13 +111,13 @@ public class Map implements Graph {
 		return ways.values().iterator();
 	}
 	
-	/**
-	 * Gives an iterator over the drivable road ways.
-	 * @return An Iterator<Way> of the road ways in the map.
-	 */
-	public Iterator<Way> getRoadIt() {
-		return roadWays.values().iterator();
-	}
+//	/**
+//	 * Gives an iterator over the drivable road ways.
+//	 * @return An Iterator<Way> of the road ways in the map.
+//	 */
+//	public Iterator<Way> getRoadIt() {
+//		return roadWays.values().iterator();
+//	}
 	
 	/**
 	 * Determines if a node is within a "circular wedge" with some start position,
@@ -180,7 +170,7 @@ public class Map implements Graph {
 	 * Method to help initialize all the RoadEdges and assign them to their nodes.
 	 */
 	private void edgeInit() {
-		Iterator<Way> it = getRoadIt();
+		Iterator<Way> it = roadWays.values().iterator();
 		while(it.hasNext()) {
 			Way w = it.next();
 			Iterator<Node> nIt = w.getNodeIt();
@@ -211,7 +201,7 @@ public class Map implements Graph {
 	 * an intersection, or the end of a way, or a dead end.
 	 */
 	private void segmentInit() {
-		Iterator<Way> wayIt = getRoadIt();
+		Iterator<Way> wayIt = roadWays.values().iterator();
 		while(wayIt.hasNext()) {
 			Way w = wayIt.next();
 			Iterator<Node> nIt = w.getNodeIt();
@@ -353,7 +343,13 @@ public class Map implements Graph {
 	 * @param s The string representing the road type
 	 * @return An integer value for the priority
 	 */
-	public Integer roadToInt(String s) {
+	public Integer wayToPri(Way w) {
+		String s = w.getRoadType();
+		String b = w.getTagVal("boundary");
+		String n = w.getTagVal("natural");
+		if(b == null) { b = ""; }	// This is so I don't have to do null checks every line.
+		if(n == null) { n = ""; }
+		
 		if(s.equals("motorway") || s.equals("motorway_link"))
 			return 4;
 		if(s.equals("trunk") || s.equals("trunk_link"))
@@ -361,14 +357,20 @@ public class Map implements Graph {
 		if(s.equals("primary") || s.equals("primary_link"))
 			return 2;
 		if(s.equals("tertiary") || s.equals("secondary") || s.equals("tertiary_link")
-				|| s.equals("secondary_link"))
+				|| s.equals("secondary_link") || s.equals("roundabout"))
 			return 1;
 		if(s.equals("residential") || s.equals("unclassified") || s.equals("service"))
 			return 0;
-		return -1;
+		if(b.equals("administrative"))
+			return -3;
+		if(b.equals("reserve") || n.equals("wood"))
+			return -1;
+		if(n.equals("water") || w.getTagVal("waterway") != null)
+			return -2;
+		return -4;
 	}
 	
-	public Iterator<Way> getNonRoadIt() {
-		return nonRoadWays.values().iterator();
-	}
+//	public Iterator<Way> getNonRoadIt() {
+//		return nonRoadWays.values().iterator();
+//	}
 }
