@@ -331,7 +331,6 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 		}
 		@Override
 		protected Map doInBackground() throws Exception {
-			
 			prsr = new OSMParser(file);
 			map = prsr.parse();
 			if (gps != null) {
@@ -345,6 +344,7 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 				}
 			}
 			gps = new GPSDevice(file.getAbsolutePath());
+			prevEvent = null;
 			gps.addGPSListener(Application.this);
 			return map;
 		}
@@ -361,6 +361,7 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 			}
 			messageDisplay.setText("Map loaded. Left click to select start, right click to select end.");
 			dir = new Director(map);
+			updateAppState();
 			getContentPane().add(mapPanel, BorderLayout.CENTER);
 			pack();
 		}
