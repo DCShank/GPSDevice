@@ -113,18 +113,26 @@ public class Director {
 	
 	/**
 	 * Returns the human-readable, line separated, direction string.
+	 * 
+	 * If the road has no name it suggests you travel on the river styx.
+	 * 
 	 * @return The string containing the directions.
 	 */
 	public String getDirString() {
 		String rtrnString = "";
 		String currName = directionSegs.get(0).getName();
+		String finalName;
 		double currLen = 0;
 		for(RoadSegment seg : directionSegs) {
+			finalName = currName;
+			if(currName.isEmpty()) {
+				finalName = "The River Styx";
+			}
 			if(seg.getName().equals(currName)) {
 				currLen += seg.getLength();
 			} else {
 				String lenStr = String.format("%.2f", currLen/1000);	// Format to 4 points
-				rtrnString += "Travel on " + currName + " for " + lenStr + "km.\n";
+				rtrnString += "Travel on " + finalName + " for " + lenStr + "km.\n";
 				currName = seg.getName();
 				currLen = seg.getLength();
 			}

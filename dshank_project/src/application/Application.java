@@ -373,7 +373,7 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 			getContentPane().add(mapPanel, BorderLayout.CENTER);
 			pack();
 		}
-	}
+	}	
 
 	/**
 	 * Updates the state of the application based on an event from the gps device.
