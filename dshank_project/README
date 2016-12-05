@@ -1,10 +1,38 @@
 Readme for project 4.
 
-TODO:	Make lines different sizes depending on the type of way.
-		Make Selected route more visible
-		Update all uml diagrams
-		Ensure that course correction is functioning correctly.
+Controls: Left click to select a start node, right click to select an end node.
+		  Buttons for other controls. Load a new map from the file menu.
+		  
+Project 4 design documentation can be found in the PRJ4_Design_Documentation folder.
 
-
-
-Bugs: 
+Features that I can remember implementing:
+	Pan
+	Zoom to mouse
+	Select start node
+	Select end node
+	Get driving directions
+	Drive there mode
+	Track driver position
+	Off course detection
+	Directed map, as opposed to all two way.
+	Loading alternative maps from the application
+	Colorful display :)
+	Concurrent graphics (Loading maps, finding directions, and off course detection occur in swing workers.)
+	User friendly: Buttons are only accessible when they have a function
+	Message display at the bottom of the application
+	
+	Notable things about shortest path calculation:
+		Shortest paths are calculated on "segments" using a priority queue.
+		
+		A segment is, essentially, a composite edge going from one intersection or dead end to another.
+		
+		The priority queue was implemented by simply readding something to the queue whenever it's distance
+		decreased. This is still much more efficient than list searching, and a research paper produced
+		here at Stony Brook indicates it was about as efficient for them.
+		
+		As far as I can tell path search is about comparable to GPSDevice.
+		
+	
+	Other notes:
+		Larger maps still take a long time to load, and hovered node doesn't work very quickly on them.
+	

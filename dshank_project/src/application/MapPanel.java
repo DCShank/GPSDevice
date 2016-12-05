@@ -190,7 +190,7 @@ public class MapPanel extends JPanel {
 	 * @param lat Amount to move by in the lat direction
 	 * @param lon Amount to move by in the lon direction
 	 */
-	public void pan(double lon, double lat) {
+	private void pan(double lon, double lat) {
 		setCenter(cenLon + lon, cenLat + lat);
 	}
 	
@@ -199,7 +199,7 @@ public class MapPanel extends JPanel {
 	 * @param lonPix The pixel position on screen of the longitude
 	 * @param latPix The pixel position on screen of the latitude
 	 */
-	public void zoomToPosition(int lonPix, int latPix, int direction) {
+	private void zoomToPosition(int lonPix, int latPix, int direction) {
 		double oldLat = screenToLat(latPix);
 		double oldLon = screenToLon(lonPix, latPix);
 		

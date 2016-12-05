@@ -14,6 +14,8 @@ import java.util.Set;
 import graph_interfaces.GraphEdge;
 import graph_interfaces.GraphNode;
 import graph_interfaces.GraphSegment;
+import map_data.DistanceStrategy;
+import map_data.HaversineDistance;
 import map_data.Map;
 import map_data.Node;
 import map_data.RoadSegment;
@@ -33,14 +35,17 @@ public class Director {
 	/**
 	 * Default angle to search for the next node in the route in.
 	 */
-	public static final double DEFAULT_ANGLE = 120;
+	private static final double DEFAULT_ANGLE = 120;
 	/**
 	 * Default radius to search for the next node in the route in.
 	 */
-	public static final double DEFAULT_RADIUS = 40;
+	private static final double DEFAULT_RADIUS = 20;
 	private final Map map;
 	/** A list of edges to follow to reach a destination */
 	private List<GraphEdge> directions;
+	
+	private final DistanceStrategy strat = new HaversineDistance();
+	private static final double DEFAULT_DIST = .5;
 	
 	private List<RoadSegment> directionSegs;
 	/** A list of the nodes traversed by this map. */
@@ -239,13 +244,11 @@ public class Director {
 	private void splitStartSegment() {
 		Iterator<GraphSegment> sIt = map.getSegmentIterator();
 		Set<GraphSegment> tempSegs = new HashSet<GraphSegment>();
-//		System.out.println("Split Start");
 		while(sIt.hasNext()) {
 			GraphSegment s = sIt.next();
 			if(s.hasNode(startNode)) {
 				GraphSegment tempSeg = s.getPostSubsegment(startNode);
 				tempSegs.add(tempSeg);
-//				System.out.println(tempSeg.toString());
 			}
 		}
 		tempSegments.addAll(tempSegs);
@@ -320,10 +323,17 @@ public class Director {
 		Iterator<GraphEdge> eIt = directions.iterator();
 		while(eIt.hasNext()) {
 			GraphEdge e = eIt.next();
-			GraphNode n = e.getEndNode();
+			Node n = (Node)e.getEndNode();
+			Node s = (Node)e.getStartNode();
 			double len = e.getLength();
-			if( map.inCircularWedge(lon, lat, DEFAULT_ANGLE, heading, len * 1.2, (Node) n)
-					|| (map.inCircle(lon, lat, DEFAULT_RADIUS,(Node) n))) {
+			double distStart = strat.getDistance(lon, lat, s.getLon(), s.getLat());
+			double distEnd = strat.getDistance(lon, lat, n.getLon(), n.getLat());
+			// Heading information was too unreliable, and after the fix I couldn't work
+			// out what trig to apply to get it into working shape. On edge detection seems
+			// to work much better.
+//			if( map.inCircularWedge(lon, lat, DEFAULT_ANGLE, heading, len * 1.2, (Node) n)
+//					|| (map.inCircle(lon, lat, DEFAULT_RADIUS,(Node) n))) {
+			if(distStart + distEnd - len < DEFAULT_DIST || map.inCircle(lon, lat, DEFAULT_RADIUS, n)) {
 				currNode = n;
 				return true;
 			}
@@ -331,19 +341,7 @@ public class Director {
 		currNode = null;
 		return false;
 	}
-	
-	/**
-	 * Finds and returns the first node ahead of some position with heading.
-	 * Returns null if there is no such node.
-	 * @param lon The longitude position.
-	 * @param lat The latitude position.
-	 * @param heading The heading.
-	 * @return The next node if such a node exists, null otherwise.
-	 */
-	private GraphNode nearNodeOnCourse(double lon, double lat, double heading) {
-		return null;
-	}
-	
+
 	/**
 	 * Removes elements from the directions until you reach the selected node.
 	 * @precondition The node must be in directions.
