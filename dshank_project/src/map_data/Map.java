@@ -347,7 +347,8 @@ public class Map implements Graph {
 		String n = w.getTagVal("natural");
 		if(b == null) { b = ""; }	// This is so I don't have to do null checks every line.
 		if(n == null) { n = ""; }
-		
+		if(n.equals("coastline") || w.getTagVal("landuse") != null)
+			return 5;
 		if(s.equals("motorway") || s.equals("motorway_link"))
 			return 4;
 		if(s.equals("trunk") || s.equals("trunk_link"))

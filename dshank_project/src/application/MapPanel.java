@@ -41,6 +41,10 @@ public class MapPanel extends JPanel {
 	/** Strategy for finding the distance between two points. */
 	public static final DistanceStrategy strat = new HaversineDistance();
 	
+	// New colors!
+	public static final Color LEAST_COLOR = new Color(220,220,120);
+	public static final Color BOUND_COLOR = new Color(150,110,220);
+	public static final Color BACKGROUND_COLOR = new Color(32,37,58);
 	
 	public static final int DEFAULT_WIDTH = 1420;
 	public static final int DEFAULT_HEIGHT = 800;
@@ -97,7 +101,7 @@ public class MapPanel extends JPanel {
 		
 		this.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 		initMouse();
-		this.setBackground(Color.DARK_GRAY);
+		this.setBackground(BACKGROUND_COLOR);
 		this.addMouseListener(mouse);
 		this.addMouseWheelListener(mouse);
 		this.addMouseMotionListener(mouse);
@@ -174,6 +178,8 @@ public class MapPanel extends JPanel {
 			public void mouseClicked(MouseEvent e) {
 //				double lat = screenToLat(e.getY());
 //				double lon = screenToLon(e.getX(), e.getY());
+//				System.out.println(lon);
+//				System.out.println(lat);
 //				Node n = map.getNearNodeInRadius(lon, lat, currentRad);
 				Node n = hoveredNode; // One fewer calculation.
 				if(e.getButton() == e.BUTTON1)
@@ -261,7 +267,7 @@ public class MapPanel extends JPanel {
 			g.setColor(Color.GREEN);
 			break;
 			case 0: g2.setStroke(least);
-			g.setColor(Color.getHSBColor(64,0,50));
+			g.setColor(LEAST_COLOR);
 			break;
 			case 1: g2.setStroke(low);
 			g.setColor(Color.YELLOW);
@@ -275,13 +281,16 @@ public class MapPanel extends JPanel {
 			case 4: g2.setStroke(most);
 			g.setColor(Color.RED);
 			break;
+			case 5: g2.setStroke(least);
+			g.setColor(BOUND_COLOR);
+			break;
 			default: g2.setStroke(new BasicStroke(1));
 			g2.setColor(Color.LIGHT_GRAY);
 			break;
 			}
 			drawWay(w, g);
 		}
-		g.setColor(Color.cyan);
+		g.setColor(BOUND_COLOR);
 		g2.setStroke(low);
 		Iterator<Relation> relIt = map.getRelationsIt();
 		while(relIt.hasNext()) {
