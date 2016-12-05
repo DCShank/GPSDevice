@@ -44,7 +44,7 @@ public class MapPanel extends JPanel {
 	// New colors!
 	public static final Color LEAST_COLOR = new Color(220,220,120);
 	public static final Color BOUND_COLOR = new Color(150,110,220);
-	public static final Color BACKGROUND_COLOR = new Color(32,37,58);
+	public static final Color BACKGROUND_COLOR = new Color(7,40,74);
 	
 	public static final int DEFAULT_WIDTH = 1420;
 	public static final int DEFAULT_HEIGHT = 800;
