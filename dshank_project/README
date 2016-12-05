@@ -1,4 +1,4 @@
-Readme for project 4.
+README for project 4.
 
 Controls: Left click to select a start node, right click to select an end node.
 		  Buttons for other controls. Load a new map from the file menu.
@@ -35,4 +35,6 @@ Features that I can remember implementing:
 	
 	Other notes:
 		Larger maps still take a long time to load, and hovered node doesn't work very quickly on them.
+		
+Project 4 submission complete!
 	
