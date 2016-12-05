@@ -30,6 +30,7 @@ public class OSMParser {
 	/** Collections of the various elements extracted from the file. */
 	private HashMap<String,Node> nodes;
 	private HashMap<String,Way> ways;
+	private HashMap<String,Relation> rels;
 	private HashMap<String,Way> roadWays;
 	
 	/** Bounds for the map being parsed. */
@@ -44,6 +45,7 @@ public class OSMParser {
 		nodes = new HashMap<String,Node>();
 		ways = new HashMap<String,Way>();
 		roadWays = new HashMap<String,Way>();
+		rels = new HashMap<String,Relation>();
 	}
 	
 	/**
@@ -92,7 +94,9 @@ public class OSMParser {
 		/** Stores whether or not a way is one way. */
 		private boolean oneway = false;
 		/** Stores all the tags for the way currently being parsed */
-		private HashMap<String, String> wayTags = new HashMap<String,String>();
+		private HashMap<String, String> wayTags = new HashMap<String, String>();
+//		private HashMap<String, String> relTags = new HashMap<String, String>();
+		private ArrayList<Way> relWays = new ArrayList<Way>();
 
 		/**
 		 * Method called by SAX parser when start of document is encountered.
@@ -116,7 +120,12 @@ public class OSMParser {
 				storeWayID(atts);
 				tempNodes = new ArrayList<Node>();
 			}
+			else if(qName.equals("relation")) {
+				storeWayID(atts); // Does what we want even though it says way.
+			}
 			else if(qName.equals("nd")) {storeWayNode(atts); }
+			else if(qName.equals("member type")) {storeRelWay(atts); }
+			// Note that parseWayTag parses tags for relations just fine.
 			else if(qName.equals("tag") && !id.isEmpty()) { parseWayTag(atts); }
 			else if(qName.equals("bounds") || qName.equals("bound")) { storeBounds(atts); }
 		}
@@ -141,6 +150,17 @@ public class OSMParser {
 				name = "";
 				oneway = false;
 				wayTags = new HashMap<String,String>();
+				relWays = new ArrayList<Way>();
+			}
+			if(qName.equals("relation")) {
+				Relation rel = new Relation(id, relWays, wayTags);
+				rels.put(id, rel);
+				id = "";
+				name = "";
+				oneway = false;
+				wayTags = new HashMap<String,String>();
+				relWays = new ArrayList<Way>();
+				
 			}
 		}
 		
@@ -220,6 +240,21 @@ public class OSMParser {
 			if(node != null)
 				tempNodes.add(nodes.get(ndID));
 		}
+
+		/**
+		 * Adds the way to a temporary list of ways for the current relation.
+		 * @param atts
+		 */
+		private void storeRelWay(Attributes atts) {
+			String wayID = "";
+			for (int i = 0; i < atts.getLength(); i++) {
+				if (atts.getQName(i).equals("ref"))
+					wayID = atts.getValue(i);
+			}
+			Way way = ways.get(wayID);
+			if(way != null)
+				relWays.add(way);
+		}
 		
 		/**
 		 * Parses a tag and stores the data in the wayTags map.
@@ -240,6 +275,11 @@ public class OSMParser {
 				oneway = value.equals("yes");
 			}
 		}
+//		private void parseRelationTag(Attributes atts) {
+//			String key = atts.getValue("k");
+//			String value = atts.getValue("v");
+//			relTags.put(key, value);
+//		}
 		
 	}
 }
