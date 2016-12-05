@@ -1,0 +1,50 @@
+Panning to a different section of the map.
+	1. User clicks and drags the map display.
+	2. The display moves, mainting the latitude and longitude of the users cursor
+		 wherever they move the cursor.
+	3. User releases the click.
+	
+Zooming into a smaller section of the map.
+	1. The user moves the cursor to where they want to zoom in and scrolls the mousewheel up.
+	2. The display zooms in towards the cursor, maintaining the latitutude and longitude of
+		the cursor relative to it's position on the display.
+	2a. If the user is in track position mode it zooms into the GPS position.
+
+Zooming out to a larger section of the map.
+	1. The user moves the cursor to where they want to zoom away from on the map and scrolls the mousewheel back.
+	2. The display zooms out, away from the cursor, but maintaining the latitude and longitude
+		at the position of the cursor relative to its position on the display.
+	2a. If the user is in track position mode it zooms away from the GPS position.
+		
+Selecting a starting location
+	1. The user moves the mouse until they have highlighted a node they would like to be the start node.
+	2. The user then left clicks on the map.
+	3. The map display hightlights their selected location.
+	
+	Variation 1: There are no locations to start from near where the user clicked.
+	1. The map display doesn't update anything.
+	2. The user may click again until they click near a location.
+
+Selecting an ending location.
+	1. The same as selecting a starting location, but the user should right click instead of left click.
+	
+Getting directions from start to finish
+	1. The user selects a starting location as previously indicated.
+	2. The user selects an ending location as previously indicated.
+	3. The user presses the directions button.
+	3. The map display highlights a route from the start location to the end location.
+	
+Activationg GPS directions mode
+	1. The user selects an ending location as previously described.
+	2. The user activates their GPS.
+	4. The user presses the Drive There button.
+	5. The map display highlights a route from the current GPS coordinates to the destination.
+	6. A panel to the right will display the directions in textual form, with distances for
+		each segment.
+	
+User goes off course while in GPS directions mode.
+	1. The program displays that the user has gone off course at the bottom of the screen.
+	2. The program updates the users directions.
+	
+Deactivating GPS directions mode
+	1. While in drive there mode, the user clicks the drive there button again.

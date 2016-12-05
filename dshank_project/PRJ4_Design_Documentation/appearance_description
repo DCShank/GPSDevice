@@ -1,0 +1,10 @@
+The Application has a center panel which displays the map data. Moving the mouse across
+this panel causes the nearest node to the mouse to be highlighted. Selecting nodes
+highlights them. Getting directions causes a path to be highlighted. Different road
+types are displayed with different colors.
+
+The bottom panel is a label that displays messages to the user.
+
+The top panel has buttons that allow the user to control the program.
+
+The right panel displays directions.
