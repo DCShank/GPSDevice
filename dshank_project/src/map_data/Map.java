@@ -29,6 +29,7 @@ public class Map implements Graph {
 	private HashMap<String,Way> roadWays;
 	/** An ordered list of ways, from least to most important. */
 	private ArrayList<Way> prioritizedWays;
+	private HashMap<String, Relation> relations;
 	
 	private Set<RoadSegment> segments = new HashSet<RoadSegment>();
 	private Set<Node> roadNodes = new HashSet<Node>();
@@ -50,7 +51,7 @@ public class Map implements Graph {
 	 */
 	public Map(double minLon, double minLat, double maxLon, double maxLat,
 				HashMap<String,Node> nodes, HashMap<String,Way> ways,
-				HashMap<String,Way> roadWays) {
+				HashMap<String,Way> roadWays, HashMap<String, Relation> rels) {
 		lonMin = minLon;
 		latMin = minLat;
 		lonMax = maxLon;
@@ -58,6 +59,7 @@ public class Map implements Graph {
 		this.nodes = nodes;
 		this.ways = ways;
 		this.roadWays = roadWays;
+		relations = rels;
 		prioritizedWays = new ArrayList<Way>(ways.values());
 		prioritizedWays.sort(new Comparator<Way>() {
 
@@ -364,5 +366,9 @@ public class Map implements Graph {
 		if(n.equals("water") || w.getTagVal("waterway") != null)
 			return -2;
 		return -4;
+	}
+	
+	public Iterator<Relation> getRelationsIt() {
+		return relations.values().iterator();
 	}
 }

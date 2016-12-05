@@ -79,7 +79,7 @@ public class OSMParser {
 	 * @return A Graph containing all the parsed data.
 	 */
 	private Map getMap() {
-		Map map = new Map(minLon, minLat, maxLon, maxLat, nodes, ways, roadWays);
+		Map map = new Map(minLon, minLat, maxLon, maxLat, nodes, ways, roadWays, rels);
 		return map;
 	}
 	
@@ -124,7 +124,7 @@ public class OSMParser {
 				storeWayID(atts); // Does what we want even though it says way.
 			}
 			else if(qName.equals("nd")) {storeWayNode(atts); }
-			else if(qName.equals("member type")) {storeRelWay(atts); }
+			else if(qName.equals("member")) {storeRelWay(atts); }
 			// Note that parseWayTag parses tags for relations just fine.
 			else if(qName.equals("tag") && !id.isEmpty()) { parseWayTag(atts); }
 			else if(qName.equals("bounds") || qName.equals("bound")) { storeBounds(atts); }
@@ -247,6 +247,7 @@ public class OSMParser {
 		 */
 		private void storeRelWay(Attributes atts) {
 			String wayID = "";
+			if(atts.getValue("type").equals("way")) {
 			for (int i = 0; i < atts.getLength(); i++) {
 				if (atts.getQName(i).equals("ref"))
 					wayID = atts.getValue(i);
@@ -254,6 +255,7 @@ public class OSMParser {
 			Way way = ways.get(wayID);
 			if(way != null)
 				relWays.add(way);
+			}
 		}
 		
 		/**

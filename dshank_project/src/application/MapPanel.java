@@ -27,6 +27,7 @@ import map_data.DistanceStrategy;
 import map_data.HaversineDistance;
 import map_data.Map;
 import map_data.Node;
+import map_data.Relation;
 import map_data.Way;
 
 /**
@@ -279,6 +280,18 @@ public class MapPanel extends JPanel {
 			break;
 			}
 			drawWay(w, g);
+		}
+		g.setColor(Color.cyan);
+		g2.setStroke(low);
+		Iterator<Relation> relIt = map.getRelationsIt();
+		while(relIt.hasNext()) {
+			Relation r = relIt.next();
+			if(r.getTagVal("boundary") != null) {
+				List<Way> relWays = r.getWays();
+				for(Way way : relWays) {
+					drawWay(way, g);
+				}
+			}
 		}
 		
 		if(directions != null) {
