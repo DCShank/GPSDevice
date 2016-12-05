@@ -392,10 +392,17 @@ public class Application extends JFrame implements GPSListener, MapPanelListener
 			messageDisplay.setText("Start node selected.");
 		if(dir.getEndNode() != e.getEndNode())
 			messageDisplay.setText("End node selected.");
-		dir.setEndNode(e.getEndNode());
+			dir.setEndNode(e.getEndNode());
 		if(driveThere.isSelected()) {
-			mapPanel.setStart(null);
-			messageDisplay.setText("Cannot select start nodes while in drive there mode.");
+			if(e.getStartNode() != null) {
+				mapPanel.setStart(null);
+				messageDisplay.setText("Cannot select start nodes while in drive there mode.");
+			}
+			if(e.getEndNode() != null) {
+				dir.setStartNode(map.getNearNode(prevEvent.getLongitude(), prevEvent.getLatitude()));
+				DirectionFinder task = new DirectionFinder();
+				task.execute();
+			}
 		} else {
 			dir.setStartNode(e.getStartNode());
 		}
