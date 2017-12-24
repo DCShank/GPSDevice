@@ -295,18 +295,19 @@ public class Director {
 	 * @return List of directions.
 	 */
 	private List<GraphEdge> extractDirections(HashMap<GraphNode, GraphSegment> predSegs) {
-		LinkedList<GraphSegment> dirSegList = new LinkedList<GraphSegment>();
+		LinkedList<RoadSegment> dirSegList = new LinkedList<>();
 		GraphNode currNode = endNode;
 		while(currNode != startNode) {
 			GraphSegment predSeg = predSegs.get(currNode);
-			dirSegList.addFirst(predSeg);
+			dirSegList.addFirst((RoadSegment)predSeg);
 			currNode = predSeg.getStartNode();
 		}
 		LinkedList<GraphEdge> dirList = new LinkedList<GraphEdge>();
 		for(GraphSegment s : dirSegList) {
 			dirList.addAll(s.getEdgeList());
 		}
-		directionSegs = new LinkedList<RoadSegment>((Collection<? extends RoadSegment>) dirSegList);
+
+		directionSegs = new LinkedList<RoadSegment>((Collection<RoadSegment>) dirSegList);
 		directions = dirList;
 		return dirList;
 	}
