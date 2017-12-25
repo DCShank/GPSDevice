@@ -1,5 +1,6 @@
 *.swp
 *.class
+*.iml
 .idea/
 /district_of_columbia.osm
 /dshank_prj3.zip
@@ -10,4 +11,3 @@
 /london.zip
 /virgin_islands.osm
 /virgin_islands.zip
-dshank_project.iml
